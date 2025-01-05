@@ -3,10 +3,6 @@ package me.ykrank.s1next.data.pref;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
-import androidx.annotation.ColorInt;
-import androidx.annotation.IntDef;
-import androidx.annotation.StyleRes;
-import androidx.core.graphics.ColorUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
@@ -17,6 +13,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.Arrays;
 import java.util.List;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.IntDef;
+import androidx.annotation.StyleRes;
+import androidx.core.graphics.ColorUtils;
 import me.ykrank.s1next.R;
 
 /**
@@ -52,8 +52,7 @@ public final class ThemeManager {
         public Theme get() {
             Theme theme;
 
-            int currentNightMode = mContext.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-            if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
+            if (isNightMode()) {
                 theme = Theme.VALUES.get(mGeneralPreferencesProvider.getDarkThemeIndex());
             } else {
                 theme = Theme.VALUES.get(mGeneralPreferencesProvider.getThemeIndex());
@@ -68,6 +67,10 @@ public final class ThemeManager {
     public ThemeManager(Context context, GeneralPreferences generalPreferencesProvider) {
         this.mContext = context;
         this.mGeneralPreferencesProvider = generalPreferencesProvider;
+    }
+
+    public boolean isNightMode() {
+        return (mContext.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
     }
 
     /**
