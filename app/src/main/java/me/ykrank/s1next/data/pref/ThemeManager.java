@@ -27,9 +27,12 @@ public final class ThemeManager {
     public static final int TRANSLUCENT_THEME_DARK = R.style.Theme_Translucent_Dark;
 
     /**
-     * Default theme in AndroidManifest.xml is light theme.
+     * Default theme in AndroidManifest.xml is {@link R.style#Theme_DayNight}.
+     * In Light mode, it points to {@link R.style#Theme_Light_AfternoonTea},
+     * In Dark mode, it points to {@link R.style#Theme_Dark}
      */
     private static final Theme DEFAULT_THEME = Theme.AFTERNOON_TEA;
+    private static final Theme DEFAULT_DARK_THEME = Theme.DARK_THEME;
 
     /**
      * https://www.google.com/design/spec/style/color.html#color-ui-color-application
@@ -114,7 +117,7 @@ public final class ThemeManager {
     }
 
     public boolean isDefaultTheme() {
-        return getTheme() == DEFAULT_THEME;
+        return getTheme() == (isNightMode() ? DEFAULT_DARK_THEME : DEFAULT_THEME);
     }
 
     public boolean isDarkTheme() {
