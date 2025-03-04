@@ -32,11 +32,11 @@ class EmoticonFactory(context: Context) {
     }
 
     private val cartonEmoticonList: List<Emoticon> by lazy {
-        createEmotionList(458, "carton2017", "c")
+        createEmotionList(490, "carton2017", "c")
     }
 
     private val deviceEmoticonList: List<Emoticon> by lazy {
-        createEmotionList(44, "device2017", "d")
+        createEmotionList(45, "device2017", "d")
     }
 
     private val faceEmoticonList: List<Emoticon> by lazy {
