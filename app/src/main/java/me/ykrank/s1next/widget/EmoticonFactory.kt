@@ -17,7 +17,7 @@ class EmoticonFactory(context: Context) {
     private val mEmoticons: SparseArray<List<Emoticon>> = SparseArray()
 
     private val animalEmoticonList: List<Emoticon> by lazy {
-        createEmotionList(30, "animal2017", "a")
+        createEmotionList(31, "animal2017", "a")
     }
 
     private val bundamEmoticonList: List<Emoticon> by lazy {
@@ -25,7 +25,7 @@ class EmoticonFactory(context: Context) {
     }
 
     private val cartonEmoticonList: List<Emoticon> by lazy {
-        createEmotionList(430, "carton2017", "c")
+        createEmotionList(458, "carton2017", "c")
     }
 
     private val deviceEmoticonList: List<Emoticon> by lazy {
@@ -33,7 +33,7 @@ class EmoticonFactory(context: Context) {
     }
 
     private val faceEmoticonList: List<Emoticon> by lazy {
-        createEmotionList(275, "face2017", "f")
+        createEmotionList(277, "face2017", "f")
     }
 
     private val gooseEmoticonList: List<Emoticon> by lazy {
@@ -63,7 +63,7 @@ class EmoticonFactory(context: Context) {
     }
 
     companion object {
-        val FORMAT_LEAD_ZERO_3 = DecimalFormat("000")
+        private val FORMAT_LEAD_ZERO_3 = DecimalFormat("000")
         const val ASSET_PATH_EMOTICON = "file:///android_asset/image/emoticon/"
 
         private fun emoticon(emoticonFileName: String, emoticonEntity: String): Emoticon {
