@@ -2,18 +2,25 @@ package me.ykrank.s1next.widget
 
 import android.content.Context
 import android.util.SparseArray
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.model.Emoticon
 import java.text.DecimalFormat
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * A factory provides emotions.
  */
 class EmoticonFactory(context: Context) {
+    private val init = AtomicBoolean()
 
     val emotionTypeTitles: List<String> =
         context.resources.getStringArray(R.array.emoticon_type).toList()
+
     private val mEmoticons: SparseArray<List<Emoticon>> = SparseArray()
 
     private val animalEmoticonList: List<Emoticon> by lazy {
@@ -58,8 +65,16 @@ class EmoticonFactory(context: Context) {
         return emoticons
     }
 
-    private fun check(){
-
+    @OptIn(DelicateCoroutinesApi::class)
+    fun preload() {
+        if (!init.compareAndSet(false, true)) {
+            return
+        }
+        GlobalScope.launch(Dispatchers.IO) {
+            for (i in emotionTypeTitles.indices) {
+                getEmoticonsByIndex(i)
+            }
+        }
     }
 
     companion object {
@@ -78,6 +93,7 @@ class EmoticonFactory(context: Context) {
             val result = mutableListOf<Emoticon>()
             for (i in 1..size) {
                 val code = FORMAT_LEAD_ZERO_3.format(i)
+
                 result.add(emoticon("${fileDir}/${code}.", "[${entityDir}:${code}]"))
             }
             return result

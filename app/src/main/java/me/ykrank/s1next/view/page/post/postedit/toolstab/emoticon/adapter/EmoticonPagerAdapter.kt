@@ -1,77 +1,64 @@
-package me.ykrank.s1next.view.page.post.postedit.toolstab.emoticon.adapter;
+package me.ykrank.s1next.view.page.post.postedit.toolstab.emoticon.adapter
 
-import android.app.Activity;
-import android.content.res.Resources;
+import android.app.Activity
+import android.view.View
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager.widget.PagerAdapter
+import com.github.ykrank.androidtools.R
+import com.github.ykrank.androidtools.widget.GridAutofitLayoutManager
+import me.ykrank.s1next.view.page.post.postedit.toolstab.emoticon.adapter.EmoticonGridRecyclerAdapter.BindingViewHolder
+import me.ykrank.s1next.widget.EmoticonFactory
 
-import androidx.viewpager.widget.PagerAdapter;
-import androidx.recyclerview.widget.RecyclerView;
+class EmoticonPagerAdapter(
+    private val mActivity: Activity,
+    private val mEmoticonFactory: EmoticonFactory
+) : PagerAdapter() {
+    private val mEmoticonWidth: Float
+    private val mEmoticonGridPadding: Int
 
-import android.view.View;
-import android.view.ViewGroup;
+    private val mEmoticonTypeTitles: List<String>
 
-import com.github.ykrank.androidtools.widget.GridAutofitLayoutManager;
-
-import java.util.List;
-
-import me.ykrank.s1next.widget.EmoticonFactory;
-
-public final class EmoticonPagerAdapter extends PagerAdapter {
-
-    private final Activity mActivity;
-
-    private final float mEmoticonWidth;
-    private final int mEmoticonGridPadding;
-
-    private final EmoticonFactory mEmoticonFactory;
-    private final List<String> mEmoticonTypeTitles;
-
-    public EmoticonPagerAdapter(Activity activity) {
-        this.mActivity = activity;
-
-        Resources resources = activity.getResources();
-        mEmoticonWidth = resources.getDimension(com.github.ykrank.androidtools.R.dimen.minimum_touch_target_size);
-        mEmoticonGridPadding = resources.getDimensionPixelSize(com.github.ykrank.androidtools.R.dimen.emoticon_padding);
-
-        mEmoticonFactory = new EmoticonFactory(activity);
-        mEmoticonTypeTitles = mEmoticonFactory.getEmotionTypeTitles();
+    init {
+        val resources = mActivity.resources
+        mEmoticonWidth = resources.getDimension(R.dimen.minimum_touch_target_size)
+        mEmoticonGridPadding = resources.getDimensionPixelSize(R.dimen.emoticon_padding)
+        mEmoticonTypeTitles = mEmoticonFactory.emotionTypeTitles
     }
 
-    @Override
-    public int getCount() {
-        return mEmoticonTypeTitles.size();
+    override fun getCount(): Int {
+        return mEmoticonTypeTitles.size
     }
 
-    @Override
-    public CharSequence getPageTitle(int position) {
-        return mEmoticonTypeTitles.get(position);
+    override fun getPageTitle(position: Int): CharSequence {
+        return mEmoticonTypeTitles[position]
     }
 
-    @Override
-    public Object instantiateItem(ViewGroup container, int position) {
-        RecyclerView recyclerView = new RecyclerView(mActivity);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setClipToPadding(false);
-        recyclerView.setPadding(0, mEmoticonGridPadding, 0, mEmoticonGridPadding);
-        GridAutofitLayoutManager gridLayoutManager = new GridAutofitLayoutManager(mActivity, (int) mEmoticonWidth);
-        gridLayoutManager.setSmoothScrollbarEnabled(true);
-        recyclerView.setLayoutManager(gridLayoutManager);
-        RecyclerView.Adapter<EmoticonGridRecyclerAdapter.BindingViewHolder> recyclerAdapter =
-                new EmoticonGridRecyclerAdapter(mActivity,
-                        mEmoticonFactory.getEmoticonsByIndex(position));
-        recyclerView.setAdapter(recyclerAdapter);
+    override fun instantiateItem(container: ViewGroup, position: Int): Any {
+        val recyclerView = RecyclerView(mActivity)
+        recyclerView.setHasFixedSize(true)
+        recyclerView.clipToPadding = false
+        recyclerView.setPadding(0, mEmoticonGridPadding, 0, mEmoticonGridPadding)
+        val gridLayoutManager = GridAutofitLayoutManager(mActivity, mEmoticonWidth.toInt())
+        gridLayoutManager.isSmoothScrollbarEnabled = true
+        recyclerView.layoutManager = gridLayoutManager
+        val recyclerAdapter: RecyclerView.Adapter<BindingViewHolder> =
+            EmoticonGridRecyclerAdapter(
+                mActivity,
+                mEmoticonFactory.getEmoticonsByIndex(position)
+            )
+        recyclerView.adapter = recyclerAdapter
 
-        container.addView(recyclerView);
+        container.addView(recyclerView)
 
-        return recyclerView;
+        return recyclerView
     }
 
-    @Override
-    public void destroyItem(ViewGroup container, int position, Object object) {
-        container.removeView((View) object);
+    override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
+        container.removeView(`object` as View)
     }
 
-    @Override
-    public boolean isViewFromObject(View view, Object object) {
-        return view == object;
+    override fun isViewFromObject(view: View, `object`: Any): Boolean {
+        return view === `object`
     }
 }
