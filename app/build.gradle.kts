@@ -17,7 +17,7 @@ val mKeyPassword: String? = properties.getProperty("keyPassword")
 val httpDnsId = properties.getProperty("httpDnsId") ?: "\"\""
 val httpDnsSecret = properties.getProperty("httpDnsSecret") ?: "\"\""
 
-val appVersionCode = 97
+val appVersionCode = 98
 val appVersionName = "3.4"
 val appVersionSuffix = ""
 
