@@ -40,6 +40,7 @@ interface ApiCacheProvider {
         authorId: String? = null,
         ignoreCache: Boolean = false,
         onRateUpdate: ((pid: Int, rate: List<Rate>) -> Unit)? = null,
+        onProfileUpdate: ((uid: String, profile: Profile) -> Unit)?= null
     ): Flow<Resource<PostsWrapper>>
 
     /**
@@ -49,12 +50,5 @@ interface ApiCacheProvider {
         threadId: String,
         postId: Int,
     ): Resource<List<Rate>>
-
-    /**
-     * 用户信息
-     */
-    suspend fun getProfile(
-        uid: String
-    ): Resource<Profile>
 
 }

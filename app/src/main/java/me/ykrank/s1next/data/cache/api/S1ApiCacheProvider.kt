@@ -6,12 +6,9 @@ import com.github.ykrank.androidtools.data.CacheParam
 import com.github.ykrank.androidtools.data.Resource
 import com.github.ykrank.androidtools.data.Source
 import com.github.ykrank.androidtools.util.L
-import com.github.ykrank.androidtools.util.L.e
 import com.github.ykrank.androidtools.widget.LoadTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -20,13 +17,12 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withContext
 import me.ykrank.s1next.BuildConfig
 import me.ykrank.s1next.data.User
-import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.data.api.ApiCacheProvider
 import me.ykrank.s1next.data.api.ApiUtil
+import me.ykrank.s1next.data.api.ProfileProvider
 import me.ykrank.s1next.data.api.S1Service
 import me.ykrank.s1next.data.api.model.Post
 import me.ykrank.s1next.data.api.model.Profile
@@ -45,6 +41,7 @@ import me.ykrank.s1next.data.pref.DownloadPreferencesManager
 class S1ApiCacheProvider(
     private val downloadPerf: DownloadPreferencesManager,
     private val s1Service: S1Service,
+    private val profileProvider: ProfileProvider,
     private val cacheBiz: CacheBiz,
     private val cacheGroupBiz: CacheGroupBiz,
     private val user: User,
@@ -52,7 +49,6 @@ class S1ApiCacheProvider(
     private val blackListBiz: BlackListBiz,
 ) : ApiCacheProvider {
     private val ratesCache = LruCache<String, BaseCache<List<Rate>>>(256)
-    private val profileCache = LruCache<String, BaseCache<Profile>>(256)
 
     override suspend fun getForumGroupsWrapper(param: CacheParam?): Flow<Resource<ForumGroupsWrapper>> {
         val cacheType = ApiCacheConstants.CacheType.ForumGroups
@@ -126,6 +122,7 @@ class S1ApiCacheProvider(
         authorId: String?,
         ignoreCache: Boolean,
         onRateUpdate: ((pid: Int, rate: List<Rate>) -> Unit)?,
+        onProfileUpdate: ((String, Profile) -> Unit)?,
     ): Flow<Resource<PostsWrapper>> {
         val isLogged = user.isLogged
         val cacheType = ApiCacheConstants.CacheType.Posts
@@ -216,6 +213,8 @@ class S1ApiCacheProvider(
 
         // 评分缓存过期的回帖，先展示缓存，然后再刷新
         val outdatedRatePostIds = mutableListOf<Int>()
+        // 需要更新的用户信息
+        val needUpdateUidList = mutableListOf<String>()
         var emitCount = 0
         return apiCacheFlow.getFlow()
             .combineTransform(ratePostFlow) { it, ratePostWrapper ->
@@ -272,9 +271,18 @@ class S1ApiCacheProvider(
                         if (!postList.isNullOrEmpty()) {
                             doTrade(postList)
 
-                            postList.filter { it.rates?.size == 0 }.forEach {
-                                loadRatesFromCache(it)
+                            postList.forEach {
+                                if (it.rates?.size != 0) {
+                                    loadRatesFromCache(it)
+                                }
+                                val authorId = it.authorId
+                                if (authorId != null) {
+                                    it.profile = profileProvider.getProfileCaches(authorId)
+                                    if (it.profile == null)
+                                        needUpdateUidList.add(authorId)
+                                }
                             }
+
                         }
                         if (!hasError && postWrapper != null && cacheValid) {
                             withContext(Dispatchers.Default) {
@@ -339,6 +347,11 @@ class S1ApiCacheProvider(
                             }
                         }
                     }
+
+                    // 获取用户信息
+                    if (needUpdateUidList.isNotEmpty()) {
+                        profileProvider.getProfiles(needUpdateUidList, onProfileUpdate)
+                    }
                 } else if (it.isSuccess && emitCount == 0) {
                     loadTime.addPoint("posts emit cache ${it.source.name} ${it.data?.data?.postList?.size}")
                     emitCount++
@@ -349,67 +362,6 @@ class S1ApiCacheProvider(
                         emit(it)
                     }
                 }
-            }.map { postsResource ->
-                val postsWrapper = postsResource.data
-                val postList = postsWrapper?.data?.postList
-
-                if (postsWrapper == null || postList.isNullOrEmpty()) {
-                    return@map postsResource
-                }
-
-                fun loadProfileFromCache(it: Post) {
-                    it.authorId?.apply {
-                        val cache = profileCache[this]
-                        if (cache != null) {
-                            if (System.currentTimeMillis() - cache.time < CACHE_GOOSE_MILLS) {
-                                it.profile = cache.data
-                            }
-                        }
-                    }
-                }
-
-                // 待更新
-                val authorIds = hashSetOf<String>()
-
-                postList.forEach {
-                    val authorId = it.authorId
-                    if (authorId != null) {
-                        loadProfileFromCache(it)
-                        if (it.profile == null) {
-                            authorIds.add(authorId)
-                        }
-                    }
-                }
-
-                if (authorIds.isNotEmpty()) {
-                    try {
-                        val profileMap = supervisorScope {
-                            authorIds.map { id ->
-                                async {
-                                    try {
-                                        id to getProfile(id)
-                                    } catch (e: Exception) {
-                                        e("getProfileWeb in provider failed for id:$id", e)
-                                        null
-                                    }
-                                }
-                            }.awaitAll()
-                                .filterNotNull()
-                                .associate { it }
-                        }
-
-                        if (profileMap.isNotEmpty()) {
-                            postList.forEach { post ->
-                                if (post.profile == null)
-                                    post.profile = profileMap[post.authorId]?.data
-                            }
-                        }
-                    } catch (e: Exception) {
-                        e("Error fetching profiles in S1ApiCacheProvider", e)
-                    }
-                }
-
-                return@map postsResource
             }
             .onCompletion {
                 loadTime.addPoint("completion")
@@ -468,23 +420,9 @@ class S1ApiCacheProvider(
         return Resource.fromResult(Source.CLOUD, rate)
     }
 
-    override suspend fun getProfile(uid: String): Resource<Profile> {
-        val profile = runCatching {
-            s1Service.getProfileWeb(
-                "${Api.BASE_URL}space-uid-${uid}.html", uid
-            ).let {
-                Profile.fromHtml(it)
-            }.apply {
-                profileCache.put(uid, BaseCache(System.currentTimeMillis(), this))
-            }
-        }
-        return Resource.fromResult(Source.CLOUD, profile)
-    }
-
     companion object {
         const val TAG = "S1ApiCache"
         const val CACHE_RATE_MILLS = 30_000L
-        const val CACHE_GOOSE_MILLS = 5 * 60 * 1_000L
         const val CACHE_RATE_SAVE_DEBOUNCE = 1_000L
     }
 }
