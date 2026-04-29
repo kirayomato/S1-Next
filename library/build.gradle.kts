@@ -9,7 +9,7 @@ android {
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        minSdk = 24
+        minSdk = libs.versions.minSdk.get().toInt()
         multiDexEnabled = true
 
         vectorDrawables {
@@ -21,9 +21,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
-    }
-    kotlinOptions {
-        jvmTarget = "21"
     }
     buildFeatures {
         dataBinding = true

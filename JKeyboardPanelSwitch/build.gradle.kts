@@ -8,12 +8,12 @@ android {
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        minSdk = 17
+        minSdk = libs.versions.minSdk.get().toInt()
         consumerProguardFile("proguard-rules.pro")
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 }
 

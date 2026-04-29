@@ -36,7 +36,7 @@ android {
 
     defaultConfig {
         applicationId = "me.ykrank.s1next"
-        minSdk = 33
+        minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = appVersionCode
         versionName = "${appVersionName}.${appVersionCode}${appVersionSuffix}"
@@ -59,9 +59,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
-    }
-    kotlinOptions {
-        jvmTarget = "21"
     }
     buildFeatures {
         dataBinding = true
@@ -161,7 +158,7 @@ dependencies {
 
     // Dagger (使用 kapt)
     implementation(libs.dagger)
-    kapt(libs.dagger.compiler)
+    ksp(libs.dagger.compiler)
 
     // AndroidX
     implementation(libs.androidx.transition)
