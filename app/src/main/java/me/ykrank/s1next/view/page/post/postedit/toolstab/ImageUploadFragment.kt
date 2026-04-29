@@ -48,6 +48,7 @@ class ImageUploadFragment : LibImageUploadFragment() {
             _okHttpClient = mOkHttpClient,
             user = mUser,
             fid = fid,
+            s1Service = mS1Service,
         ).also {
             uploadManager = it
         }

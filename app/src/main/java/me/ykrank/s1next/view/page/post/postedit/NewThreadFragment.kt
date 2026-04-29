@@ -54,7 +54,7 @@ class NewThreadFragment : BasePostEditFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        mForumId = arguments!!.getInt(ARG_FORUM_ID)
+        mForumId = requireArguments().getInt(ARG_FORUM_ID)
         mCacheKey = String.format(CACHE_KEY_PREFIX, mForumId)
         leavePageMsg("NewThreadFragment##mForumId:" + mForumId)
 
@@ -85,7 +85,7 @@ class NewThreadFragment : BasePostEditFragment() {
         }
 
         NewThreadRequestDialogFragment.newInstance(mForumId, typeId, title, message, mCacheKey)
-                .show(fragmentManager!!, NewThreadRequestDialogFragment.TAG)
+                .show(parentFragmentManager, NewThreadRequestDialogFragment.TAG)
 
         return true
     }
@@ -128,10 +128,7 @@ class NewThreadFragment : BasePostEditFragment() {
     }
 
     private fun isTitleValid(string: String): Boolean {
-        if (string.isNullOrBlank()) {
-            return false
-        }
-        return true
+        return string.isNotBlank()
     }
 
     private fun isMessageValid(string: String): Boolean {
@@ -140,7 +137,7 @@ class NewThreadFragment : BasePostEditFragment() {
 
     private fun init() {
         mS1Service.getNewThreadInfo(mForumId)
-                .map<List<ThreadType>>(ThreadType.Companion::fromXmlString)
+                .map(ThreadType.Companion::fromXmlString)
                 .doOnSuccess { _ ->
                     // 解析并存储上传配置
                     mS1Service.getNewThreadInfo(mForumId)
@@ -173,7 +170,7 @@ class NewThreadFragment : BasePostEditFragment() {
         } else {
             typeSpinner.visibility = View.VISIBLE
         }
-        val spinnerAdapter = SimpleSpinnerAdapter(context!!, types) { it?.typeName.toString() }
+        val spinnerAdapter = SimpleSpinnerAdapter(requireContext(), types) { it?.typeName.toString() }
         typeSpinner.adapter = spinnerAdapter
         if (cacheModel != null && types.size > cacheModel!!.selectPosition) {
             typeSpinner.setSelection(cacheModel!!.selectPosition)

@@ -6,7 +6,7 @@ import com.github.ykrank.androidtools.util.StringUtils
 import io.reactivex.Single
 import me.ykrank.s1next.App.Companion.get
 import me.ykrank.s1next.R
-import me.ykrank.s1next.data.User
+import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.data.api.model.ForumUploadConfig
 import me.ykrank.s1next.data.api.model.Quote
 import me.ykrank.s1next.data.api.model.wrapper.AccountResultWrapper
@@ -27,17 +27,6 @@ class ReplyRequestDialogFragment : BaseRequestDialogFragment<AccountResultWrappe
         val quotePostId = requireArguments().getString(ARG_QUOTE_POST_ID)
         val reply = requireArguments().getString(ARG_REPLY)
         
-        // 尝试解析并存储上传配置
-        if (!TextUtils.isEmpty(quotePostId)) {
-            mS1Service.getQuoteInfo(threadId, quotePostId)
-                .map { html -> ForumUploadConfig.fromHtml(html) }
-                .subscribe({ config ->
-                    if (config != null) {
-                        mUser.forumUploadConfig = config
-                    }
-                }, { e -> })
-        }
-        
         return if (TextUtils.isEmpty(quotePostId)) {
             flatMappedWithAuthenticityToken { s: String? -> mS1Service.reply(s, threadId, reply) }
         } else {
@@ -49,7 +38,7 @@ class ReplyRequestDialogFragment : BaseRequestDialogFragment<AccountResultWrappe
                         token, threadId, reply, quote.encodedUserId,
                         quote.quoteMessage, StringUtils.abbreviate(
                             reply,
-                            me.ykrank.s1next.data.api.Api.REPLY_NOTIFICATION_MAX_LENGTH
+                            Api.REPLY_NOTIFICATION_MAX_LENGTH
                         )
                     )
                 }
