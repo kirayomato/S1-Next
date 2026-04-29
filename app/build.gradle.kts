@@ -1,14 +1,6 @@
 import java.io.FileInputStream
 import java.util.Properties
-
-fun gradleLocalProperties(rootDir: java.io.File): Properties {
-    val localProperties = rootDir.resolve("local.properties")
-    return Properties().apply {
-        if (localProperties.exists()) {
-            FileInputStream(localProperties).use { load(it) }
-        }
-    }
-}
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
 plugins {
     alias(libs.plugins.androidApplication)
@@ -19,7 +11,7 @@ plugins {
     id("kotlin-parcelize")
 }
 
-val properties = gradleLocalProperties(rootDir)
+val properties = gradleLocalProperties(rootDir, providers)
 val mStoreFile: String? = properties.getProperty("storeFile")
 val mStorePassword: String? = properties.getProperty("storePassword")
 val mKeyAlias: String? = properties.getProperty("keyAlias")
