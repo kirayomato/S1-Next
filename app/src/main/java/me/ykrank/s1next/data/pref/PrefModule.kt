@@ -89,8 +89,8 @@ class PrefModule(private val prefContext: Context) {
 
     @Provides
     @Singleton
-    internal fun provideAppDataPreferencesProvider(sharedPreferences: SharedPreferences): AppDataPreferences {
-        return AppDataPreferencesImpl(prefContext, sharedPreferences)
+    internal fun provideAppDataPreferencesProvider(sharedPreferences: SharedPreferences, objectMapper: ObjectMapper): AppDataPreferences {
+        return AppDataPreferencesImpl(prefContext, sharedPreferences, objectMapper)
     }
 
     @Provides

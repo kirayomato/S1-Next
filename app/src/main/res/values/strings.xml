@@ -318,4 +318,5 @@
     <string name="message_load_error">Load Error</string>
 
     <!---->
+    <string name="pref_key_forum_upload_config" translatable="false">pref_forum_upload_config</string>
 </resources>
