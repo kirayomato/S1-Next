@@ -2,6 +2,7 @@ package me.ykrank.s1next.data
 
 import android.text.TextUtils
 import com.github.ykrank.androidtools.data.TrackUser
+import me.ykrank.s1next.data.api.model.ForumUploadConfig
 import me.ykrank.s1next.data.pref.AppDataPreferencesManager
 
 open class User(private val appDataPref: AppDataPreferencesManager) : TrackUser {
@@ -19,6 +20,9 @@ open class User(private val appDataPref: AppDataPreferencesManager) : TrackUser 
 
     @Volatile
     var authenticityToken: String? = null
+
+    @Volatile
+    var forumUploadConfig: ForumUploadConfig? = null
 
     var appSecureToken: String?
         get() = appDataPref.appToken

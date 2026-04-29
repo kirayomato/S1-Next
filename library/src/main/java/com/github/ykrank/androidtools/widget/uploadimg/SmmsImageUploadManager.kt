@@ -52,6 +52,19 @@ class SmmsImageUploadManager(_okHttpClient: OkHttpClient? = null) : ImageUploadM
         val requestFile = imageFile.asRequestBody("image/*".toMediaTypeOrNull())
         val body = MultipartBody.Part.createFormData("smfile", imageFile.name, requestFile)
         return uploadApiService.postSmmsImage(body).map { it.toCommon() }
+            .onErrorReturn { throwable ->
+                // Handle Jackson deserialization errors (empty response, etc.)
+                L.report(throwable)
+                val errorMsg = when {
+                    throwable.message?.contains("No content to map") == true -> "上传失败: 服务器返回为空"
+                    throwable.message?.contains("end-of-input") == true -> "上传失败: 服务器返回不完整"
+                    else -> "上传失败: ${throwable.message ?: "未知错误"}"
+                }
+                ImageUpload().apply {
+                    success = false
+                    msg = errorMsg
+                }
+            }
     }
 
     @OptIn(ExperimentalOkHttpApi::class)
@@ -59,11 +72,32 @@ class SmmsImageUploadManager(_okHttpClient: OkHttpClient? = null) : ImageUploadM
         val requestFile = imageFile.toRequestBody("image/*".toMediaTypeOrNull())
         val body = MultipartBody.Part.createFormData("smfile", "image.jpg", requestFile)
         return uploadApiService.postSmmsImage(body).map { it.toCommon() }
+            .onErrorReturn { throwable ->
+                // Handle Jackson deserialization errors (empty response, etc.)
+                L.report(throwable)
+                val errorMsg = when {
+                    throwable.message?.contains("No content to map") == true -> "上传失败: 服务器返回为空"
+                    throwable.message?.contains("end-of-input") == true -> "上传失败: 服务器返回不完整"
+                    else -> "上传失败: ${throwable.message ?: "未知错误"}"
+                }
+                ImageUpload().apply {
+                    success = false
+                    msg = errorMsg
+                }
+            }
     }
 
     override fun delUploadedImage(url: String): Single<ImageDelete> {
         return uploadApiService.deldSmmsImage(url)
                 .map { SmmsImageDelete.fromHtml(it).toCommon() }
+            .onErrorReturn { throwable ->
+                // Handle errors when deleting images
+                L.report(throwable)
+                ImageDelete().apply {
+                    success = false
+                    msg = "删除失败: ${throwable.message ?: "未知错误"}"
+                }
+            }
     }
 }
 

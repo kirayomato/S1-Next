@@ -152,9 +152,9 @@ abstract class BasePostEditFragment : BaseFragment(),
                 .ofType(PostAddImageEvent::class.java)
                 .to(AndroidRxDispose.withObservable(this, FragmentEvent.PAUSE))
                 .subscribe { event ->
-                    addImages.add(event.url)
+                    addImages.add(event.bbCode)
                     mReplyView.text.replace(mReplyView.selectionStart,
-                            mReplyView.selectionEnd, "[img]${event.url}[/img]")
+                            mReplyView.selectionEnd, event.bbCode)
                 }
 
         RxJavaUtil.disposeIfNotNull(mCacheDisposable)
@@ -212,6 +212,8 @@ abstract class BasePostEditFragment : BaseFragment(),
     }
 
     protected abstract fun onMenuSendClick(): Boolean
+
+    open fun getForumId(): Int = 0
 
     /**
      * Key of EditorDiskCache cache. not save/restore if return null

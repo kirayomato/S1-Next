@@ -17,7 +17,9 @@ import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import me.ykrank.s1next.App
 import me.ykrank.s1next.R
+import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.S1Service
+import me.ykrank.s1next.data.api.model.ForumUploadConfig
 import me.ykrank.s1next.data.api.model.ThreadType
 import me.ykrank.s1next.data.cache.exmodel.NewThreadCacheModel
 import me.ykrank.s1next.databinding.FragmentNewThreadBinding
@@ -69,7 +71,6 @@ class NewThreadFragment : BasePostEditFragment() {
                 return true
             }
             typeId = selectType.typeId
-            //未选择类别
             if (typeId == null || "0" == typeId.trim { it <= ' ' }) {
                 showSnackbar(R.string.error_no_type_id)
                 return true
@@ -83,11 +84,13 @@ class NewThreadFragment : BasePostEditFragment() {
             return true
         }
 
-        NewThreadRequestDialogFragment.newInstance(mForumId, typeId, title, message, cacheKey)
+        NewThreadRequestDialogFragment.newInstance(mForumId, typeId, title, message, mCacheKey)
                 .show(fragmentManager!!, NewThreadRequestDialogFragment.TAG)
 
         return true
     }
+
+    override fun getForumId(): Int = mForumId
 
     override val cacheKey: String?
         get() = mCacheKey
@@ -138,6 +141,17 @@ class NewThreadFragment : BasePostEditFragment() {
     private fun init() {
         mS1Service.getNewThreadInfo(mForumId)
                 .map<List<ThreadType>>(ThreadType.Companion::fromXmlString)
+                .doOnSuccess { _ ->
+                    // 解析并存储上传配置
+                    mS1Service.getNewThreadInfo(mForumId)
+                        .map { html -> ForumUploadConfig.fromHtml(html) }
+                        .subscribe({ config ->
+                            if (config != null) {
+                                mUser.forumUploadConfig = config
+                                L.d("✅ 已存储上传配置: hash=${config.hash}, fid=${config.fid}")
+                            }
+                        }, { e -> L.report(e) })
+                }
                 .compose(RxJavaUtil.iOSingleTransformer())
                 .to(AndroidRxDispose.withSingle(this, FragmentEvent.DESTROY))
                 .subscribe({
@@ -181,5 +195,4 @@ class NewThreadFragment : BasePostEditFragment() {
             return fragment
         }
     }
-
 }

@@ -7,9 +7,6 @@ import android.text.TextUtils
 import me.ykrank.s1next.R
 import me.ykrank.s1next.view.page.post.postedit.ReplyFragment
 
-/**
- * An Activity which used to send a reply.
- */
 class ReplyActivity : BaseActivity() {
 
     private lateinit var mReplyFragment: ReplyFragment
@@ -23,7 +20,8 @@ class ReplyActivity : BaseActivity() {
         val intent = intent
         val threadId = intent.getStringExtra(ARG_THREAD_ID)
         val quotePostId = intent.getStringExtra(ARG_QUOTE_POST_ID)
-        leavePageMsg("ReplyActivity##threadId:$threadId,quotePostId:$quotePostId")
+        val forumId = intent.getIntExtra(ARG_FORUM_ID, 0)
+        leavePageMsg("ReplyActivity##threadId:$threadId,quotePostId:$quotePostId,forumId:$forumId")
 
         val titlePrefix = if (TextUtils.isEmpty(quotePostId))
             getString(R.string.reply_activity_title_prefix)
@@ -36,7 +34,7 @@ class ReplyActivity : BaseActivity() {
         val fragment = fragmentManager.findFragmentByTag(ReplyFragment.TAG)
         if (fragment == null) {
             mReplyFragment = ReplyFragment.newInstance(threadId!!,
-                    quotePostId)
+                    quotePostId, forumId)
             fragmentManager.beginTransaction().add(R.id.frame_layout, mReplyFragment,
                     ReplyFragment.TAG).commit()
         } else {
@@ -44,9 +42,6 @@ class ReplyActivity : BaseActivity() {
         }
     }
 
-    /**
-     * Show [android.support.v7.app.AlertDialog] when reply content is not empty.
-     */
     override fun onBackPressed() {
         if (mReplyFragment.isToolsKeyboardShowing) {
             mReplyFragment.hideToolsKeyboard()
@@ -62,15 +57,18 @@ class ReplyActivity : BaseActivity() {
 
         private const val ARG_QUOTE_POST_ID = "quote_post_id"
         private const val ARG_QUOTE_POST_COUNT = "quote_post_count"
+        private const val ARG_FORUM_ID = "forum_id"
 
         fun startReplyActivityForResultMessage(activity: Activity, threadId: String, threadTitle: String?,
-                                               quotePostId: String?, quotePostCount: String?) {
+                                               quotePostId: String?, quotePostCount: String?,
+                                               forumId: Int = 0) {
             val intent = Intent(activity, ReplyActivity::class.java)
             intent.putExtra(ARG_THREAD_ID, threadId)
             intent.putExtra(ARG_THREAD_TITLE, threadTitle)
 
             intent.putExtra(ARG_QUOTE_POST_ID, quotePostId)
             intent.putExtra(ARG_QUOTE_POST_COUNT, quotePostCount)
+            intent.putExtra(ARG_FORUM_ID, forumId)
 
             BaseActivity.startActivityForResultMessage(activity, intent)
         }

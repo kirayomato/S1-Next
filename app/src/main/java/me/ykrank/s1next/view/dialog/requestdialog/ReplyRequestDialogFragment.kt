@@ -6,15 +6,18 @@ import com.github.ykrank.androidtools.util.StringUtils
 import io.reactivex.Single
 import me.ykrank.s1next.App.Companion.get
 import me.ykrank.s1next.R
-import me.ykrank.s1next.data.api.Api
+import me.ykrank.s1next.data.User
+import me.ykrank.s1next.data.api.model.ForumUploadConfig
 import me.ykrank.s1next.data.api.model.Quote
 import me.ykrank.s1next.data.api.model.wrapper.AccountResultWrapper
 import me.ykrank.s1next.widget.track.event.NewReplyTrackEvent
+import javax.inject.Inject
 
 /**
  * A dialog requests to reply to post.
  */
 class ReplyRequestDialogFragment : BaseRequestDialogFragment<AccountResultWrapper>() {
+
     override fun getProgressMessage(): CharSequence? {
         return getText(R.string.dialog_progress_message_reply)
     }
@@ -23,6 +26,18 @@ class ReplyRequestDialogFragment : BaseRequestDialogFragment<AccountResultWrappe
         val threadId = requireArguments().getString(ARG_THREAD_ID)
         val quotePostId = requireArguments().getString(ARG_QUOTE_POST_ID)
         val reply = requireArguments().getString(ARG_REPLY)
+        
+        // 尝试解析并存储上传配置
+        if (!TextUtils.isEmpty(quotePostId)) {
+            mS1Service.getQuoteInfo(threadId, quotePostId)
+                .map { html -> ForumUploadConfig.fromHtml(html) }
+                .subscribe({ config ->
+                    if (config != null) {
+                        mUser.forumUploadConfig = config
+                    }
+                }, { e -> })
+        }
+        
         return if (TextUtils.isEmpty(quotePostId)) {
             flatMappedWithAuthenticityToken { s: String? -> mS1Service.reply(s, threadId, reply) }
         } else {
@@ -34,7 +49,7 @@ class ReplyRequestDialogFragment : BaseRequestDialogFragment<AccountResultWrappe
                         token, threadId, reply, quote.encodedUserId,
                         quote.quoteMessage, StringUtils.abbreviate(
                             reply,
-                            Api.REPLY_NOTIFICATION_MAX_LENGTH
+                            me.ykrank.s1next.data.api.Api.REPLY_NOTIFICATION_MAX_LENGTH
                         )
                     )
                 }
@@ -52,10 +67,11 @@ class ReplyRequestDialogFragment : BaseRequestDialogFragment<AccountResultWrappe
     }
 
     companion object {
-        val TAG: String = ReplyRequestDialogFragment::class.java.getName()
+        val TAG: String = ReplyRequestDialogFragment::class.java.name
         private const val ARG_THREAD_ID = "thread_id"
         private const val ARG_REPLY = "reply"
         private const val ARG_QUOTE_POST_ID = "quote_post_id"
+        
         fun newInstance(
             threadId: String?, quotePostId: String?,
             reply: String?
@@ -66,7 +82,7 @@ class ReplyRequestDialogFragment : BaseRequestDialogFragment<AccountResultWrappe
             bundle.putString(ARG_THREAD_ID, threadId)
             bundle.putString(ARG_QUOTE_POST_ID, quotePostId)
             bundle.putString(ARG_REPLY, reply)
-            fragment.setArguments(bundle)
+            fragment.arguments = bundle
             return fragment
         }
     }

@@ -53,6 +53,7 @@ class AppPostListFragment : BaseViewPagerFragment(), AppPostListPagerFragment.Pa
 
     private lateinit var mThreadId: String
     private var mThreadTitle: String? = null
+    private var mForumId: Int = 0
 
     private val scrollState = PagerScrollState()
 
@@ -211,6 +212,7 @@ class AppPostListFragment : BaseViewPagerFragment(), AppPostListPagerFragment.Pa
         set(value) {
             if (value != null && field != value) {
                 field = value
+                mForumId = value.fid
                 setThreadTitle(value.subject)
             }
         }
@@ -247,7 +249,7 @@ class AppPostListFragment : BaseViewPagerFragment(), AppPostListPagerFragment.Pa
         }
 
         ReplyActivity.startReplyActivityForResultMessage(activity, mThreadId, mThreadTitle,
-                quotePostId, quotePostCount)
+                quotePostId, quotePostCount, mForumId)
     }
 
     private fun startRateActivity(threadId: String, postId: String) {

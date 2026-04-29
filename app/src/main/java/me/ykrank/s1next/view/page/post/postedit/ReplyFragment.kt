@@ -7,24 +7,25 @@ import me.ykrank.s1next.util.AppDeviceUtil
 import me.ykrank.s1next.view.dialog.requestdialog.ReplyRequestDialogFragment
 import me.ykrank.s1next.view.event.RequestDialogSuccessEvent
 
-/**
- * A Fragment shows [EditText] to let the user enter reply.
- */
 class ReplyFragment : BasePostEditFragment() {
     override var cacheKey: String? = null
         private set
 
     private var mThreadId: String? = null
     private var mQuotePostId: String? = null
+    private var mForumId: Int = 0
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val bundle = requireArguments()
         mThreadId = bundle.getString(ARG_THREAD_ID)
         mQuotePostId = bundle.getString(ARG_QUOTE_POST_ID)
+        mForumId = bundle.getInt(ARG_FORUM_ID, 0)
         cacheKey = String.format(CACHE_KEY_PREFIX, mThreadId, mQuotePostId)
-        leavePageMsg("ReplyFragment##mThreadId:$mThreadId,mQuotePostId$mQuotePostId")
+        leavePageMsg("ReplyFragment##mThreadId:$mThreadId,mQuotePostId$mQuotePostId,mForumId:$mForumId")
     }
+
+    override fun getForumId(): Int = mForumId
 
     override fun onMenuSendClick(): Boolean {
         val stringBuilder = StringBuilder(mReplyView.text)
@@ -54,14 +55,16 @@ class ReplyFragment : BasePostEditFragment() {
 
         private const val ARG_THREAD_ID = "thread_id"
         private const val ARG_QUOTE_POST_ID = "quote_post_id"
+        private const val ARG_FORUM_ID = "forum_id"
 
         private val CACHE_KEY_PREFIX = "NewReply_%s_%s"
 
-        fun newInstance(threadId: String, quotePostId: String?): ReplyFragment {
+        fun newInstance(threadId: String, quotePostId: String?, forumId: Int = 0): ReplyFragment {
             val fragment = ReplyFragment()
             val bundle = Bundle()
             bundle.putString(ARG_THREAD_ID, threadId)
             bundle.putString(ARG_QUOTE_POST_ID, quotePostId)
+            bundle.putInt(ARG_FORUM_ID, forumId)
             fragment.arguments = bundle
 
             return fragment

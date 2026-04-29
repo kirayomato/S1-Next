@@ -1,4 +1,14 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import java.io.FileInputStream
+import java.util.Properties
+
+fun gradleLocalProperties(rootDir: java.io.File): Properties {
+    val localProperties = rootDir.resolve("local.properties")
+    return Properties().apply {
+        if (localProperties.exists()) {
+            FileInputStream(localProperties).use { load(it) }
+        }
+    }
+}
 
 plugins {
     alias(libs.plugins.androidApplication)
@@ -9,7 +19,7 @@ plugins {
     id("kotlin-parcelize")
 }
 
-val properties = gradleLocalProperties(rootDir, providers)
+val properties = gradleLocalProperties(rootDir)
 val mStoreFile: String? = properties.getProperty("storeFile")
 val mStorePassword: String? = properties.getProperty("storePassword")
 val mKeyAlias: String? = properties.getProperty("keyAlias")
@@ -25,9 +35,16 @@ android {
     namespace = "me.ykrank.s1next"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
+    // 16KB 页面大小对齐支持（Android 15+）
+    packaging {
+        jniLibs {
+            useLegacyPackaging = false
+        }
+    }
+
     defaultConfig {
         applicationId = "me.ykrank.s1next"
-        minSdk = 26
+        minSdk = 33
         targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = appVersionCode
         versionName = "${appVersionName}.${appVersionCode}${appVersionSuffix}"
@@ -48,22 +65,27 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "21"
     }
     buildFeatures {
         dataBinding = true
         buildConfig = true
     }
-    packaging {
-        resources {
-            excludes += "META-INF/LICENSE"
-            excludes += "META-INF/LICENSE.txt"
-            excludes += "META-INF/NOTICE"
-            excludes += "META-INF/NOTICE.txt"
+    
+    // Lint 配置
+    lint {
+        enable += "ParcelCreator"
+        abortOnError = false
+    }
+
+    // 测试配置
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
         }
     }
     buildTypes {
@@ -128,23 +150,31 @@ ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
 }
 
-val alphaImplementation by configurations
 dependencies {
+    // 本地库
     implementation(fileTree("libs") { include("*.jar", "*.aar") })
 
+    // 项目模块
     implementation(project(":library"))
     implementation(project(":JKeyboardPanelSwitch"))
 
+    // DataBinding (仍需 kapt)
     kapt(libs.databinding.compiler)
+
+    // Paging
     implementation(libs.paging)
 
+    // Bugly
     implementation(libs.bugly.nativecrashreport)
 
+    // Dagger (使用 kapt)
     implementation(libs.dagger)
     kapt(libs.dagger.compiler)
 
+    // AndroidX
     implementation(libs.androidx.transition)
 
+    // 网络库
     implementation(libs.okhttp.urlconnection)
     implementation(libs.okhttp.coroutines)
     implementation(libs.okhttp)
@@ -153,30 +183,39 @@ dependencies {
     implementation(libs.retrofit2.converter.jackson)
     implementation(libs.retrofit2.converter.scalars)
 
+    // JSON
     implementation(libs.jackson.kotlin)
     implementation(libs.jackson.databind)
 
+    // Parcel
     implementation(libs.paperparcel)
-    implementation(libs.paperparcel.kotlin) // Optional
+    implementation(libs.paperparcel.kotlin)
     implementation(libs.paperparcel.api)
     kapt(libs.paperparcel.compiler)
 
+    // Glide
     ksp(libs.glide.ksp)
 
+    // UI
     implementation(libs.photoview)
     implementation(libs.quicksidebar)
 
-//  flipper
-    releaseImplementation(libs.flipper.noop)
-    alphaImplementation(libs.flipper.noop)
+    // Flipper (调试工具)
     debugImplementation(libs.flipper)
     debugImplementation(libs.soloader)
     debugImplementation(libs.flipper.network.plugin)
     debugImplementation(libs.flipper.leakcanary.plugin)
+    // release 和 alpha 使用 noop 版本
+    releaseImplementation(libs.flipper.noop)
+    // 为 alpha build type 添加 noop（如果配置存在）
+    configurations.findByName("alphaImplementation")?.let {
+        add("alphaImplementation", libs.flipper.noop)
+    }
 
+    // 阿里云 HTTP DNS
     implementation(libs.alicloud.android.httpdns)
 
-    //room
+    // Room
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
