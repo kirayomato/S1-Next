@@ -11,6 +11,7 @@ import java.io.FileDescriptor
 import java.util.concurrent.TimeUnit
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.Api
+import me.ykrank.s1next.data.api.S1Service
 import me.ykrank.s1next.data.api.model.ForumUploadConfig
 import me.ykrank.s1next.widget.uploadimg.model.DiscuzUploadResponse
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -31,6 +32,7 @@ class ForumImageUploadManager(
     _okHttpClient: OkHttpClient? = null,
     private val user: User? = null,
     private var fid: Int = 0,
+    private val s1Service: S1Service? = null,
 ) : ImageUploadManager {
 
     private val okHttpClient: OkHttpClient by lazy {
@@ -112,29 +114,63 @@ class ForumImageUploadManager(
         val hash = uploadConfig?.hash
 
         if (hash.isNullOrEmpty()) {
-            L.e("❌ 未找到上传 hash，请先打开发帖页面")
-            return Single.just(ImageUpload().apply {
-                success = false
-                msg = "未找到上传参数，请先打开发帖或回复页面"
-            })
+            L.w("⚠️ hash为空，尝试更新上传配置")
+            val currentFid = 151
+            return s1Service?.getNewThreadInfo(currentFid)
+                ?.map { html -> ForumUploadConfig.fromHtml(html) }
+                ?.doOnSuccess { config ->
+                    if (config != null) {
+                        user.forumUploadConfig = config
+                        L.d("✅ 已更新上传配置: hash=${config.hash}, fid=${config.fid}")
+                    }
+                }
+                ?.flatMap { config ->
+                    if (config.hash.isNullOrEmpty()) {
+                        L.e("❌ 更新后 hash 仍为空")
+                        Single.just(ImageUpload().apply {
+                            success = false
+                            msg = "未找到上传参数，请先打开发帖或回复页面"
+                        })
+                    } else {
+                        uploadWithHashInternal(filePart, filename, fileSize, config!!)
+                    }
+                }
+                ?: run {
+                    L.e("❌ 未找到上传 hash 且 S1Service 为空")
+                    Single.just(ImageUpload().apply {
+                        success = false
+                        msg = "未找到上传参数，请先打开发帖或回复页面"
+                    })
+                }
         }
 
-        val uploadFid = if (uploadConfig?.fid != 0) uploadConfig?.fid else fid
+        return uploadWithHashInternal(filePart, filename, fileSize, uploadConfig!!)
+    }
+
+    private fun uploadWithHashInternal(
+        filePart: MultipartBody.Part,
+        filename: String,
+        fileSize: Long,
+        uploadConfig: ForumUploadConfig,
+    ): Single<ImageUpload> {
+        val hash = uploadConfig.hash!!
+
+        val uploadFid = if (uploadConfig.fid != 0) uploadConfig.fid else fid
 
         val ext = filename.substringAfterLast('.', "").let {
             if (it.isNotEmpty()) it else "jpg"
         }
 
-        L.d("🔑 Using hash: '$hash' (uid: $uid, fid: $uploadFid)")
+        L.d("🔑 Using hash: '$hash' (uid: ${user?.uid}, fid: $uploadFid)")
 
-        val uidPart = uid!!.toRequestBody("text/plain".toMediaTypeOrNull())
-        val hashPart = hash!!.toRequestBody("text/plain".toMediaTypeOrNull())
+        val uidPart = user!!.uid!!.toRequestBody("text/plain".toMediaTypeOrNull())
+        val hashPart = hash.toRequestBody("text/plain".toMediaTypeOrNull())
         val typePart = "image".toRequestBody("text/plain".toMediaTypeOrNull())
         val idPart = "WU_FILE_0".toRequestBody("text/plain".toMediaTypeOrNull())
         val sizePart = fileSize.toString().toRequestBody("text/plain".toMediaTypeOrNull())
         val filetypePart = ext.toRequestBody("text/plain".toMediaTypeOrNull())
 
-        val uploadUrl = uploadConfig?.uploadUrl ?: "misc.php?mod=swfupload&action=swfupload&operation=upload&fid=${uploadFid ?: 0}"
+        val uploadUrl = uploadConfig.uploadUrl ?: "misc.php?mod=swfupload&action=swfupload&operation=upload&fid=${uploadFid ?: 0}"
 
         return uploadApiService.uploadImage(
             url = uploadUrl,
