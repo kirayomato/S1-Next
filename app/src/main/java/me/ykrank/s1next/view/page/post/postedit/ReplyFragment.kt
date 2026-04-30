@@ -3,6 +3,7 @@ package me.ykrank.s1next.view.page.post.postedit
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
+import com.github.ykrank.androidtools.widget.uploadimg.ModelImageUpload
 import me.ykrank.s1next.util.AppDeviceUtil
 import me.ykrank.s1next.view.dialog.requestdialog.ReplyRequestDialogFragment
 import me.ykrank.s1next.view.event.RequestDialogSuccessEvent
@@ -38,11 +39,37 @@ class ReplyFragment : BasePostEditFragment() {
             stringBuilder.append("\n\n").append(signature)
         }
 
+        // 收集附件ID
+        val attachments = buildAttachmentsMap()
+
         ReplyRequestDialogFragment.newInstance(mThreadId, mQuotePostId,
-                stringBuilder.toString()).show(childFragmentManager,
+                stringBuilder.toString(), attachments).show(childFragmentManager,
                 ReplyRequestDialogFragment.TAG)
 
         return true
+    }
+
+    /**
+     * 从已上传的图片中构建附件字段Map
+     */
+    private fun buildAttachmentsMap(): Map<String, String>? {
+        val images = selectImages
+        if (images.isEmpty()) return null
+
+        val attachments = mutableMapOf<String, String>()
+        val regex = """\[attachimg\](\d+)\[/attachimg\]""".toRegex()
+
+        images.forEach { image ->
+            val url = image.url
+            if (!url.isNullOrEmpty()) {
+                regex.find(url)?.groupValues?.get(1)?.let { aid ->
+                    attachments["attachupdate[$aid]"] = ""
+                    attachments["attachnew[$aid][description]"] = ""
+                }
+            }
+        }
+
+        return if (attachments.isEmpty()) null else attachments
     }
 
     override fun isRequestDialogAccept(event: RequestDialogSuccessEvent): Boolean {

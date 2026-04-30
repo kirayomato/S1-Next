@@ -330,7 +330,7 @@ abstract class BasePostEditFragment : BaseFragment(),
             return mReplyView.text.toString()
         }
 
-    private val selectImages: List<ModelImageUpload>
+    protected val selectImages: List<ModelImageUpload>
         get() {
             return (toolsFragments[1].second as ImageUploadFragment).images
         }

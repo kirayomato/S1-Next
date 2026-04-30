@@ -26,9 +26,12 @@ class ReplyRequestDialogFragment : BaseRequestDialogFragment<AccountResultWrappe
         val threadId = requireArguments().getString(ARG_THREAD_ID)
         val quotePostId = requireArguments().getString(ARG_QUOTE_POST_ID)
         val reply = requireArguments().getString(ARG_REPLY)
-        
+        val attachments = requireArguments().getSerializable(ARG_ATTACHMENTS) as? HashMap<String, String>
+
         return if (TextUtils.isEmpty(quotePostId)) {
-            flatMappedWithAuthenticityToken { s: String? -> mS1Service.reply(s, threadId, reply) }
+            flatMappedWithAuthenticityToken { s: String? ->
+                mS1Service.reply(s, threadId, reply, attachments = attachments)
+            }
         } else {
             mS1Service.getQuoteInfo(threadId, quotePostId).flatMap { s: String? ->
                 val quote = Quote.fromXmlString(s)
@@ -39,7 +42,7 @@ class ReplyRequestDialogFragment : BaseRequestDialogFragment<AccountResultWrappe
                         quote.quoteMessage, StringUtils.abbreviate(
                             reply,
                             Api.REPLY_NOTIFICATION_MAX_LENGTH
-                        )
+                        ), attachments = attachments
                     )
                 }
             }
@@ -60,10 +63,11 @@ class ReplyRequestDialogFragment : BaseRequestDialogFragment<AccountResultWrappe
         private const val ARG_THREAD_ID = "thread_id"
         private const val ARG_REPLY = "reply"
         private const val ARG_QUOTE_POST_ID = "quote_post_id"
-        
+        private const val ARG_ATTACHMENTS = "attachments"
+
         fun newInstance(
             threadId: String?, quotePostId: String?,
-            reply: String?
+            reply: String?, attachments: Map<String, String>? = null
         ): ReplyRequestDialogFragment {
             get().trackAgent.post(NewReplyTrackEvent(threadId, quotePostId))
             val fragment = ReplyRequestDialogFragment()
@@ -71,6 +75,9 @@ class ReplyRequestDialogFragment : BaseRequestDialogFragment<AccountResultWrappe
             bundle.putString(ARG_THREAD_ID, threadId)
             bundle.putString(ARG_QUOTE_POST_ID, quotePostId)
             bundle.putString(ARG_REPLY, reply)
+            if (attachments != null) {
+                bundle.putSerializable(ARG_ATTACHMENTS, HashMap(attachments))
+            }
             fragment.arguments = bundle
             return fragment
         }

@@ -96,7 +96,8 @@ interface S1Service {
     fun reply(
         @Field("formhash") authenticityToken: String?,
         @Field("tid") threadId: String?,
-        @Field("message") reply: String?
+        @Field("message") reply: String?,
+        @FieldMap attachments: Map<String, String>? = null
     ): Single<AccountResultWrapper>
 
     @GET(ApiForum.URL_QUOTE_HELPER)
@@ -113,7 +114,8 @@ interface S1Service {
         @Field("message") reply: String?,
         @Field("noticeauthor") encodedUserId: String?,
         @Field("noticetrimstr") quoteMessage: String?,
-        @Field("noticeauthormsg") replyNotification: String?
+        @Field("noticeauthormsg") replyNotification: String?,
+        @FieldMap attachments: Map<String, String>? = null
     ): Single<AccountResultWrapper>
 
     //endregion
