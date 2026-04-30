@@ -227,8 +227,8 @@ object PostFilter {
             val replyCopy = tReply
 
             val nTag: String
+            attachmentMapResult[key] = attachment
             if (!attachment.isImage) {
-                attachmentMapResult[key] = attachment
                 nTag =
                     "<attach href=${attachment.realUrl} name=${attachment.name}>${attachment.name}, ${
                         FileUtil.getPrintSize(

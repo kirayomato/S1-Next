@@ -158,8 +158,9 @@ class EditPostFragment : BasePostEditFragment() {
                     }
                     binding.layoutPost.reply.setText(postEditor.message)
 
-                    // 解析消息中的 attachimg 标签，将已有图片添加到上传列表
-                    addExistingImagesFromMessage(postEditor.message)
+                    // 从 mPost 的 attachmentMap 中获取附件信息，用于显示已有图片
+                    // 参考 PostFilter.processAttachment() 的实现
+                    addExistingImagesFromAttachmentMap(postEditor.message)
                 }, { e ->
                     L.report(e)
                     showRetrySnackbar(e, View.OnClickListener { init() })
@@ -167,23 +168,32 @@ class EditPostFragment : BasePostEditFragment() {
     }
 
     /**
-     * 从消息中解析 attachimg 标签，将已有图片添加到 ImageUploadFragment
+     * 从 mPost.attachmentMap 中解析 attachimg 标签，将已有图片添加到 ImageUploadFragment
+     * 参考 PostFilter.processAttachment() 的实现，使用 PostAttachment.realUrl
      */
-    private fun addExistingImagesFromMessage(message: String?) {
+    private fun addExistingImagesFromAttachmentMap(message: String?) {
         if (message.isNullOrEmpty()) return
+
+        val attachmentMap = mPost.attachmentMap
+        if (attachmentMap.isEmpty()) return
 
         val regex = """\[attachimg](\d+)\[/attachimg]""".toRegex()
         val images = mutableListOf<ModelImageUpload>()
 
         regex.findAll(message).forEach { matchResult ->
-            val aid = matchResult.groupValues[1]
-            val model = ModelImageUpload(null)
-            model.aid = aid
-            model.url = "[attachimg]${aid}[/attachimg]"
-            model.state = ModelImageUpload.STATE_DONE
-            model.tid = mThread.id?.toIntOrNull()
-            model.pid = mPost.id
-            images.add(model)
+            val aid = matchResult.groupValues[1].toIntOrNull() ?: return@forEach
+            val attachment = attachmentMap[aid]
+
+            if (attachment != null && attachment.isImage) {
+                val model = ModelImageUpload(null)
+                model.aid = aid.toString()
+                // 使用 PostAttachment.realUrl，这样 Glide 可以使用缓存（浏览帖子时已加载）
+                model.url = attachment.realUrl
+                model.state = ModelImageUpload.STATE_DONE
+                model.tid = mThread.id?.toIntOrNull()
+                model.pid = mPost.id
+                images.add(model)
+            }
         }
 
         if (images.isNotEmpty()) {

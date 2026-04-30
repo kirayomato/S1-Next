@@ -111,7 +111,8 @@ class Post : PaperParcelable, Cloneable, DiffSameItem, StableIdModel {
                     attachments,
                     object : TypeReference<Map<Int, PostAttachment>>() {})
             }
-            tReply = PostFilter.processAttachment(this.attachmentMap, tReply, attachmentMap)
+            tReply = PostFilter.
+            processAttachment(this.attachmentMap, tReply, attachmentMap)
         }
         tReply = PostFilter.prettifyReply(tReply)
         this.reply = tReply
