@@ -2,8 +2,6 @@ package me.ykrank.s1next.view.page.post.postedit
 
 import android.os.Bundle
 import android.view.View
-import android.widget.EditText
-import com.github.ykrank.androidtools.widget.uploadimg.ModelImageUpload
 import me.ykrank.s1next.util.AppDeviceUtil
 import me.ykrank.s1next.view.dialog.requestdialog.ReplyRequestDialogFragment
 import me.ykrank.s1next.view.event.RequestDialogSuccessEvent
@@ -27,6 +25,10 @@ class ReplyFragment : BasePostEditFragment() {
     }
 
     override fun getForumId(): Int = mForumId
+
+    override fun getThreadId(): Int? = mThreadId?.toIntOrNull()
+
+    override fun getPostId(): Int? = mQuotePostId?.toIntOrNull()
 
     override fun onMenuSendClick(): Boolean {
         val stringBuilder = StringBuilder(mReplyView.text)
@@ -57,7 +59,7 @@ class ReplyFragment : BasePostEditFragment() {
         if (images.isEmpty()) return null
 
         val attachments = mutableMapOf<String, String>()
-        val regex = """\[attachimg\](\d+)\[/attachimg\]""".toRegex()
+        val regex = """\[attachimg](\d+)\[/attachimg]""".toRegex()
 
         images.forEach { image ->
             val url = image.url

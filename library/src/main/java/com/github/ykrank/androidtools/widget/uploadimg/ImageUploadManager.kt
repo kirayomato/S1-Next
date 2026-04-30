@@ -10,5 +10,8 @@ interface ImageUploadManager {
     fun uploadImage(imageFile: FileDescriptor): Single<ImageUpload>
 
     fun delUploadedImage(url: String): Single<ImageDelete>
+
+    // 用于Discuz论坛删除附件，提供完整的模型信息
+    fun delUploadedImage(model: ModelImageUpload): Single<ImageDelete> = delUploadedImage(model.deleteUrl ?: "")
 }
 

@@ -1,10 +1,10 @@
 package me.ykrank.s1next.widget.uploadimg
 
-import com.fasterxml.jackson.core.JsonProcessingException
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.widget.uploadimg.ImageDelete
 import com.github.ykrank.androidtools.widget.uploadimg.ImageUpload
 import com.github.ykrank.androidtools.widget.uploadimg.ImageUploadManager
+import com.github.ykrank.androidtools.widget.uploadimg.ModelImageUpload
 import io.reactivex.Single
 import java.io.File
 import java.io.FileDescriptor
@@ -34,6 +34,17 @@ class ForumImageUploadManager(
     private var fid: Int = 0,
     private val s1Service: S1Service? = null,
 ) : ImageUploadManager {
+
+    private var tid: Int? = null
+    private var pid: Int? = null
+
+    fun setTid(tid: Int?) {
+        this.tid = tid
+    }
+
+    fun setPid(pid: Int?) {
+        this.pid = pid
+    }
 
     private val okHttpClient: OkHttpClient by lazy {
         val builder = _okHttpClient?.newBuilder() ?: OkHttpClient.Builder()
@@ -78,10 +89,6 @@ class ForumImageUploadManager(
             .create(DiscuzUploadApiService::class.java)
     }
 
-    fun setFid(fid: Int) {
-        this.fid = fid
-        L.d("📝 Set fid: $fid")
-    }
 
     override fun uploadImage(imageFile: File): Single<ImageUpload> {
         val requestFile = imageFile.asRequestBody("image/*".toMediaTypeOrNull())
@@ -120,7 +127,7 @@ class ForumImageUploadManager(
                 ?.map { html -> ForumUploadConfig.fromHtml(html) }
                 ?.doOnSuccess { config ->
                     if (config != null) {
-                        user.forumUploadConfig = config
+                        user?.forumUploadConfig = config
                         L.d("✅ 已更新上传配置: hash=${config.hash}, fid=${config.fid}")
                     }
                 }
@@ -132,7 +139,7 @@ class ForumImageUploadManager(
                             msg = "未找到上传参数，请先打开发帖或回复页面"
                         })
                     } else {
-                        uploadWithHashInternal(filePart, filename, fileSize, config!!)
+                        uploadWithHashInternal(filePart, filename, fileSize, config)
                     }
                 }
                 ?: run {
@@ -144,7 +151,7 @@ class ForumImageUploadManager(
                 }
         }
 
-        return uploadWithHashInternal(filePart, filename, fileSize, uploadConfig!!)
+        return uploadWithHashInternal(filePart, filename, fileSize, uploadConfig)
     }
 
     private fun uploadWithHashInternal(
@@ -158,7 +165,7 @@ class ForumImageUploadManager(
         val uploadFid = if (uploadConfig.fid != 0) uploadConfig.fid else fid
 
         val ext = filename.substringAfterLast('.', "").let {
-            if (it.isNotEmpty()) it else "jpg"
+            it.ifEmpty { "jpg" }
         }
 
         L.d("🔑 Using hash: '$hash' (uid: ${user?.uid}, fid: $uploadFid)")
@@ -170,7 +177,8 @@ class ForumImageUploadManager(
         val sizePart = fileSize.toString().toRequestBody("text/plain".toMediaTypeOrNull())
         val filetypePart = ext.toRequestBody("text/plain".toMediaTypeOrNull())
 
-        val uploadUrl = uploadConfig.uploadUrl ?: "misc.php?mod=swfupload&action=swfupload&operation=upload&fid=${uploadFid ?: 0}"
+        val uploadUrl = uploadConfig.uploadUrl
+            ?: "misc.php?mod=swfupload&action=swfupload&operation=upload&fid=${uploadFid}"
 
         return uploadApiService.uploadImage(
             url = uploadUrl,
@@ -184,26 +192,22 @@ class ForumImageUploadManager(
         ).map { responseBody ->
             val responseStr = responseBody.string()
             L.d("📥 原始响应: $responseStr")
-            
+
             // 尝试解析响应
             val uploadResponse = try {
                 // 先尝试作为纯数字解析（服务器可能直接返回附件ID）
                 val aid = responseStr.trim().toLongOrNull()
-                if (aid != null && aid > 0) {
-                    // 纯数字，认为是附件ID
-                    DiscuzUploadResponse().apply {
-                        this.aid = aid.toString()
-                    }
-                } else {
-                    // 尝试作为 JSON 解析
-                    val objectMapper = com.fasterxml.jackson.databind.ObjectMapper()
-                    objectMapper.readValue(responseStr, DiscuzUploadResponse::class.java)
+                assert(aid != null && aid > 0)
+                // 纯数字，认为是附件ID
+                DiscuzUploadResponse().apply {
+                    this.aid = aid.toString()
                 }
+
             } catch (e: Exception) {
                 L.e("❌ 解析响应失败: $responseStr", e)
                 DiscuzUploadResponse.fromError("解析响应失败: ${e.message}")
             }
-            
+
             if (uploadResponse.aid.isNullOrEmpty() && uploadResponse.error.isNullOrEmpty()) {
                 throw Exception("服务器返回数据格式错误: $responseStr")
             }
@@ -219,18 +223,19 @@ class ForumImageUploadManager(
                 throwable is retrofit2.HttpException -> {
                     "上传失败: HTTP ${throwable.code()} - ${throwable.message()}"
                 }
+
                 throwable is java.io.IOException -> {
                     "上传失败: 网络连接错误 - ${throwable.message ?: "请检查网络"}"
                 }
-                throwable is JsonProcessingException -> {
-                    "上传失败: 数据解析错误 - ${throwable.message ?: "服务器返回格式异常"}"
-                }
+
                 throwable.message?.contains("No content to map", ignoreCase = true) == true -> {
                     "上传失败: 服务器返回为空"
                 }
+
                 throwable.message?.contains("end-of-input", ignoreCase = true) == true -> {
                     "上传失败: 服务器返回不完整"
                 }
+
                 else -> "上传失败: ${throwable.message ?: "未知错误"}"
             }
             ImageUpload().apply {
@@ -243,7 +248,56 @@ class ForumImageUploadManager(
     override fun delUploadedImage(url: String): Single<ImageDelete> {
         return Single.just(ImageDelete().apply { success = true })
     }
+
+    override fun delUploadedImage(model: ModelImageUpload): Single<ImageDelete> {
+        val aid = model.aid
+        val tid = model.tid ?: this.tid ?: return Single.just(ImageDelete().apply {
+            success = false
+            msg = "删除失败: 缺少主题ID"
+        })
+        val pid = model.pid ?: this.pid ?: 0
+        val formhash = user?.authenticityToken
+
+        if (aid.isNullOrEmpty()) {
+            L.w("❌ 删除附件失败: aid为空")
+            return Single.just(ImageDelete().apply {
+                success = false
+                msg = "删除失败: 附件ID为空"
+            })
+        }
+
+        if (formhash.isNullOrEmpty()) {
+            L.w("❌ 删除附件失败: formhash为空")
+            return Single.just(ImageDelete().apply {
+                success = false
+                msg = "删除失败: 请先刷新页面获取formhash"
+            })
+        }
+
+        return s1Service?.deleteAttachments(formhash, tid, pid, aid)
+            ?.map { response ->
+                L.d("📥 删除附件响应: $response")
+                // 解析响应，判断删除是否成功
+                val success = !response.contains("失败") && !response.contains("错误")
+                ImageDelete().apply {
+                    this.success = success
+                    msg = if (success) "删除成功" else "删除失败: $response"
+                }
+            }
+            ?.onErrorReturn { throwable ->
+                L.report(throwable)
+                ImageDelete().apply {
+                    success = false
+                    msg = "删除失败: ${throwable.message ?: "未知错误"}"
+                }
+            }
+            ?: Single.just(ImageDelete().apply {
+                success = false
+                msg = "删除失败: S1Service 为空"
+            })
+    }
 }
+
 
 interface DiscuzUploadApiService {
     @Multipart

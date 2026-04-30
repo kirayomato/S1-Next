@@ -266,4 +266,14 @@ interface S1Service {
 
     @GET(Api.URL_WEB_BLACK_LIST)
     suspend fun getWebBlackList(@Query("uid") uid: String?, @Query("page") page: Int): String
+
+    //region Delete Attachments
+    @GET("forum.php?mod=ajax&action=deleteattach&inajax=yes")
+    fun deleteAttachments(
+        @Query("formhash") formhash: String,
+        @Query("tid") tid: Int,
+        @Query("pid") pid: Int,
+        @Query("aids[]") aid: String
+    ): Single<String>
+    //endregion
 }

@@ -45,9 +45,9 @@ import javax.inject.Inject
  */
 abstract class BasePostEditFragment : BaseFragment(),
     PostToolsExtrasFragment.PostToolsExtrasContextProvider {
-    protected lateinit var mFragmentPostBinding: FragmentPostBinding
+    private lateinit var mFragmentPostBinding: FragmentPostBinding
     protected lateinit var mReplyView: EditText
-    protected lateinit var mImePanelView: KPSwitchPanelFrameLayout
+    private lateinit var mImePanelView: KPSwitchPanelFrameLayout
 
     /**
      * `mMenuSend` is null when configuration changes.
@@ -80,7 +80,7 @@ abstract class BasePostEditFragment : BaseFragment(),
         if (savedInstanceState != null) {
             toolsFirstInit = false
             //Find tools fragment from childFragmentManager
-            val fragments = listOf<androidx.fragment.app.Fragment>(
+            val fragments = listOf(
                     childFragmentManager.findFragmentByTag(EmotionFragment.TAG)!!,
                     childFragmentManager.findFragmentByTag(ImageUploadFragment.TAG)!!,
                     childFragmentManager.findFragmentByTag(PostToolsExtrasFragment.TAG)!!
@@ -161,7 +161,7 @@ abstract class BasePostEditFragment : BaseFragment(),
         mCacheDisposable = null
         if (!TextUtils.isEmpty(cacheKey) && TextUtils.isEmpty(mReplyView.text)) {
             mCacheDisposable = resumeFromCache(Single.just(cacheKey)
-                    .flatMap { key -> RxJavaUtil.neverNull(editorDiskCache.get(key)) })
+                    .flatMap { key -> RxJavaUtil.neverNull(editorDiskCache[key]) })
         }
     }
 
@@ -178,7 +178,7 @@ abstract class BasePostEditFragment : BaseFragment(),
                             editorDiskCache.put(key, s)
                             s
                         }
-                        .compose(RxJavaUtil.iOSingleTransformer<String>())
+                        .compose(RxJavaUtil.iOSingleTransformer())
                         .subscribe(L::i, L::report)
             }
         }
@@ -215,6 +215,10 @@ abstract class BasePostEditFragment : BaseFragment(),
 
     open fun getForumId(): Int = 0
 
+    open fun getThreadId(): Int? = null
+
+    open fun getPostId(): Int? = null
+
     /**
      * Key of EditorDiskCache cache. not save/restore if return null
      */
@@ -232,7 +236,7 @@ abstract class BasePostEditFragment : BaseFragment(),
 
     @UiThread
     open fun resumeFromCache(cache: Single<String>): Disposable? {
-        return cache.compose(RxJavaUtil.iOSingleTransformer<String>())
+        return cache.compose(RxJavaUtil.iOSingleTransformer())
                 .subscribe({ mReplyView.setText(it) }, L::report)
     }
 
@@ -292,7 +296,7 @@ abstract class BasePostEditFragment : BaseFragment(),
     private fun showToolsTab(tab: TabLayout.Tab?) {
         val pos = tab?.position ?: -1
         if (pos >= 0 && pos < toolsFragments.size) {
-            childFragmentManager.beginTransaction()?.also { t ->
+            childFragmentManager.beginTransaction().also { t ->
                 toolsFragments.forEachIndexed { index, pair ->
                     if (index == pos) {
                         t.show(pair.second)
@@ -300,7 +304,7 @@ abstract class BasePostEditFragment : BaseFragment(),
                         t.hide(pair.second)
                     }
                 }
-            }?.commit()
+            }.commit()
         } else {
             L.report(IllegalStateException("Illegal TabLayout pos: $pos, ${toolsFragments.size}"))
         }
@@ -325,7 +329,7 @@ abstract class BasePostEditFragment : BaseFragment(),
         return mReplyView.text.isNullOrBlank()
     }
 
-    val content: String?
+    val content: String
         get() {
             return mReplyView.text.toString()
         }

@@ -11,7 +11,6 @@ import com.github.ykrank.androidautodispose.AndroidRxDispose
 import com.github.ykrank.androidlifecycle.event.FragmentEvent
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.RxJavaUtil
-import com.github.ykrank.androidtools.widget.uploadimg.ModelImageUpload
 import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.S1Service
@@ -24,7 +23,6 @@ import me.ykrank.s1next.view.adapter.SimpleSpinnerAdapter
 import me.ykrank.s1next.view.dialog.requestdialog.EditPostRequestDialogFragment
 import me.ykrank.s1next.view.event.RequestDialogSuccessEvent
 import me.ykrank.s1next.view.page.post.postedit.BasePostEditFragment
-import java.util.regex.Pattern
 import javax.inject.Inject
 
 /**
@@ -46,7 +44,7 @@ class EditPostFragment : BasePostEditFragment() {
         App.appComponent.inject(this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentEditPostBinding.inflate(inflater, container, false)
         initCreateView(binding.layoutPost)
 
@@ -110,7 +108,7 @@ class EditPostFragment : BasePostEditFragment() {
         if (images.isEmpty()) return null
 
         val attachments = mutableMapOf<String, String>()
-        val regex = """\[attachimg\](\d+)\[/attachimg\]""".toRegex()
+        val regex = """\[attachimg](\d+)\[/attachimg]""".toRegex()
 
         images.forEach { image ->
             val url = image.url
@@ -139,15 +137,12 @@ class EditPostFragment : BasePostEditFragment() {
     }
 
     private fun isMessageValid(string: String?): Boolean {
-        if (string.isNullOrBlank()) {
-            return false
-        }
-        return true
+        return !string.isNullOrBlank()
     }
 
     private fun init() {
         mS1Service.getEditPostInfo(mThread.fid!!.toInt(), mThread.id!!.toInt(), mPost.id)
-                .map<PostEditor> { PostEditor.fromHtml(it) }
+                .map { PostEditor.fromHtml(it) }
                 .compose(RxJavaUtil.iOSingleTransformer())
                 .to(AndroidRxDispose.withSingle(this, FragmentEvent.DESTROY))
                 .subscribe({ postEditor ->
@@ -193,6 +188,10 @@ class EditPostFragment : BasePostEditFragment() {
     override fun isRequestDialogAccept(event: RequestDialogSuccessEvent): Boolean {
         return event.dialogFragment is EditPostRequestDialogFragment
     }
+
+    override fun getThreadId(): Int? = mThread.id?.toIntOrNull()
+
+    override fun getPostId(): Int = mPost.id
 
     override fun onRequestDialogSuccess() {
         activity?.setResult(Activity.RESULT_OK)

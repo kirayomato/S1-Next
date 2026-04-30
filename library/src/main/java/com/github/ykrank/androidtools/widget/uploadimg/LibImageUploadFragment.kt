@@ -28,8 +28,7 @@ open class LibImageUploadFragment : LibImagePickerFragment() {
 
     private lateinit var binding: FragmentUploadedImageBinding
     private lateinit var adapter: ImageUploadAdapter
-
-    private lateinit var imageUploadManager: ImageUploadManager
+    protected lateinit var imageUploadManager: ImageUploadManager
 
     val images = arrayListOf<ModelImageUpload>()
     private val modelAdd = ModelImageUploadAdd()
@@ -140,6 +139,7 @@ open class LibImageUploadFragment : LibImagePickerFragment() {
                     it.model.state = ModelImageUpload.STATE_DONE
                     it.model.url = it.upload.url
                     it.model.deleteUrl = it.upload.deleteUrl
+                    it.model.aid = it.upload.aid  // 保存附件ID用于删除
                 } else {
                     it.model.state = ModelImageUpload.STATE_ERROR
                     context?.toast(it.upload?.msg)
@@ -158,7 +158,7 @@ open class LibImageUploadFragment : LibImagePickerFragment() {
     }
 
     @MainThread
-    fun delPickedImage(model: ModelImageUpload?) {
+    open fun delPickedImage(model: ModelImageUpload?) {
         if (model != null) {
             val deleteUrl = model.deleteUrl
             if (deleteUrl == null) {
@@ -183,7 +183,7 @@ open class LibImageUploadFragment : LibImagePickerFragment() {
     }
 
     @MainThread
-    private fun removeUploadedImage(model: ModelImageUpload) {
+    fun removeUploadedImage(model: ModelImageUpload) {
         images.remove(model)
         adapter.dataSet.indexOf(model).also {
             if (it >= 0) {

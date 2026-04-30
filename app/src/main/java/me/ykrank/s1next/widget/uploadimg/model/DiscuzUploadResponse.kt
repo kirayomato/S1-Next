@@ -27,6 +27,7 @@ class DiscuzUploadResponse {
         model.success = success
         model.msg = if (success) null else error
         model.url = if (success) "[attachimg]${aid}[/attachimg]" else null
+        model.aid = aid  // 保存附件ID用于删除
         return model
     }
 
