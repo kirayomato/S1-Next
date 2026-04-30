@@ -75,11 +75,25 @@ open class LibImageUploadFragment : LibImagePickerFragment() {
         outState.putParcelableArrayList(Extras_Upload_Images, images)
     }
 
-    private fun refreshDataSet() {
+    protected fun refreshDataSet() {
         val dataset = mutableListOf<Any>()
         dataset.addAll(images)
         dataset.add(modelAdd)
         adapter.refreshDataSet(dataset, true)
+    }
+
+    /**
+     * Add existing images (e.g., from editing a post with attachments)
+     */
+    @MainThread
+    fun addExistingImages(newImages: List<ModelImageUpload>) {
+        val existingAids = images.mapNotNull { it.aid }.toSet()
+        newImages.forEach { newImage ->
+            if (newImage.aid != null && !existingAids.contains(newImage.aid)) {
+                images.add(newImage)
+            }
+        }
+        refreshDataSet()
     }
 
     override fun afterPickImage(medias: List<LocalMedia>) {

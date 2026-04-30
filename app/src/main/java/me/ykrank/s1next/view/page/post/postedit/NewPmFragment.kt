@@ -17,13 +17,13 @@ class NewPmFragment : BasePostEditFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mToUid = arguments!!.getString(ARG_TO_UID)!!
+        mToUid = requireArguments().getString(ARG_TO_UID)!!
         cacheKey = String.format(CACHE_KEY_PREFIX, mToUid)
-        leavePageMsg("NewPmFragment##mToUid" + mToUid)
+        leavePageMsg("NewPmFragment##mToUid$mToUid")
     }
 
     override fun onMenuSendClick(): Boolean {
-        PmRequestDialogFragment.newInstance(mToUid, mReplyView.text.toString()).show(fragmentManager!!,
+        PmRequestDialogFragment.newInstance(mToUid, mReplyView.text.toString()).show(requireFragmentManager(),
                 PmRequestDialogFragment.TAG)
 
         return true

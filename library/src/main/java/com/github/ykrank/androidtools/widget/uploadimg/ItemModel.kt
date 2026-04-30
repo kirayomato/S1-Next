@@ -52,7 +52,11 @@ class ModelImageUpload(val media: LocalMedia?) : DiffSameItem, Parcelable, Stabl
     }
 
     override val stableId: Long
-        get() = localUri.hashCode().toLong()
+        get() = if (media == null) {
+            (aid?.hashCode() ?: System.identityHashCode(this)).toLong()
+        } else {
+            (localUri?.hashCode() ?: System.identityHashCode(this)).toLong()
+        }
 
     override fun isSameItem(other: Any?): Boolean {
         if (this === other) return true

@@ -338,4 +338,8 @@ abstract class BasePostEditFragment : BaseFragment(),
         get() {
             return (toolsFragments[1].second as ImageUploadFragment).images
         }
+
+    protected fun getImageUploadFragment(): ImageUploadFragment? {
+        return toolsFragments.getOrNull(1)?.second as? ImageUploadFragment
+    }
 }

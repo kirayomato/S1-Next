@@ -23,6 +23,7 @@ import me.ykrank.s1next.view.adapter.SimpleSpinnerAdapter
 import me.ykrank.s1next.view.dialog.requestdialog.EditPostRequestDialogFragment
 import me.ykrank.s1next.view.event.RequestDialogSuccessEvent
 import me.ykrank.s1next.view.page.post.postedit.BasePostEditFragment
+import com.github.ykrank.androidtools.widget.uploadimg.ModelImageUpload
 import javax.inject.Inject
 
 /**
@@ -156,11 +157,38 @@ class EditPostFragment : BasePostEditFragment() {
                         binding.title.setText(postEditor.subject)
                     }
                     binding.layoutPost.reply.setText(postEditor.message)
+
+                    // 解析消息中的 attachimg 标签，将已有图片添加到上传列表
+                    addExistingImagesFromMessage(postEditor.message)
                 }, { e ->
                     L.report(e)
                     showRetrySnackbar(e, View.OnClickListener { init() })
                 })
+    }
 
+    /**
+     * 从消息中解析 attachimg 标签，将已有图片添加到 ImageUploadFragment
+     */
+    private fun addExistingImagesFromMessage(message: String?) {
+        if (message.isNullOrEmpty()) return
+
+        val regex = """\[attachimg](\d+)\[/attachimg]""".toRegex()
+        val images = mutableListOf<ModelImageUpload>()
+
+        regex.findAll(message).forEach { matchResult ->
+            val aid = matchResult.groupValues[1]
+            val model = ModelImageUpload(null)
+            model.aid = aid
+            model.url = "[attachimg]${aid}[/attachimg]"
+            model.state = ModelImageUpload.STATE_DONE
+            model.tid = mThread.id?.toIntOrNull()
+            model.pid = mPost.id
+            images.add(model)
+        }
+
+        if (images.isNotEmpty()) {
+            getImageUploadFragment()?.addExistingImages(images)
+        }
     }
 
     private fun setSpinnerType(types: List<ThreadType>?) {
