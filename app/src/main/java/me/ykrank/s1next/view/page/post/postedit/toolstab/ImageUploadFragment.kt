@@ -2,6 +2,7 @@ package me.ykrank.s1next.view.page.post.postedit.toolstab
 
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import com.github.ykrank.androidautodispose.AndroidRxDispose
 import com.github.ykrank.androidlifecycle.event.FragmentEvent
 import com.github.ykrank.androidtools.extension.toast
@@ -66,33 +67,50 @@ class ImageUploadFragment : LibImageUploadFragment() {
     }
 
     override fun delPickedImage(model: ModelImageUpload?) {
-        if (model != null) {
-            // 如果没有 aid，直接移除（图片可能未上传成功）
-            if (model.aid.isNullOrEmpty()) {
-                removeUploadedImage(model)
-                return
-            }
-            
-            (imageUploadManager as? ForumImageUploadManager)?.apply {
-                // 设置tid和pid（可能从model中获取）
-                if (model.tid != null) setTid(model.tid)
-                if (model.pid != null) setPid(model.pid)
-            }
-            imageUploadManager.delUploadedImage(model)
-                .compose(RxJavaUtil.iOSingleTransformer())
-                .doAfterTerminate {
-                    LooperUtil.workInMainThread {
-                        removeUploadedImage(model)
-                    }
+        if (model == null) return
+        
+        // 已上传的图片（有aid）需要确认
+        if (!model.aid.isNullOrEmpty()) {
+            AlertDialog.Builder(requireContext())
+                .setTitle("删除图片")
+                .setMessage("确定要删除这张图片吗？删除后将无法恢复。")
+                .setPositiveButton("删除") { _, _ ->
+                    delPickedImageAfterConfirm(model)
                 }
-                .to(AndroidRxDispose.withSingle(this, FragmentEvent.DESTROY))
-                .subscribe({
-                    context?.toast(it.msg)
-                    if (!it.success) {
-                        L.report(ImageUploadError("Delete image error: $model, $it"))
-                    }
-                }, L::report)
+                .setNegativeButton("取消", null)
+                .show()
+        } else {
+            // 未上传的图片直接移除
+            delPickedImageAfterConfirm(model)
         }
+    }
+
+    private fun delPickedImageAfterConfirm(model: ModelImageUpload) {
+        // 如果没有 aid，直接移除（图片可能未上传成功）
+        if (model.aid.isNullOrEmpty()) {
+            removeUploadedImage(model)
+            return
+        }
+        
+        (imageUploadManager as? ForumImageUploadManager)?.apply {
+            // 设置tid和pid（可能从model中获取）
+            if (model.tid != null) setTid(model.tid)
+            if (model.pid != null) setPid(model.pid)
+        }
+        imageUploadManager.delUploadedImage(model)
+            .compose(RxJavaUtil.iOSingleTransformer())
+            .doAfterTerminate {
+                LooperUtil.workInMainThread {
+                    removeUploadedImage(model)
+                }
+            }
+            .to(AndroidRxDispose.withSingle(this, FragmentEvent.DESTROY))
+            .subscribe({
+                context?.toast(it.msg)
+                if (!it.success) {
+                    L.report(ImageUploadError("Delete image error: $model, $it"))
+                }
+            }, L::report)
     }
 
     companion object {

@@ -197,7 +197,7 @@ open class LibImageUploadFragment : LibImagePickerFragment() {
     }
 
     @MainThread
-    fun removeUploadedImage(model: ModelImageUpload) {
+    protected fun removeUploadedImage(model: ModelImageUpload) {
         images.remove(model)
         adapter.dataSet.indexOf(model).also {
             if (it >= 0) {
