@@ -169,7 +169,8 @@ interface S1Service {
         @Field("typeid") typeId: String?, @Field("subject") subject: String?,
         @Field("message") message: String?, @Field("allownoticeauthor") allowNoticeAuthor: Int,
         @Field("usesig") useSign: Int, @Field("save") saveAsDraft: Int?,
-        @Field("readperm") readPerm: String?
+        @Field("readperm") readPerm: String?,
+        @FieldMap attachments: Map<String, String>? = null
     ): Single<String>
 
     @FormUrlEncoded

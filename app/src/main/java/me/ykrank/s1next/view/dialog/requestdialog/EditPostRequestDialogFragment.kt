@@ -25,6 +25,7 @@ class EditPostRequestDialogFragment : BaseRequestDialogFragment<AjaxResult>() {
         val typeId = bundle.getString(ARG_TYPE_ID)
         val readPerm = bundle.getString(ARG_READ_PERM)
         val message = bundle.getString(ARG_MESSAGE)
+        val attachments = bundle.getSerializable(ARG_ATTACHMENTS) as? HashMap<String, String>
 
         if (mPost == null || mThread == null) {
             return Single.error(NullPointerException())
@@ -39,7 +40,8 @@ class EditPostRequestDialogFragment : BaseRequestDialogFragment<AjaxResult>() {
                 1,
                 1,
                 saveAsDraft,
-                readPerm
+                readPerm,
+                attachments
             ).map {
                 AjaxResult.fromAjaxString(it)
             }
@@ -64,9 +66,10 @@ class EditPostRequestDialogFragment : BaseRequestDialogFragment<AjaxResult>() {
         private const val ARG_READ_PERM = "read_perm"
         private const val ARG_TITLE = "title"
         private const val ARG_MESSAGE = "message"
+        private const val ARG_ATTACHMENTS = "attachments"
 
         fun newInstance(thread: Thread, post: Post, typeId: String?, readPerm: String?, title: String,
-                        message: String): EditPostRequestDialogFragment {
+                        message: String, attachments: Map<String, String>? = null): EditPostRequestDialogFragment {
             val fragment = EditPostRequestDialogFragment()
             val bundle = Bundle()
             bundle.putParcelable(ARG_THREAD, thread)
@@ -75,6 +78,9 @@ class EditPostRequestDialogFragment : BaseRequestDialogFragment<AjaxResult>() {
             bundle.putString(ARG_READ_PERM, readPerm)
             bundle.putString(ARG_TITLE, title)
             bundle.putString(ARG_MESSAGE, message)
+            if (attachments != null) {
+                bundle.putSerializable(ARG_ATTACHMENTS, HashMap(attachments))
+            }
             fragment.arguments = bundle
 
             return fragment

@@ -11,6 +11,7 @@ import com.github.ykrank.androidautodispose.AndroidRxDispose
 import com.github.ykrank.androidlifecycle.event.FragmentEvent
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.RxJavaUtil
+import com.github.ykrank.androidtools.widget.uploadimg.ModelImageUpload
 import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.S1Service
@@ -23,6 +24,7 @@ import me.ykrank.s1next.view.adapter.SimpleSpinnerAdapter
 import me.ykrank.s1next.view.dialog.requestdialog.EditPostRequestDialogFragment
 import me.ykrank.s1next.view.event.RequestDialogSuccessEvent
 import me.ykrank.s1next.view.page.post.postedit.BasePostEditFragment
+import java.util.regex.Pattern
 import javax.inject.Inject
 
 /**
@@ -91,10 +93,36 @@ class EditPostFragment : BasePostEditFragment() {
             return true
         }
 
-        EditPostRequestDialogFragment.newInstance(mThread, mPost, typeId, readPerm, title!!, message!!)
+        // 收集附件ID
+        val attachments = buildAttachmentsMap()
+
+        EditPostRequestDialogFragment.newInstance(mThread, mPost, typeId, readPerm, title!!, message!!, attachments)
                 .show(parentFragmentManager, EditPostRequestDialogFragment.TAG)
 
         return true
+    }
+
+    /**
+     * 从已上传的图片中构建附件字段Map
+     */
+    private fun buildAttachmentsMap(): Map<String, String>? {
+        val images = selectImages
+        if (images.isEmpty()) return null
+
+        val attachments = mutableMapOf<String, String>()
+        val regex = """\[attachimg\](\d+)\[/attachimg\]""".toRegex()
+
+        images.forEach { image ->
+            val url = image.url
+            if (!url.isNullOrEmpty()) {
+                regex.find(url)?.groupValues?.get(1)?.let { aid ->
+                    attachments["attachupdate[$aid]"] = ""
+                    attachments["attachnew[$aid][description]"] = ""
+                }
+            }
+        }
+
+        return if (attachments.isEmpty()) null else attachments
     }
 
     override val cacheKey: String?
