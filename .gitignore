@@ -53,3 +53,4 @@ freeline_project_description.json
 /library/libs/normal/._*.jar
 /library/libs/play/._*.jar
 /.kotlin
+/app/normal
