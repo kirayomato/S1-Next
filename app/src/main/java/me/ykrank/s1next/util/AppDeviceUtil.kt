@@ -16,11 +16,11 @@ object AppDeviceUtil {
         get() = App.get().packageName
 
     @JvmStatic
-    fun getVersionName(): String {
+    fun getVersionName(): String? {
         return packageInfo.versionName
     }
 
-    fun getAppFullVersionName(): String {
+    fun getAppFullVersionName(): String? {
         return getVersionName()
     }
 
