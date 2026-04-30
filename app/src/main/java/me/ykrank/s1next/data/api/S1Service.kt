@@ -97,7 +97,7 @@ interface S1Service {
         @Field("formhash") authenticityToken: String?,
         @Field("tid") threadId: String?,
         @Field("message") reply: String?,
-        @FieldMap attachments: Map<String, String>? = null
+        @FieldMap attachments: Map<String, String> = emptyMap()
     ): Single<AccountResultWrapper>
 
     @GET(ApiForum.URL_QUOTE_HELPER)
@@ -115,7 +115,7 @@ interface S1Service {
         @Field("noticeauthor") encodedUserId: String?,
         @Field("noticetrimstr") quoteMessage: String?,
         @Field("noticeauthormsg") replyNotification: String?,
-        @FieldMap attachments: Map<String, String>? = null
+        @FieldMap attachments: Map<String, String> = emptyMap()
     ): Single<AccountResultWrapper>
 
     //endregion

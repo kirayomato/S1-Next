@@ -7,18 +7,16 @@ import io.reactivex.Single
 import me.ykrank.s1next.App.Companion.get
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.Api
-import me.ykrank.s1next.data.api.model.ForumUploadConfig
 import me.ykrank.s1next.data.api.model.Quote
 import me.ykrank.s1next.data.api.model.wrapper.AccountResultWrapper
 import me.ykrank.s1next.widget.track.event.NewReplyTrackEvent
-import javax.inject.Inject
 
 /**
  * A dialog requests to reply to post.
  */
 class ReplyRequestDialogFragment : BaseRequestDialogFragment<AccountResultWrapper>() {
 
-    override fun getProgressMessage(): CharSequence? {
+    override fun getProgressMessage(): CharSequence {
         return getText(R.string.dialog_progress_message_reply)
     }
 
@@ -26,7 +24,7 @@ class ReplyRequestDialogFragment : BaseRequestDialogFragment<AccountResultWrappe
         val threadId = requireArguments().getString(ARG_THREAD_ID)
         val quotePostId = requireArguments().getString(ARG_QUOTE_POST_ID)
         val reply = requireArguments().getString(ARG_REPLY)
-        val attachments = requireArguments().getSerializable(ARG_ATTACHMENTS) as? HashMap<String, String>
+        val attachments = (requireArguments().getSerializable(ARG_ATTACHMENTS) as? Map<String, String>) ?: emptyMap()
 
         return if (TextUtils.isEmpty(quotePostId)) {
             flatMappedWithAuthenticityToken { s: String? ->
@@ -75,7 +73,7 @@ class ReplyRequestDialogFragment : BaseRequestDialogFragment<AccountResultWrappe
             bundle.putString(ARG_THREAD_ID, threadId)
             bundle.putString(ARG_QUOTE_POST_ID, quotePostId)
             bundle.putString(ARG_REPLY, reply)
-            if (attachments != null) {
+            if (!attachments.isNullOrEmpty()) {
                 bundle.putSerializable(ARG_ATTACHMENTS, HashMap(attachments))
             }
             fragment.arguments = bundle

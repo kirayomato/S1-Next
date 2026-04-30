@@ -13,7 +13,7 @@ import me.ykrank.s1next.data.api.model.Thread
  */
 class EditPostRequestDialogFragment : BaseRequestDialogFragment<AjaxResult>() {
 
-    override fun getProgressMessage(): CharSequence? {
+    override fun getProgressMessage(): CharSequence {
         return getText(R.string.dialog_progress_message_reply)
     }
 
@@ -25,7 +25,7 @@ class EditPostRequestDialogFragment : BaseRequestDialogFragment<AjaxResult>() {
         val typeId = bundle.getString(ARG_TYPE_ID)
         val readPerm = bundle.getString(ARG_READ_PERM)
         val message = bundle.getString(ARG_MESSAGE)
-        val attachments = bundle.getSerializable(ARG_ATTACHMENTS) as? HashMap<String, String>
+        val attachments = (bundle.getSerializable(ARG_ATTACHMENTS) as? Map<String, String>) ?: emptyMap()
 
         if (mPost == null || mThread == null) {
             return Single.error(NullPointerException())
@@ -78,7 +78,7 @@ class EditPostRequestDialogFragment : BaseRequestDialogFragment<AjaxResult>() {
             bundle.putString(ARG_READ_PERM, readPerm)
             bundle.putString(ARG_TITLE, title)
             bundle.putString(ARG_MESSAGE, message)
-            if (attachments != null) {
+            if (!attachments.isNullOrEmpty()) {
                 bundle.putSerializable(ARG_ATTACHMENTS, HashMap(attachments))
             }
             fragment.arguments = bundle

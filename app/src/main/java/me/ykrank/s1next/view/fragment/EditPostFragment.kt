@@ -104,9 +104,9 @@ class EditPostFragment : BasePostEditFragment() {
     /**
      * 从已上传的图片中构建附件字段Map
      */
-    private fun buildAttachmentsMap(): Map<String, String>? {
+    private fun buildAttachmentsMap(): Map<String, String> {
         val images = selectImages
-        if (images.isEmpty()) return null
+        if (images.isEmpty()) return emptyMap()
 
         val attachments = mutableMapOf<String, String>()
         val regex = """\[attachimg](\d+)\[/attachimg]""".toRegex()
@@ -121,7 +121,7 @@ class EditPostFragment : BasePostEditFragment() {
             }
         }
 
-        return if (attachments.isEmpty()) null else attachments
+        return if (attachments.isEmpty()) emptyMap() else attachments
     }
 
     override val cacheKey: String?
