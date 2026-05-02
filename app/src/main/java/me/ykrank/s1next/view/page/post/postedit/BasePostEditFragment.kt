@@ -70,7 +70,6 @@ abstract class BasePostEditFragment : BaseFragment(),
     //Init onCreate
     private var toolsFirstInit = false
 
-    private val addImages: HashSet<String> = hashSetOf()
 
     override val currentEditText: EditText
         get() = mFragmentPostBinding.reply
@@ -152,7 +151,6 @@ abstract class BasePostEditFragment : BaseFragment(),
                 .ofType(PostAddImageEvent::class.java)
                 .to(AndroidRxDispose.withObservable(this, FragmentEvent.PAUSE))
                 .subscribe { event ->
-                    addImages.add(event.bbCode)
                     mReplyView.text.replace(mReplyView.selectionStart,
                             mReplyView.selectionEnd, event.bbCode)
                 }
@@ -198,10 +196,6 @@ abstract class BasePostEditFragment : BaseFragment(),
                     val url = image.url
                     if (url.isNullOrEmpty()) {
                         showSnackbar("请先等待图片上传完成")
-                        return false
-                    }
-                    if (!addImages.contains(url)) {
-                        showSnackbar("点击上传完成的图片，才能插入到帖子中")
                         return false
                     }
                 }

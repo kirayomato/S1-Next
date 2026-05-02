@@ -46,8 +46,19 @@ class ImageUploadFragment : LibImageUploadFragment() {
         App.appComponent.inject(this)
     }
 
-    override val imageClickListener: (View, ModelImageUpload) -> Unit =
-            { view, model -> model.url?.also { mEventBus.postDefault(PostAddImageEvent(it)) } }
+    override val imageClickListener: (View, ModelImageUpload) -> Unit = { view, model ->
+        val bbccode = if (!model.aid.isNullOrBlank()) {
+            "[attachimg]${model.aid}[/attachimg]"
+        } else if (!model.url.isNullOrBlank()) {
+            "[img]${model.url}[/img]"
+        } else {
+            "" // 都为空时给个默认值，避免崩溃
+        }
+
+        if (bbccode.isNotEmpty()) {
+            mEventBus.postDefault(PostAddImageEvent(bbccode))
+        }
+    }
 
     override fun provideImageUploadManager(): ImageUploadManager {
         val fid = (parentFragment as? BasePostEditFragment)?.getForumId() ?: 0
