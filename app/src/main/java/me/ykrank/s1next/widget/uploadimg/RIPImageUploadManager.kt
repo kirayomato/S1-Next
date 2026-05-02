@@ -96,7 +96,6 @@ class ForumImageUploadManager(
         return uploadWithHash(filePart, imageFile.name, imageFile.length())
     }
 
-    @OptIn(okhttp3.ExperimentalOkHttpApi::class)
     override fun uploadImage(imageFile: FileDescriptor): Single<ImageUpload> {
         val requestFile = imageFile.toRequestBody("image/*".toMediaTypeOrNull())
         val filePart = MultipartBody.Part.createFormData("Filedata", "image.jpg", requestFile)
@@ -117,7 +116,7 @@ class ForumImageUploadManager(
             })
         }
 
-        val uploadConfig = user?.forumUploadConfig
+        val uploadConfig = user.forumUploadConfig
         val hash = uploadConfig?.hash
 
         if (hash.isNullOrEmpty()) {
@@ -127,7 +126,7 @@ class ForumImageUploadManager(
                 ?.map { html -> ForumUploadConfig.fromHtml(html) }
                 ?.doOnSuccess { config ->
                     if (config != null) {
-                        user?.forumUploadConfig = config
+                        user.forumUploadConfig = config
                         L.d("✅ 已更新上传配置: hash=${config.hash}, fid=${config.fid}")
                     }
                 }
