@@ -54,7 +54,12 @@ class Threads @JsonCreator constructor(
         } catch (e: Exception) {
             L.report(e)
         }
-        this.threadList = getFilterThreadList(threadList)
+        this.threadList = try {
+            getFilterThreadList(threadList)
+        } catch (e: Exception) {
+            L.report(e)
+            threadList?.toMutableList() ?: mutableListOf()
+        }
     }
 
     companion object {
