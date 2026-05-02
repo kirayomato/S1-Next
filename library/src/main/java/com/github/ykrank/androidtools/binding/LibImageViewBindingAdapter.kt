@@ -73,11 +73,11 @@ object LibImageViewBindingAdapter {
                 .load(url)
                 .apply(requestOptions)
                 .thumbnail(localRequest)
-                .listener(object : RequestListener<Drawable?> {
+                .listener(object : RequestListener<Drawable> {
                     override fun onLoadFailed(
                         e: GlideException?,
                         model: Any?,
-                        target: Target<Drawable?>,
+                        target: Target<Drawable>,
                         isFirstResource: Boolean
                     ): Boolean {
                         return true
@@ -152,11 +152,11 @@ object LibImageViewBindingAdapter {
             .load(url)
             .apply(requestOptions)
             .thumbnail(thumbnailRequest)
-            .listener(object : RequestListener<Drawable?> {
+            .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(
                     e: GlideException?,
                     model: Any?,
-                    target: Target<Drawable?>,
+                    target: Target<Drawable>,
                     isFirstResource: Boolean
                 ): Boolean {
                     //stop thumnal animatable like gif

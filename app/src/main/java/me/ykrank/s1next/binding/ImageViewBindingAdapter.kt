@@ -1,7 +1,6 @@
 package me.ykrank.s1next.binding
 
 import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.text.TextUtils
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
@@ -28,6 +27,7 @@ import me.ykrank.s1next.widget.glide.model.AvatarUrl
 import me.ykrank.s1next.widget.image.ImageBiz
 import me.ykrank.s1next.widget.image.avatar
 import me.ykrank.s1next.widget.image.avatarUid
+import androidx.core.net.toUri
 
 object ImageViewBindingAdapter {
     @JvmStatic
@@ -39,20 +39,20 @@ object ImageViewBindingAdapter {
     ) {
         val imageType = emoticon.imageType
         if (imageType != null) {
-            val uri = Uri.parse(emoticon.imagePath + imageType)
+            val uri = (emoticon.imagePath + imageType).toUri()
             requestManager.load(uri).into(imageView)
         } else {
-            val pngUri = Uri.parse(emoticon.imagePath + Emoticon.TYPE_PNG)
+            val pngUri = (emoticon.imagePath + Emoticon.TYPE_PNG).toUri()
             requestManager.load(pngUri)
-                .listener(object : RequestListener<Drawable?> {
+                .listener(object : RequestListener<Drawable> {
                     override fun onLoadFailed(
                         e: GlideException?,
                         model: Any?,
-                        target: Target<Drawable?>,
+                        target: Target<Drawable>,
                         isFirstResource: Boolean
                     ): Boolean {
                         emoticon.imageType = Emoticon.TYPE_GIF
-                        val uri = Uri.parse(emoticon.imagePath + Emoticon.TYPE_GIF)
+                        val uri = (emoticon.imagePath + Emoticon.TYPE_GIF).toUri()
                         imageView.post {
                             requestManager.load(uri).into(imageView)
                         }
@@ -62,7 +62,7 @@ object ImageViewBindingAdapter {
                     override fun onResourceReady(
                         resource: Drawable,
                         model: Any,
-                        target: Target<Drawable?>,
+                        target: Target<Drawable>,
                         dataSource: DataSource,
                         isFirstResource: Boolean
                     ): Boolean {

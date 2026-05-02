@@ -51,11 +51,11 @@ object PhotoViewBindingAdapter {
             .image(imageBiz, url, forcePass = true)
             .apply(requestOptions)
             .thumbnail(thumbnailRequest)
-            .listener(object : RequestListener<Drawable?> {
+            .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(
                     e: GlideException?,
                     model: Any?,
-                    target: Target<Drawable?>,
+                    target: Target<Drawable>,
                     isFirstResource: Boolean
                 ): Boolean {
                     //stop thumnal animatable like gif
@@ -72,7 +72,7 @@ object PhotoViewBindingAdapter {
                 override fun onResourceReady(
                     resource: Drawable,
                     model: Any,
-                    target: Target<Drawable?>,
+                    target: Target<Drawable>,
                     dataSource: DataSource,
                     isFirstResource: Boolean
                 ): Boolean {
