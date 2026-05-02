@@ -4,10 +4,9 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
 plugins {
     alias(libs.plugins.androidApplication)
-    alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.gradleVersionsPlugin)
     alias(libs.plugins.androidKsp)
-    kotlin("kapt")
+    alias(libs.plugins.legacy.kapt)
     id("kotlin-parcelize")
 }
 
