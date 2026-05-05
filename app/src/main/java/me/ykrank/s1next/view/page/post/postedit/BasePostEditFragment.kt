@@ -309,8 +309,11 @@ abstract class BasePostEditFragment : BaseFragment(),
 
     private fun showToolsKeyboard() {
         isToolsKeyboardShowing = true
-        KPSwitchConflictUtil.showPanel(mImePanelView)
-
+        // 先隐藏键盘再显示面板，确保切换正常
+        KeyboardUtil.hideKeyboard(mReplyView)
+        mImePanelView.post {
+            KPSwitchConflictUtil.showPanel(mImePanelView)
+        }
     }
 
     fun hideToolsKeyboard() {
