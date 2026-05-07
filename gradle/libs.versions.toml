@@ -45,7 +45,7 @@ transition = "1.7.0"
 largeimageview = "1.1.0"
 minSdk = "32"
 compileSdk = "37"
-targetSdk = "35"
+targetSdk = "34"
 agp = "9.2.0"
 
 [libraries]
