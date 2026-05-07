@@ -2,26 +2,25 @@
 adapterdelegates3 = "3.1.0"
 alicloudAndroidHttpdns = "2.4.0"
 androidautodispose = "0.4.0"
-activity = "1.9.0"
+activity = "1.13.0"
 cardview = "1.0.0"
 databinding_compiler = "3.1.4"
-constraintlayout = "2.1.4"
+constraintlayout = "2.2.1"
 bugly_crashreport = "4.1.9.3"
 bugly_crashreport_upgrade = "1.6.1"
 bugly_nativecrashreport = "3.9.2"
-dagger = "2.51.1"
-flipper = "0.271.0"
+dagger = "2.59.2"
+flipper = "0.273.0"
 glide = "5.0.7"
-guava = "33.2.0-android"
-# https://github.com/FasterXML/jackson-databind/issues/3702
-# jackson 2.14 does not work on Android API < 26
-jackson = "2.17.1"
-jsoup = "1.17.2"
+guava = "33.6.0-android"
+jackson = "2.21.3"
+jsoup = "1.22.2"
 leakcanaryAndroid = "2.14"
 leakcanaryAndroidNoOp = "1.6.3"
 preference = "1.2.1"
-lifecycleLivedataKtx = "2.8.3"
+lifecycleLivedataKtx = "2.10.0"
 logger = "2.2.0"
+# don't update material to 1.13.0
 material = "1.12.0"
 multidex = "2.0.1"
 okhttp = "5.3.2"
@@ -33,21 +32,16 @@ paperparcelKotlin = "2.0.8"
 percentlayout = "1.0.0"
 photoview = "2.3.0"
 quicksidebar = "1.0.3"
-retrofit = "2.11.0"
+retrofit = "3.0.0"
 rxandroid = "2.1.1"
 rxjava = "2.2.21"
 rxkotlin = "2.4.0"
-soloader = "0.11.0"
-gradleVersionsPlugin = "0.51.0"
+soloader = "0.12.1"
+gradleVersionsPlugin = "0.54.0"
 kotlinKsp = "2.3.7"
-coreKtx = "1.13.1"
-junit = "4.13.2"
-junitVersion = "1.2.1"
-espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.8.3"
-paging = "3.3.0"
-room = "2.6.1"
-transition = "1.5.0"
+paging = "3.4.2"
+room = "2.8.4"
+transition = "1.7.0"
 largeimageview = "1.1.0"
 minSdk = "32"
 compileSdk = "37"
@@ -58,11 +52,9 @@ agp = "9.2.0"
 adapterdelegates3 = { module = "com.hannesdorfmann:adapterdelegates3", version.ref = "adapterdelegates3" }
 alicloud-android-httpdns = { module = "com.aliyun.ams:alicloud-android-httpdns", version.ref = "alicloudAndroidHttpdns" }
 androidautodispose = { module = "com.github.ykrank:androidautodispose", version.ref = "androidautodispose" }
-androidx-activity = { module = "androidx.activity:activity", version.ref = "activity" }
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
 androidx-cardview = { module = "androidx.cardview:cardview", version.ref = "cardview" }
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
-androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-preference = { module = "androidx.preference:preference-ktx", version.ref = "preference" }
 androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
 androidx-multidex = { module = "androidx.multidex:multidex", version.ref = "multidex" }
@@ -85,10 +77,6 @@ guava = { module = "com.google.guava:guava", version.ref = "guava" }
 jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
-androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
