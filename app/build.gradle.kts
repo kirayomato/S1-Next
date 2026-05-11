@@ -36,6 +36,7 @@ android {
     defaultConfig {
         applicationId = "me.ykrank.s1next"
         minSdk = libs.versions.minSdk.get().toInt()
+        //noinspection OldTargetApi
         targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = appVersionCode
         versionName = "${appVersionName}.${appVersionCode}${appVersionSuffix}"

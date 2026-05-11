@@ -21,6 +21,7 @@ preference = "1.2.1"
 lifecycleLivedataKtx = "2.10.0"
 logger = "2.2.0"
 # don't update material to 1.13.0
+#noinspection GradleDependency
 material = "1.12.0"
 multidex = "2.0.1"
 okhttp = "5.3.2"
@@ -39,14 +40,15 @@ rxkotlin = "2.4.0"
 soloader = "0.12.1"
 gradleVersionsPlugin = "0.54.0"
 kotlinKsp = "2.3.7"
-paging = "3.4.2"
+paging = "3.5.0"
 room = "2.8.4"
 transition = "1.7.0"
 largeimageview = "1.1.0"
 minSdk = "32"
 compileSdk = "37"
+#noinspection OldTargetApi
 targetSdk = "34"
-agp = "9.2.0"
+agp = "9.2.1"
 
 [libraries]
 adapterdelegates3 = { module = "com.hannesdorfmann:adapterdelegates3", version.ref = "adapterdelegates3" }
