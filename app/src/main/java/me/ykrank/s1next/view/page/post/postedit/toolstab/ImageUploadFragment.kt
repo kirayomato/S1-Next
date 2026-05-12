@@ -48,9 +48,9 @@ class ImageUploadFragment : LibImageUploadFragment() {
 
     override val imageClickListener: (View, ModelImageUpload) -> Unit = { view, model ->
         val bbccode = if (!model.aid.isNullOrBlank()) {
-            "[attachimg]${model.aid}[/attachimg]"
+            "\n[attachimg]${model.aid}[/attachimg]"
         } else if (!model.url.isNullOrBlank()) {
-            "[img]${model.url}[/img]"
+            "\n[img]${model.url}[/img]"
         } else {
             "" // 都为空时给个默认值，避免崩溃
         }
