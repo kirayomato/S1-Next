@@ -34,6 +34,7 @@
         <item name="actionModeBackground">?attr/colorPrimary</item>
         <item name="colorControlActivated">?attr/colorAccent</item>
         <item name="materialCardViewStyle">@style/CardView.Light.AfternoonTea</item>
+        <item name="cardViewBackground">@color/saraba_background</item>
     </style>
 
     <style name="Lib.Base.Theme.Light.Amber" parent="Lib.Base.Theme.Light.Inverse">
@@ -72,6 +73,7 @@
         <item name="colorPrimaryDark">@android:color/black</item>
         <item name="colorPrimary">@android:color/black</item>
         <item name="materialCardViewStyle">@style/CardView.Dark.NightMode.Amoled</item>
+        <item name="cardViewBackground">@android:color/black</item>
         <item name="cardViewContainerBackground">@android:color/black</item>
     </style>
 
@@ -109,6 +111,7 @@
         <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
         <item name="preferenceTheme">@style/Preference.Overlay</item>
         <item name="materialCardViewStyle">@style/CustomCardView.Light</item>
+        <item name="cardViewBackground">@color/light_background</item>
         <item name="cardViewContainerBackground">@color/light_card_view_container</item>
 
         <item name="drawerTextColor">?android:attr/textColorPrimaryInverse</item>
@@ -162,6 +165,7 @@
         <item name="toolbarTitleTextStyle">@style/CustomToolbarTitle.Dark</item>
         <item name="popupTheme">@style/ThemeOverlay.AppCompat.Dark</item>
         <item name="materialCardViewStyle">@style/CustomCardView.Dark</item>
+        <item name="cardViewBackground">@color/dark_card_view</item>
         <!-- Actually the dark CardView background is not same to `android:colorBackground` which
         is inconsistent with light theme. But it looks much better. May fix this inconsistency later.-->
         <item name="cardViewContainerBackground">@color/dark_background</item>

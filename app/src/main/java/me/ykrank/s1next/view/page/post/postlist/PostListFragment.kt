@@ -9,12 +9,14 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
 import androidx.annotation.MainThread
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import com.github.ykrank.androidautodispose.AndroidRxDispose
 import com.github.ykrank.androidlifecycle.event.FragmentEvent
 import com.github.ykrank.androidtools.extension.throttleFirst
+import com.github.ykrank.androidtools.ui.dialog.PageJumpDialogFragment
 import com.github.ykrank.androidtools.ui.internal.CoordinatorLayoutAnchorDelegate
 import com.github.ykrank.androidtools.util.*
 import com.github.ykrank.androidtools.widget.EventBus
@@ -84,6 +86,7 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
 
     private var mThreadAttachment: Posts.ThreadAttachment? = null
     private var mMenuThreadAttachment: MenuItem? = null
+    private var toolbarPageJumpView: TextView? = null
 
     private var readProgress: ReadProgress? = null
     private var tempReadProgress: ReadProgress? = null
@@ -103,6 +106,7 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupToolbarPageJump()
         App.appComponent.inject(this)
 
         val bundle = requireArguments()
@@ -169,6 +173,7 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
             }
             saveHistory()
         }
+        setTitleWithPosition(currentPage)
 
         (activity as CoordinatorLayoutAnchorDelegate).setupFloatingActionButton(
             R.drawable.ic_insert_comment_black_24dp, this
@@ -271,6 +276,7 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
+        menu.findItem(R.id.menu_page_jump)?.isVisible = false
         inflater.inflate(R.menu.fragment_post, menu)
 
         mMenuThreadAttachment = menu.findItem(R.id.menu_thread_attachment)
@@ -423,15 +429,21 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
         return mThreadTitle
     }
 
+    override fun setTitleWithPosition(position: Int) {
+        activity?.title = mThreadTitle
+        renderToolbarPageJump(position)
+    }
+
     override fun setThreadInfo(thread: Thread?) {
         if (thread != null) {
-            setThreadTitle(thread.title)
             setTotalPageByPosts(thread.reliesCount + 1)
+            setThreadTitle(thread.title)
         }
     }
 
     private fun setTotalPageByPosts(threads: Int) {
         setTotalPages(MathUtil.divide(threads, Api.POSTS_PER_PAGE))
+        renderToolbarPageJump()
         //save reply count in database
         mLastThreadInfoFlow.tryEmit(threads - 1)
     }
@@ -442,6 +454,30 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
             setTitleWithPosition(currentPage)
         }
         saveHistory()
+    }
+
+    private fun setupToolbarPageJump() {
+        toolbarPageJumpView = activity?.findViewById<TextView>(R.id.toolbar_page_jump)?.apply {
+            setOnClickListener {
+                showPageJumpDialog()
+            }
+        }
+        renderToolbarPageJump()
+    }
+
+    private fun renderToolbarPageJump(position: Int = currentPage) {
+        toolbarPageJumpView?.apply {
+            visibility = View.VISIBLE
+            text = "${position + 1}/${maxOf(getTotalPages(), 1)}"
+        }
+    }
+
+    private fun showPageJumpDialog() {
+        if (getTotalPages() <= 1) {
+            return
+        }
+        PageJumpDialogFragment.newInstance(getTotalPages(), currentPage)
+            .show(childFragmentManager, PageJumpDialogFragment.TAG)
     }
 
     override fun setupThreadAttachment(threadAttachment: Posts.ThreadAttachment) {

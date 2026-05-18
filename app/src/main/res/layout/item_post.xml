@@ -25,7 +25,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_micro"
         android:layout_marginBottom="@dimen/spacing_micro"
-        app:cardCornerRadius="0dp">
+        app:cardCornerRadius="0dp"
+        app:cardElevation="0dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -33,17 +34,35 @@
             android:padding="@dimen/item_padding"
             app:marginEnd="@{quickSidebarEnable?(int)@dimen/spacing_normal:0}">
 
+            <TextView
+                android:id="@+id/thread_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:lineSpacingExtra="@dimen/text_line_spacing_extra"
+                android:text="@{postViewModel.thread.title}"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textStyle="bold"
+                android:visibility="@{postViewModel.pageNum == 1 &amp;&amp; postViewModel.post.isFirst &amp;&amp; postViewModel.thread.title != null ? View.VISIBLE : View.GONE}"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="这里是一条很长很长的帖子标题，作为主贴内容卡片的一部分自然展示"
+                tools:visibility="visible" />
+
             <ImageView
                 android:id="@+id/avatar"
                 android:layout_width="@dimen/avatar_size"
                 android:layout_height="@dimen/avatar_size"
                 android:layout_marginLeft="@dimen/spacing_micro"
                 android:layout_marginRight="@dimen/spacing_micro"
+                android:layout_marginTop="@dimen/item_padding"
                 android:contentDescription="@string/avatar_content_desc"
                 android:onClick="@{postViewModel::onAvatarClick}"
                 android:onLongClick="@{postViewModel::onAvatarLongClick}"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/thread_title"
+                app:layout_goneMarginTop="0dp"
                 app:uid="@{postViewModel.post.authorId}"
                 tools:src="@drawable/ic_avatar_placeholder" />
 

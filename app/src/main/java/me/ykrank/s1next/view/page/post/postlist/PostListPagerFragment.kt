@@ -145,6 +145,7 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
                     startPullToRefresh()
                 }
             }
+
         })
 
         quickSideBarView.setOnQuickSideBarTouchListener(this)
@@ -219,6 +220,9 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
                 }
             }
             val totalItemCount = mRecyclerAdapter.itemCount
+            if (totalItemCount <= 0) {
+                return
+            }
             if (totalItemCount <= position) {
                 position = totalItemCount - 1
             }
@@ -265,6 +269,9 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
      */
     private fun findNowItemPosition(): Pair<Int, Int> {
         val itemPosition = mLayoutManager.findFirstVisibleItemPosition()
+        if (itemPosition == androidx.recyclerview.widget.RecyclerView.NO_POSITION) {
+            return Pair(0, 0)
+        }
         var offset = 0
         val view = mLayoutManager.findViewByPosition(itemPosition)
         if (view != null) {
@@ -283,26 +290,26 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
             mThreadId ?: "", mPageNum, mAuthorId,
             ignoreCache = isIgnoreCache,
             { pid, rates ->
-                mRecyclerAdapter.dataSet.filterIsInstance<Post>()
-                    .forEachIndexed { index, post ->
-                        if (post.id == pid) {
-                            post.rates = rates
-                            mRecyclerAdapter.notifyItemChanged(index)
-                        }
+                mRecyclerAdapter.dataSet.forEachIndexed { index, item ->
+                    val post = item as? Post ?: return@forEachIndexed
+                    if (post.id == pid) {
+                        post.rates = rates
+                        mRecyclerAdapter.notifyItemChanged(index)
                     }
+                }
             },
             { uid, profile ->
-                mRecyclerAdapter.dataSet.filterIsInstance<Post>()
-                    .forEachIndexed { index, post ->
-                        if (post.authorId == uid) {
-                            post.profile = profile
-                            val payload = Bundle().apply {
-                                putString(PostAdapterDelegate.KEY_GOOSE_UPDATE, profile.goose)
-                            }
-
-                            mRecyclerAdapter.notifyItemChanged(index, payload)
+                mRecyclerAdapter.dataSet.forEachIndexed { index, item ->
+                    val post = item as? Post ?: return@forEachIndexed
+                    if (post.authorId == uid) {
+                        post.profile = profile
+                        val payload = Bundle().apply {
+                            putString(PostAdapterDelegate.KEY_GOOSE_UPDATE, profile.goose)
                         }
+
+                        mRecyclerAdapter.notifyItemChanged(index, payload)
                     }
+                }
             }
         )
     }
@@ -351,10 +358,9 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
                 }
             }
         } else {
-            initQuickSidebar(mPageNum, postList)
-
             //Thread info must not null, or exception
             val postListInfo = posts?.postListInfo as Thread
+            initQuickSidebar(postList)
             mRecyclerAdapter.setThreadInfo(postListInfo, mPageNum)
 
             posts.vote?.let {
@@ -424,8 +430,9 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
         return enable
     }
 
-    private fun initQuickSidebar(page: Int, posts: List<Post>) {
+    private fun initQuickSidebar(posts: List<Post>) {
         invalidateQuickSidebarVisible()
+        letters.clear()
         val customLetters = ArrayList<String>()
         var i = 0
         posts.forEach {
@@ -522,8 +529,13 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
 
         private fun filterPostAfterBlacklistChanged(dataSet: List<Any>): List<Any> {
             LooperUtil.enforceOnWorkThread()
-            return dataSet.filterIsInstance<Post>()
-                .mapNotNull { Posts.filterPost(it, true) }
+            return dataSet.mapNotNull {
+                if (it is Post) {
+                    Posts.filterPost(it, true)
+                } else {
+                    it
+                }
+            }
         }
     }
 }

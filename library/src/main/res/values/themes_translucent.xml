@@ -27,6 +27,7 @@
         <item name="actionModeBackground">?attr/colorPrimary</item>
         <item name="colorControlActivated">?attr/colorAccent</item>
         <item name="materialCardViewStyle">@style/CardView.Light.AfternoonTea</item>
+        <item name="cardViewBackground">@color/saraba_background</item>
     </style>
 
     <style name="Lib.Base.Theme.Light.Translucent.Amber" parent="Lib.Base.Theme.Light.Inverse.Translucent">
@@ -64,6 +65,7 @@
         <item name="colorPrimaryDark">@android:color/black</item>
         <item name="colorPrimary">@android:color/black</item>
         <item name="materialCardViewStyle">@style/CardView.Dark.NightMode.Amoled</item>
+        <item name="cardViewBackground">@android:color/black</item>
         <item name="cardViewContainerBackground">@android:color/black</item>
     </style>
 

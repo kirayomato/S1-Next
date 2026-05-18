@@ -8,26 +8,55 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="?attr/toolbarTheme">
+        android:background="?attr/cardViewBackground"
+        android:theme="?attr/toolbarTheme"
+        app:elevation="0dp">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:background="?attr/cardViewBackground"
             app:contentInsetLeft="0dp"
             app:contentInsetStart="0dp"
             app:contentInsetStartWithNavigation="0dp"
             app:layout_scrollFlags="scroll|enterAlways|snap"
             app:title="">
 
-            <TextView
-                android:id="@+id/toolbar_title_long"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
-                tools:text="S1NextS1NextS1NextS1NextS1NextS1NextS1Next" />
+                android:layout_marginEnd="?attr/actionBarSize"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/toolbar_title_long"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                    tools:text="S1NextS1NextS1NextS1NextS1NextS1NextS1Next" />
+
+                <TextView
+                    android:id="@+id/toolbar_page_jump"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/selector_empty"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:minWidth="@dimen/minimum_touch_target_size"
+                    android:minHeight="@dimen/minimum_touch_target_size"
+                    android:paddingStart="@dimen/spacing_normal"
+                    android:paddingEnd="@dimen/spacing_normal"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:textColor="?attr/colorAccent"
+                    android:visibility="gone"
+                    tools:text="1/2" />
+            </LinearLayout>
 
         </androidx.appcompat.widget.Toolbar>
 
