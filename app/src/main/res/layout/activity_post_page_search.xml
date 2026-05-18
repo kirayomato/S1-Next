@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".view.page.post.postlist.PostPageSearchActivity">
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinator_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?android:attr/colorBackground">
+
+        <include
+            android:id="@+id/app_bar"
+            layout="@layout/app_bar_search" />
+
+        <LinearLayout
+            android:id="@+id/results_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?android:attr/colorBackground"
+            android:orientation="vertical"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <LinearLayout
+                android:id="@+id/search_scope_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/cardViewBackground"
+                android:gravity="center_vertical"
+                android:minHeight="44dp"
+                android:orientation="horizontal"
+                android:paddingLeft="@dimen/item_padding"
+                android:paddingTop="@dimen/spacing_micro"
+                android:paddingRight="@dimen/item_padding"
+                android:paddingBottom="@dimen/spacing_micro"
+                android:paddingStart="@dimen/item_padding"
+                android:paddingEnd="@dimen/item_padding">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/search_scope_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:textStyle="bold"
+                        tools:text="只搜当前页" />
+
+                    <TextView
+                        android:id="@+id/search_scope_hint"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_mill"
+                        android:ellipsize="end"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                        android:textColor="?android:attr/textColorSecondary"
+                        tools:text="范围：当前第 1 页" />
+
+                </LinearLayout>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/search_scope_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/item_padding_small"
+                    android:layout_marginStart="@dimen/item_padding_small" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/search_state"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/cardViewBackground"
+                android:gravity="center_vertical"
+                android:includeFontPadding="false"
+                android:minHeight="32dp"
+                android:paddingLeft="@dimen/item_padding"
+                android:paddingTop="@dimen/spacing_micro"
+                android:paddingRight="@dimen/item_padding"
+                android:paddingBottom="@dimen/spacing_micro"
+                android:paddingStart="@dimen/item_padding"
+                android:paddingEnd="@dimen/item_padding"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                android:textColor="?android:attr/textColorSecondary"
+                tools:text="12 results for keyword" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/search_results"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:clipToPadding="false"
+                android:paddingBottom="@dimen/spacing_normal"
+                android:scrollbarStyle="outsideOverlay"
+                android:scrollbars="vertical"
+                tools:listitem="@layout/item_post_page_search_result" />
+
+        </LinearLayout>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>

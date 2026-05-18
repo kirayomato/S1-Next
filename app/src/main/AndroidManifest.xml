@@ -109,6 +109,12 @@
             android:windowSoftInputMode="adjustPan" />
 
         <activity
+            android:name=".view.page.post.postlist.PostPageSearchActivity"
+            android:colorMode="wideColorGamut"
+            android:configChanges="uiMode"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
+
+        <activity
             android:name=".view.page.app.AppPostListActivity"
             android:colorMode="wideColorGamut"
             android:configChanges="uiMode"

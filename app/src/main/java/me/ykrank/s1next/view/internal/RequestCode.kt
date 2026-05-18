@@ -6,5 +6,6 @@ package me.ykrank.s1next.view.internal
 object RequestCode {
     const val REQUEST_CODE_MESSAGE_IF_SUCCESS = 0
     const val REQUEST_CODE_EDIT_POST = 6
+    const val REQUEST_CODE_POST_PAGE_SEARCH = 7
     const val REQUEST_KEY_BLACKLIST = "blacklist"
 }

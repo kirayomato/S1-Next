@@ -61,6 +61,7 @@
     <string name="menu_blacklist_add">Add to blacklist</string>
     <string name="menu_refresh_avatar">Refresh avatar</string>
     <string name="menu_search">Search</string>
+    <string name="menu_search_current_page">Search page</string>
 
     <!-- login -->
     <string name="activity_label_login" translatable="false">@string/action_login</string>
@@ -96,6 +97,18 @@
     <string name="dialog_button_text_use_a_different_app">Use a different app</string>
     <string name="dialog_message_processing">Processing…</string>
     <string name="dialog_message_quote_not_found">This post could not be found.</string>
+    <string name="post_page_search_hint">Search current page</string>
+    <string name="post_page_search_empty_query">Enter search text</string>
+    <string name="post_page_search_no_data">Current page is not loaded yet</string>
+    <string name="post_page_search_no_results">No results for “%1$s” on this page</string>
+    <string name="post_page_search_results_title">%1$d results for “%2$s”</string>
+    <string name="post_page_search_jump_message">Jumped to %1$s (%2$d/%3$d)</string>
+    <string name="post_page_search_result_floor">P%1$d %2$s</string>
+    <string name="post_page_search_scope_current">Search current page only</string>
+    <string name="post_page_search_scope_current_hint">Scope: page %1$d</string>
+    <string name="post_page_search_scope_cached">Search cached pages in this thread</string>
+    <string name="post_page_search_scope_cached_hint">Scope: locally cached pages; results may jump to another page</string>
+    <string name="post_page_search_scope_cached_hint_loaded">Scope: %1$d locally cached pages; results may jump to another page</string>
     <string name="prompt_thread_link_or_id">Thread link/ID</string>
     <string name="error_field_invalid_or_unsupported_thread_link_or_id">Invalid or unsupported link/ID format</string>
 

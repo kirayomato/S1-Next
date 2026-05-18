@@ -36,7 +36,7 @@
 
     <color name="transparent">#00000000</color>
 
-    <color name="saraba_primary">#cccc99</color>
+    <color name="saraba_primary">#d8d8a8</color>
     <color name="saraba_primary_dark">#999972</color>
     <color name="saraba_accent">@color/light_blue_A400</color>
     <color name="saraba_background">#f6f7eb</color>

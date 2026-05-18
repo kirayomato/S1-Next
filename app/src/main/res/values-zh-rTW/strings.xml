@@ -313,6 +313,19 @@
         
     <string name="menu_large_image_mode">大圖模式</string>
         
+    <string name="menu_search_current_page">頁內搜尋</string>
+    <string name="post_page_search_hint">搜尋目前頁</string>
+    <string name="post_page_search_empty_query">請輸入搜尋內容</string>
+    <string name="post_page_search_no_data">目前頁還沒有載入完成</string>
+    <string name="post_page_search_no_results">目前頁未找到「%1$s」</string>
+    <string name="post_page_search_results_title">「%2$s」的%1$d個結果</string>
+    <string name="post_page_search_jump_message">已跳轉到%1$s（%2$d/%3$d）</string>
+    <string name="post_page_search_result_floor">第%1$d頁 %2$s</string>
+    <string name="post_page_search_scope_current">只搜尋目前頁</string>
+    <string name="post_page_search_scope_current_hint">範圍：目前第%1$d頁</string>
+    <string name="post_page_search_scope_cached">搜尋本主題本機快取</string>
+    <string name="post_page_search_scope_cached_hint">範圍：本主題已快取頁面，結果可能跳轉到其他頁</string>
+    <string name="post_page_search_scope_cached_hint_loaded">範圍：本主題已快取%1$d頁，結果可能跳轉到其他頁</string>
     <string name="search_type_entry_forum">帖子</string>
         
     <string name="search_type_entry_user">用戶</string>

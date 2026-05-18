@@ -1,15 +1,20 @@
 package me.ykrank.s1next.view.page.post.postlist
 
 import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Paint
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.graphics.ColorUtils
 import androidx.core.util.Pair
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import com.bigkoo.quicksidebar.QuickSideBarView
 import com.bigkoo.quicksidebar.listener.OnQuickSideBarTouchListener
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -19,6 +24,7 @@ import com.github.ykrank.androidtools.data.Resource
 import com.github.ykrank.androidtools.ui.internal.LoadingViewModelBindingDelegate
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.LooperUtil
+import com.github.ykrank.androidtools.util.ResourceUtil
 import com.github.ykrank.androidtools.util.RxJavaUtil
 import com.github.ykrank.androidtools.widget.recycleview.StartSnapLinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
@@ -67,6 +73,7 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
 
     private var mThreadId: String? = null
     private var mPageNum: Int = 0
+    private var mThreadInfo: Thread? = null
 
     /**
      * Only see this author, or all if null
@@ -81,12 +88,40 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
     private var blacklistChanged = false
 
     private lateinit var binding: FragmentBaseWithQuickSideBarBinding
-    private lateinit var mRecyclerView: androidx.recyclerview.widget.RecyclerView
+    private lateinit var mRecyclerView: RecyclerView
     private lateinit var mRecyclerAdapter: PostListRecyclerViewAdapter
     private lateinit var mLayoutManager: StartSnapLinearLayoutManager
     private lateinit var quickSideBarView: QuickSideBarView
     private lateinit var quickSideBarTipsView: TextView
     private val letters = HashMap<String, Int>()
+    private val searchHighlightPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private var highlightedPostPosition = RecyclerView.NO_POSITION
+    private val clearSearchHighlightRunnable = Runnable {
+        highlightedPostPosition = RecyclerView.NO_POSITION
+        if (this::mRecyclerView.isInitialized) {
+            mRecyclerView.invalidateItemDecorations()
+        }
+    }
+    private val searchHighlightDecoration = object : RecyclerView.ItemDecoration() {
+        override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
+            if (highlightedPostPosition == RecyclerView.NO_POSITION) {
+                return
+            }
+            for (i in 0 until parent.childCount) {
+                val child = parent.getChildAt(i)
+                if (parent.getChildAdapterPosition(child) == highlightedPostPosition) {
+                    c.drawRect(
+                        child.left.toFloat(),
+                        child.top.toFloat(),
+                        child.right.toFloat(),
+                        child.bottom.toFloat(),
+                        searchHighlightPaint
+                    )
+                    break
+                }
+            }
+        }
+    }
 
     private var mPagerCallback: PagerCallback? = null
 
@@ -121,6 +156,11 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
         mRecyclerView = recyclerView
         mLayoutManager = StartSnapLinearLayoutManager(requireActivity())
         mRecyclerView.layoutManager = mLayoutManager
+        searchHighlightPaint.color = ColorUtils.setAlphaComponent(
+            ResourceUtil.getAttrColorInt(requireContext(), androidx.appcompat.R.attr.colorAccent),
+            SEARCH_RESULT_HIGHLIGHT_ALPHA
+        )
+        mRecyclerView.addItemDecoration(searchHighlightDecoration)
         mRecyclerAdapter =
             PostListRecyclerViewAdapter(
                 this,
@@ -168,6 +208,9 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
 
     override fun onDestroy() {
         RxJavaUtil.disposeIfNotNull(refreshAfterBlacklistChangeDisposable)
+        if (this::mRecyclerView.isInitialized) {
+            mRecyclerView.removeCallbacks(clearSearchHighlightRunnable)
+        }
         mPagerCallback = null
         super.onDestroy()
     }
@@ -250,6 +293,58 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
         }
     }
 
+    internal fun startPageSearch(fragment: Fragment, requestCode: Int) {
+        val snapshot = buildPageSearchSnapshot()
+        if (snapshot == null || snapshot.posts.isEmpty()) {
+            showSnackbar(R.string.post_page_search_no_data)
+            return
+        }
+        PostPageSearchActivity.startForResult(
+            fragment,
+            requestCode,
+            snapshot.thread,
+            mThreadId,
+            snapshot.pageNum,
+            mPagerCallback?.getTotalPages() ?: mPageNum,
+            snapshot.posts,
+            arrayListOf(snapshot)
+        )
+    }
+
+    internal fun buildPageSearchSnapshot(): PostPageSearchActivity.PageSnapshot? {
+        val posts = ArrayList(mRecyclerAdapter.dataSet.filterIsInstance<Post>())
+        if (posts.isEmpty()) {
+            return null
+        }
+        return PostPageSearchActivity.PageSnapshot(mPageNum, mThreadInfo, posts)
+    }
+
+    internal fun scrollToPostPosition(position: Int, highlight: Boolean = false): Boolean {
+        if (position == RecyclerView.NO_POSITION ||
+            position < 0 ||
+            position >= mRecyclerAdapter.itemCount
+        ) {
+            return false
+        }
+        mLayoutManager.scrollToPositionWithOffset(position, 0)
+        if (highlight) {
+            highlightPostPosition(position)
+        }
+        return true
+    }
+
+    private fun highlightPostPosition(position: Int) {
+        highlightedPostPosition = position
+        mRecyclerView.removeCallbacks(clearSearchHighlightRunnable)
+        mRecyclerView.post {
+            mRecyclerView.invalidateItemDecorations()
+            mRecyclerView.postDelayed(
+                clearSearchHighlightRunnable,
+                SEARCH_RESULT_HIGHLIGHT_DURATION_MS
+            )
+        }
+    }
+
     internal val curReadProgress: ReadProgress?
         get() {
             if (isLoading) {
@@ -269,9 +364,9 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
      */
     private fun findNowItemPosition(): Pair<Int, Int> {
         val itemPosition = mLayoutManager.findFirstVisibleItemPosition()
-        if (itemPosition == androidx.recyclerview.widget.RecyclerView.NO_POSITION) {
-            return Pair(0, 0)
-        }
+            if (itemPosition == RecyclerView.NO_POSITION) {
+                return Pair(0, 0)
+            }
         var offset = 0
         val view = mLayoutManager.findViewByPosition(itemPosition)
         if (view != null) {
@@ -360,6 +455,7 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
         } else {
             //Thread info must not null, or exception
             val postListInfo = posts?.postListInfo as Thread
+            mThreadInfo = postListInfo
             initQuickSidebar(postList)
             mRecyclerAdapter.setThreadInfo(postListInfo, mPageNum)
 
@@ -372,25 +468,31 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
                     blacklistChanged = false
                 } else if (pullUpToRefresh) {
 
-                } else if (readProgress != null && scrollState?.state == PagerScrollState.BEFORE_SCROLL_POSITION) {
-                    mLayoutManager.scrollToPositionWithOffset(
-                        readProgress!!.position,
-                        readProgress!!.offset
-                    )
-                    readProgress = null
-                    scrollState!!.state = PagerScrollState.FREE
                 } else {
-                    val quotePostId = arguments?.getString(ARG_QUOTE_POST_ID)
-                    if (!TextUtils.isEmpty(quotePostId)) {
-                        for (i in postList.indices) {
-                            if (quotePostId?.toInt() == postList[i].id) {
-                                // scroll to post post
-                                mLayoutManager.scrollToPositionWithOffset(i, 0)
-                                break
+                    val searchResultPosition =
+                        mPagerCallback?.consumePendingSearchResultPosition(mPageNum)
+                    if (searchResultPosition != null) {
+                        scrollToPostPosition(searchResultPosition, true)
+                    } else if (readProgress != null && scrollState?.state == PagerScrollState.BEFORE_SCROLL_POSITION) {
+                        mLayoutManager.scrollToPositionWithOffset(
+                            readProgress!!.position,
+                            readProgress!!.offset
+                        )
+                        readProgress = null
+                        scrollState!!.state = PagerScrollState.FREE
+                    } else {
+                        val quotePostId = arguments?.getString(ARG_QUOTE_POST_ID)
+                        if (!TextUtils.isEmpty(quotePostId)) {
+                            for (i in postList.indices) {
+                                if (quotePostId?.toInt() == postList[i].id) {
+                                    // scroll to post post
+                                    mLayoutManager.scrollToPositionWithOffset(i, 0)
+                                    break
+                                }
                             }
+                            // clear this argument after redirecting
+                            arguments?.putString(ARG_QUOTE_POST_ID, null)
                         }
-                        // clear this argument after redirecting
-                        arguments?.putString(ARG_QUOTE_POST_ID, null)
                     }
                 }
             }
@@ -471,10 +573,14 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
         fun setupThreadAttachment(threadAttachment: Posts.ThreadAttachment)
 
         fun setThreadInfo(thread: Thread?)
+
+        fun consumePendingSearchResultPosition(pageNum: Int): Int?
     }
 
     companion object {
         val TAG = PostListPagerFragment::class.simpleName
+        private const val SEARCH_RESULT_HIGHLIGHT_ALPHA = 56
+        private const val SEARCH_RESULT_HIGHLIGHT_DURATION_MS = 3_000L
         private const val ARG_THREAD_ID = "thread_id"
         private const val ARG_PAGE_NUM = "page_num"
         private const val ARG_AUTHOR_ID = "author_id"

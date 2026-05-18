@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.annotation.MainThread
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import com.github.ykrank.androidautodispose.AndroidRxDispose
 import com.github.ykrank.androidlifecycle.event.FragmentEvent
 import com.github.ykrank.androidtools.extension.throttleFirst
@@ -91,6 +92,7 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
     private var readProgress: ReadProgress? = null
     private var tempReadProgress: ReadProgress? = null
     private val scrollState = PagerScrollState()
+    private var pendingSearchResult: SearchResultJump? = null
 
     private val mLastThreadInfoFlow by lazy {
         MutableSharedFlow<Int>(
@@ -366,6 +368,11 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
                 return true
             }
 
+            R.id.menu_search_current_page -> {
+                startPageSearch()
+                return true
+            }
+
             R.id.menu_save_progress -> {
                 if (curPostPageFragment != null) {
                     curPostPageFragment?.saveReadProgress()
@@ -409,15 +416,33 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == RequestCode.REQUEST_CODE_EDIT_POST) {
-            if (resultCode == Activity.RESULT_OK) {
-                val msg = data?.getStringExtra(BaseActivity.EXTRA_MESSAGE)
-                showSnackbar(msg)
-                val fragment = curPostPageFragment
-                fragment?.startSwipeRefresh()
+        when (requestCode) {
+            RequestCode.REQUEST_CODE_EDIT_POST -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    val msg = data?.getStringExtra(BaseActivity.EXTRA_MESSAGE)
+                    showSnackbar(msg)
+                    val fragment = curPostPageFragment
+                    fragment?.startSwipeRefresh()
+                }
             }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data)
+
+            RequestCode.REQUEST_CODE_POST_PAGE_SEARCH -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    val page = data?.getIntExtra(
+                        PostPageSearchActivity.EXTRA_PAGE,
+                        currentPage + 1
+                    ) ?: currentPage + 1
+                    val position = data?.getIntExtra(
+                        PostPageSearchActivity.EXTRA_POSITION,
+                        RecyclerView.NO_POSITION
+                    ) ?: RecyclerView.NO_POSITION
+                    jumpToSearchResult(page, position)
+                }
+            }
+
+            else -> {
+                super.onActivityResult(requestCode, resultCode, data)
+            }
         }
     }
 
@@ -439,6 +464,59 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
             setTotalPageByPosts(thread.reliesCount + 1)
             setThreadTitle(thread.title)
         }
+    }
+
+    override fun consumePendingSearchResultPosition(pageNum: Int): Int? {
+        val jump = pendingSearchResult ?: return null
+        if (jump.pageNum != pageNum) {
+            return null
+        }
+        pendingSearchResult = null
+        return jump.position
+    }
+
+    private fun jumpToSearchResult(pageNum: Int, position: Int) {
+        if (pageNum <= 0 || position == RecyclerView.NO_POSITION || position < 0) {
+            return
+        }
+        val targetPageIndex = pageNum - 1
+        setTotalPages(maxOf(getTotalPages(), pageNum))
+        pendingSearchResult = SearchResultJump(pageNum, position)
+        val fragment = mPostListPagerAdapter.getCachedFragment(targetPageIndex)
+        if (currentPage != targetPageIndex) {
+            currentPage = targetPageIndex
+        }
+        if (fragment != null) {
+            if (fragment.scrollToPostPosition(position, true)) {
+                pendingSearchResult = null
+            }
+        }
+    }
+
+    private fun startPageSearch() {
+        val currentSnapshot = curPostPageFragment?.buildPageSearchSnapshot()
+        if (currentSnapshot == null || currentSnapshot.posts.isEmpty()) {
+            showSnackbar(R.string.post_page_search_no_data)
+            return
+        }
+
+        val memoryPages = ArrayList<PostPageSearchActivity.PageSnapshot>()
+        for (pageIndex in 0 until getTotalPages()) {
+            mPostListPagerAdapter.getCachedFragment(pageIndex)
+                ?.buildPageSearchSnapshot()
+                ?.let { memoryPages += it }
+        }
+
+        PostPageSearchActivity.startForResult(
+            this,
+            RequestCode.REQUEST_CODE_POST_PAGE_SEARCH,
+            currentSnapshot.thread,
+            mThreadId,
+            currentSnapshot.pageNum,
+            getTotalPages(),
+            currentSnapshot.posts,
+            memoryPages
+        )
     }
 
     private fun setTotalPageByPosts(threads: Int) {
@@ -617,6 +695,11 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
             }
         }
     }
+
+    private data class SearchResultJump(
+        val pageNum: Int,
+        val position: Int
+    )
 
     companion object {
         val TAG = PostListFragment::class.java.simpleName

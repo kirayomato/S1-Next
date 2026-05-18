@@ -10,6 +10,12 @@
         android:title="@string/menu_thread_attachment"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/menu_search_current_page"
+        android:icon="@drawable/ic_search_24dp"
+        android:orderInCategory="22"
+        android:title="@string/menu_search_current_page"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/menu_favourites_add"
         android:orderInCategory="22"
         android:title="@string/menu_favourites_add"
