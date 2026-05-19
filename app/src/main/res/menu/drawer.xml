@@ -27,6 +27,11 @@
             android:title="@string/histories" />
 
         <item
+            android:id="@+id/menu_post_backups"
+            android:icon="@drawable/ic_menu_grade_black_24dp"
+            android:title="@string/post_backups" />
+
+        <item
             android:id="@+id/menu_blacklist"
             android:icon="@drawable/ic_block_black_24dp"
             android:title="@string/blacklist" />

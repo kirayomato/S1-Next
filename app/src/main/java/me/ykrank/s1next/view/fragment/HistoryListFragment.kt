@@ -11,8 +11,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.ykrank.s1next.App.Companion.appComponent
+import me.ykrank.s1next.data.cache.biz.CacheBiz
 import me.ykrank.s1next.data.db.biz.HistoryBiz
 import me.ykrank.s1next.databinding.FragmentBaseBinding
+import me.ykrank.s1next.view.activity.HistoryActivity
 import me.ykrank.s1next.view.adapter.HistoryCursorRecyclerViewAdapter
 import javax.inject.Inject
 
@@ -24,7 +26,19 @@ class HistoryListFragment : BaseFragment() {
 
     @Inject
     lateinit var historyBiz: HistoryBiz
+
+    @Inject
+    lateinit var cacheBiz: CacheBiz
+
     private lateinit var binding: FragmentBaseBinding
+    private var mode: String = HistoryActivity.MODE_HISTORY
+    private var query: String = ""
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mode = requireArguments().getString(ARG_MODE, HistoryActivity.MODE_HISTORY)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -55,20 +69,39 @@ class HistoryListFragment : BaseFragment() {
     }
 
     private fun load() {
+        val currentQuery = query.trim()
         lifecycleScope.launch {
             val cursor = withContext(Dispatchers.IO) {
-                historyBiz.getHistoryListCursor()
+                if (mode == HistoryActivity.MODE_POST_BACKUP) {
+                    cacheBiz.getPostBackupThreadsCursor(currentQuery)
+                } else {
+                    historyBiz.getHistoryListCursor(currentQuery)
+                }
             }
             mRecyclerAdapter?.changeCursor(cursor)
         }
     }
 
+    fun updateQuery(newQuery: String) {
+        val normalizedQuery = newQuery.trim()
+        if (query == normalizedQuery) {
+            return
+        }
+        query = normalizedQuery
+        load()
+    }
+
     companion object {
         val TAG = HistoryListFragment::class.java.getName()
+        private const val ARG_MODE = "mode"
 
         @JvmStatic
-        fun newInstance(): HistoryListFragment {
-            return HistoryListFragment()
+        fun newInstance(mode: String = HistoryActivity.MODE_HISTORY): HistoryListFragment {
+            return HistoryListFragment().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_MODE, mode)
+                }
+            }
         }
     }
 }

@@ -18,6 +18,13 @@ interface HistoryDao {
     @Query("SELECT * FROM History ORDER BY Timestamp DESC LIMIT :limit")
     fun loadCursor(limit: Int): Cursor
 
+    @Query(
+        "SELECT * FROM History" +
+                " WHERE (:query IS NULL OR Title LIKE '%' || :query || '%' OR ThreadId LIKE '%' || :query || '%')" +
+                " ORDER BY Timestamp DESC LIMIT :limit"
+    )
+    fun searchCursor(limit: Int, query: String?): Cursor
+
     @Query("SELECT * FROM History WHERE ThreadId == :threadId LIMIT 1")
     fun getByThreadId(threadId: Int): History?
 

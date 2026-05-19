@@ -1,5 +1,6 @@
 package me.ykrank.s1next.data.cache.dao
 
+import android.database.Cursor
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -27,8 +28,28 @@ interface CacheDao {
         group3: String = CacheConstants.GROUP_EMPTY,
     ): Cache?
 
-    @Query("DELETE FROM Cache WHERE _id NOT IN ( SELECT _id FROM Cache ORDER BY Timestamp DESC LIMIT :maxSize)")
-    fun deleteNotTopRecords(maxSize: Int): Int
+    @Query(
+        "DELETE FROM Cache WHERE `group` != :excludeGroup" +
+                " AND _id NOT IN (" +
+                " SELECT _id FROM Cache WHERE `group` != :excludeGroup ORDER BY Timestamp DESC LIMIT :maxSize" +
+                ")"
+    )
+    fun deleteNotTopRecords(
+        maxSize: Int,
+        excludeGroup: String = CacheConstants.GROUP_POST_BACKUP
+    ): Int
+
+    @Query(
+        "SELECT MIN(_id) AS _id, CAST(group1 AS INTEGER) AS ThreadId," +
+                " COALESCE(MAX(title), group1) AS Title, MAX(timestamp) AS Timestamp" +
+                " FROM Cache WHERE `group` == :group" +
+                " AND (:query IS NULL OR title LIKE '%' || :query || '%' OR group1 LIKE '%' || :query || '%')" +
+                " GROUP BY group1 ORDER BY MAX(timestamp) DESC"
+    )
+    fun loadPostBackupThreadsCursor(
+        group: String = CacheConstants.GROUP_POST_BACKUP,
+        query: String? = null
+    ): Cursor
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(cache: Cache)
@@ -41,4 +62,7 @@ interface CacheDao {
 
     @Query("SELECT COUNT(*) FROM Cache")
     fun getCount(): Int
+
+    @Query("SELECT COUNT(*) FROM Cache WHERE `group` != :excludeGroup")
+    fun getCountExcludeGroup(excludeGroup: String = CacheConstants.GROUP_POST_BACKUP): Int
 }

@@ -1,15 +1,18 @@
 package me.ykrank.s1next.data.cache.biz
 
+import android.database.Cursor
 import androidx.annotation.WorkerThread
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.ZipUtils
 import me.ykrank.s1next.App
+import me.ykrank.s1next.data.cache.CacheConstants
 import me.ykrank.s1next.data.cache.CacheDatabase
 import me.ykrank.s1next.data.cache.CacheDatabaseManager
 import me.ykrank.s1next.data.cache.dao.CacheDao
 import me.ykrank.s1next.data.cache.dbmodel.Cache
 import me.ykrank.s1next.data.cache.exmodel.CacheGroupModel
+import me.ykrank.s1next.data.db.dbmodel.History
 
 /**
  * Created by ykrank on 7/17/24
@@ -26,6 +29,10 @@ class CacheBiz(private val manager: CacheDatabaseManager, private val objectMapp
     val count
         @WorkerThread
         get() = cacheDao.getCount()
+
+    val ordinaryCount
+        @WorkerThread
+        get() = cacheDao.getCountExcludeGroup()
 
     val size
         @WorkerThread
@@ -51,9 +58,28 @@ class CacheBiz(private val manager: CacheDatabaseManager, private val objectMapp
             )
             cache.blob = gzipBlob
         }
+        preserveBackupGroup(cache)
         cacheDao.insert(cache)
-        if (count > maxSize) {
+        if (ordinaryCount > maxSize) {
             cacheDao.deleteNotTopRecords(maxSize)
+        }
+    }
+
+    @WorkerThread
+    private fun preserveBackupGroup(cache: Cache) {
+        if (cache.group == CacheConstants.GROUP_POST_BACKUP) {
+            return
+        }
+        val oldCache = cacheDao.getByKey(cache.key)
+        if (oldCache?.group == CacheConstants.GROUP_POST_BACKUP) {
+            cache.id = oldCache.id
+            cache.group = oldCache.group
+            cache.group1 = oldCache.group1
+            cache.group2 = oldCache.group2
+            cache.group3 = oldCache.group3
+            if (cache.title.isNullOrBlank()) {
+                cache.title = oldCache.title
+            }
         }
     }
 
@@ -107,6 +133,51 @@ class CacheBiz(private val manager: CacheDatabaseManager, private val objectMapp
                 ZipUtils.decompressGzipToString(it)
             }
         }
+    }
+
+    @WorkerThread
+    fun savePostBackup(
+        key: String,
+        uid: Int?,
+        content: Any,
+        title: String?,
+        threadId: String,
+        page: Int,
+    ) {
+        saveZip(
+            Cache(
+                key,
+                uid = uid,
+                title = title,
+                groups = listOf(
+                    CacheConstants.GROUP_POST_BACKUP,
+                    threadId,
+                    page.toString(),
+                ),
+                decodeZipString = if (content is String) {
+                    content
+                } else {
+                    objectMapper.writeValueAsString(content)
+                }
+            ),
+            maxSize = Int.MAX_VALUE
+        )
+    }
+
+    @WorkerThread
+    fun getPostBackupThreadsCursor(query: String?): Cursor {
+        return cacheDao.loadPostBackupThreadsCursor(
+            query = query?.trim()?.takeIf { it.isNotEmpty() }
+        )
+    }
+
+    fun historyFromPostBackupCursor(cursor: Cursor): History {
+        return History(
+            id = cursor.getLong(cursor.getColumnIndexOrThrow("_id")),
+            threadId = cursor.getInt(cursor.getColumnIndexOrThrow("ThreadId")),
+            title = cursor.getString(cursor.getColumnIndexOrThrow("Title")),
+            timestamp = cursor.getLong(cursor.getColumnIndexOrThrow("Timestamp")),
+        )
     }
 
     companion object {

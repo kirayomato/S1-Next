@@ -88,20 +88,20 @@ class Profile() : Account(), Parcelable {
     }
 
     @JsonCreator
-    constructor(@JsonProperty("extcredits") extCredits: JsonNode, @JsonProperty("space") space: JsonNode) : this() {
-        this.homeUsername = space.get("username")?.asText()
-        this.homeUid = space.get("uid")?.asText()
-        this.signHtml = space.get("sightml")?.asText()
-        val posts = space.get("posts")?.asInt() ?: -1
-        this.friends = space.get("friends")?.asInt() ?: -1
-        this.threads = space.get("threads")?.asInt() ?: -1
+    constructor(@JsonProperty("extcredits") extCredits: JsonNode?, @JsonProperty("space") space: JsonNode?) : this() {
+        this.homeUsername = space?.get("username")?.asText()
+        this.homeUid = space?.get("uid")?.asText()
+        this.signHtml = space?.get("sightml")?.asText()
+        val posts = space?.get("posts")?.asInt() ?: -1
+        this.friends = space?.get("friends")?.asInt() ?: -1
+        this.threads = space?.get("threads")?.asInt() ?: -1
         this.replies = posts - threads
-        this.groupTitle = space.get("group")?.get("grouptitle")?.asText()
-        this.onlineHour = space.get("oltime")?.asInt() ?: -1
-        this.regDate = space.get("regdate")?.asLong()
-        this.lastVisitDate = space.get("lastvisit")?.asLong()
-        this.lastActiveDate = space.get("lastactivity")?.asLong()
-        this.lastPostDate = space.get("lastpost")?.asLong()
+        this.groupTitle = space?.get("group")?.get("grouptitle")?.asText()
+        this.onlineHour = space?.get("oltime")?.asInt() ?: -1
+        this.regDate = space?.get("regdate")?.asLong()
+        this.lastVisitDate = space?.get("lastvisit")?.asLong()
+        this.lastActiveDate = space?.get("lastactivity")?.asLong()
+        this.lastPostDate = space?.get("lastpost")?.asLong()
     }
 
     companion object {

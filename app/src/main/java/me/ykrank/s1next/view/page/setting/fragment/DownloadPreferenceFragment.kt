@@ -158,7 +158,7 @@ class DownloadPreferenceFragment : BasePreferenceFragment(), Preference.OnPrefer
             lifecycleScope.launch(L.report) {
                 val maxSize = mDownloadPreferencesManager.totalDataCacheSize
                 val message = withContext(Dispatchers.IO) {
-                    "${mCacheBiz.count}/$maxSize ${
+                    "${mCacheBiz.ordinaryCount}/$maxSize ${
                         FileUtil.getPrintSize(
                             mCacheBiz.size
                         )

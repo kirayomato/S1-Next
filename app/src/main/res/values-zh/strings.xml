@@ -172,6 +172,7 @@
     <string name="post_page_search_scope_cached">搜索本主题本地缓存</string>
     <string name="post_page_search_scope_cached_hint">范围：本主题已缓存页面，结果可能跳转到其他页</string>
     <string name="post_page_search_scope_cached_hint_loaded">范围：本主题已缓存%1$d页，结果可能跳转到其他页</string>
+    <string name="post_backup_success">帖子备份完成</string>
     <string name="search_type_entry_forum">帖子</string>
     <string name="search_type_entry_user">用户</string>
     <string name="edit_post_succeed">编辑帖子成功</string>
@@ -187,6 +188,8 @@
     <string name="pref_network_summary">专业的技术参数，谨慎修改</string>
     <string name="title_history">历史记录</string>
     <string name="histories">历史记录</string>
+    <string name="title_post_backups">已备份帖子</string>
+    <string name="post_backups">已备份帖子</string>
     <string name="prompt_answer">答案</string>
     <string name="app_login_info_error">登录应用服务器失败</string>
     <string name="action_auto_sign">自动签到</string>
@@ -263,6 +266,7 @@
     <string name="data_load_from_cache">数据来自缓存</string>
     <string name="stop">停止</string>
     <string name="menu_prefetch_after_posts">预加载本页之后</string>
+    <string name="menu_backup_thread">备份本帖</string>
     <string name="menu_refresh_avatar">刷新头像</string>
     <string name="menu_copy_link">复制链接</string>
 </resources>

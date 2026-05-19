@@ -15,6 +15,7 @@ import com.google.android.material.snackbar.Snackbar
 import me.ykrank.s1next.App.Companion.appComponent
 import me.ykrank.s1next.BuildConfig
 import me.ykrank.s1next.R
+import me.ykrank.s1next.data.db.AppDatabaseBackupMerger
 import me.ykrank.s1next.data.db.AppDatabaseManager
 import javax.inject.Inject
 
@@ -38,6 +39,7 @@ class BackupPreferenceFragment : BasePreferenceFragment(), Preference.OnPreferen
         findPreference<Preference>(getString(R.string.pref_key_backup_restore))?.onPreferenceClickListener =
             this
 
+        val appContext = requireContext().applicationContext
         backupAgent = BackupDelegate(
             requireActivity(),
             this,
@@ -52,6 +54,9 @@ class BackupPreferenceFragment : BasePreferenceFragment(), Preference.OnPreferen
                 override fun accept(result: Int?) {
                     this@BackupPreferenceFragment.afterRestore(result)
                 }
+            },
+            restoreAction = { uri ->
+                AppDatabaseBackupMerger(appContext, databaseManager).merge(uri)
             })
     }
 

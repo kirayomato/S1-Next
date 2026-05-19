@@ -21,8 +21,13 @@ class HistoryBiz(private val manager: AppDatabaseManager) {
      * limit [.MAX_SIZE] order by timestamp desc
      */
     @WorkerThread
-    fun getHistoryListCursor(): Cursor {
-        return historyDao.loadCursor(MAX_SIZE)
+    fun getHistoryListCursor(query: String? = null): Cursor {
+        val normalizedQuery = query?.trim()?.takeIf { it.isNotEmpty() }
+        return if (normalizedQuery == null) {
+            historyDao.loadCursor(MAX_SIZE)
+        } else {
+            historyDao.searchCursor(MAX_SIZE, normalizedQuery)
+        }
     }
 
     fun fromCursor(cursor: Cursor): History {

@@ -64,4 +64,9 @@
         android:orderInCategory="29"
         android:title="@string/menu_prefetch_after_posts"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_backup_thread"
+        android:orderInCategory="30"
+        android:title="@string/menu_backup_thread"
+        app:showAsAction="never" />
 </menu>

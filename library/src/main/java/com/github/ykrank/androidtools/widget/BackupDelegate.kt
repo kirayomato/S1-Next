@@ -34,7 +34,8 @@ class BackupDelegate(
     private val backupFileName: String,
     private val dbName: String,
     private val afterBackup: AfterBackup = DefaultAfterBackup(mContext),
-    private val afterRestore: AfterRestore = DefaultAfterRestore(mContext)
+    private val afterRestore: AfterRestore = DefaultAfterRestore(mContext),
+    private val restoreAction: ((Uri) -> Int)? = null
 ) {
 
     fun backup(fragment: Fragment) {
@@ -133,6 +134,10 @@ class BackupDelegate(
                 srcUri, Intent.FLAG_GRANT_READ_URI_PERMISSION
             )
 
+            restoreAction?.let {
+                return it(srcUri)
+            }
+
             contentResolver.openInputStream(srcUri)?.use { inputStream ->
                 val dbFile = mContext.getDatabasePath(dbName)
                 copyFile(inputStream, dbFile)
@@ -229,4 +234,3 @@ class BackupDelegate(
         }
     }
 }
-

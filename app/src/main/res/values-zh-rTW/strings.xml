@@ -326,6 +326,7 @@
     <string name="post_page_search_scope_cached">搜尋本主題本機快取</string>
     <string name="post_page_search_scope_cached_hint">範圍：本主題已快取頁面，結果可能跳轉到其他頁</string>
     <string name="post_page_search_scope_cached_hint_loaded">範圍：本主題已快取%1$d頁，結果可能跳轉到其他頁</string>
+    <string name="post_backup_success">帖子備份完成</string>
     <string name="search_type_entry_forum">帖子</string>
         
     <string name="search_type_entry_user">用戶</string>
@@ -353,8 +354,10 @@
     <string name="pref_network_summary">專業的技術參數，謹慎修改</string>
         
     <string name="title_history">歷史記錄</string>
-        
+    
     <string name="histories">歷史記錄</string>
+    <string name="title_post_backups">已備份帖子</string>
+    <string name="post_backups">已備份帖子</string>
     <string name="prompt_answer">答案</string>
         
     <string name="app_login_info_error">登錄應用服務器失敗</string>
@@ -454,6 +457,7 @@
     <string name="message_load_error">加載失敗</string>
     <string name="stop">停止</string>
     <string name="menu_prefetch_after_posts">預加載本頁之後</string>
+    <string name="menu_backup_thread">備份本帖</string>
     <string name="menu_refresh_avatar">刷新頭像</string>
     <string name="menu_copy_link">複製鏈接</string>
 </resources>

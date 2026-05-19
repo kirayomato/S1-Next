@@ -109,6 +109,7 @@
     <string name="post_page_search_scope_cached">Search cached pages in this thread</string>
     <string name="post_page_search_scope_cached_hint">Scope: locally cached pages; results may jump to another page</string>
     <string name="post_page_search_scope_cached_hint_loaded">Scope: %1$d locally cached pages; results may jump to another page</string>
+    <string name="post_backup_success">Thread backup complete</string>
     <string name="prompt_thread_link_or_id">Thread link/ID</string>
     <string name="error_field_invalid_or_unsupported_thread_link_or_id">Invalid or unsupported link/ID format</string>
 
@@ -256,6 +257,7 @@
     <string name="last_replier">Last replier %1$s</string>
     <string name="menu_quick_side_bar_enable">QuickSidebar Enable</string>
     <string name="menu_prefetch_after_posts">Prefetch after this page</string>
+    <string name="menu_backup_thread">Back up this thread</string>
 
     <string name="rate">Rate</string>
     <string name="menu_report">Report</string>
@@ -282,6 +284,8 @@
     <string name="error_force_host_ip">Error host ip list: %s</string>
     <string name="title_history">History</string>
     <string name="histories">Histories</string>
+    <string name="title_post_backups">Backed up threads</string>
+    <string name="post_backups">Backed up threads</string>
     <string name="prompt_answer">Answer</string>
     <string name="app_login_info_error">Login app server error</string>
     <string name="action_auto_sign">Auto sign</string>

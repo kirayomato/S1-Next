@@ -411,6 +411,12 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
                 return true
             }
 
+            R.id.menu_backup_thread -> {
+                ThreadPrefetchDialogFragment.newBackupInstance(mThreadId)
+                    .show(childFragmentManager, LoadBlackListFromWebDialogFragment.TAG)
+                return true
+            }
+
             else -> return super.onOptionsItemSelected(item)
         }
     }

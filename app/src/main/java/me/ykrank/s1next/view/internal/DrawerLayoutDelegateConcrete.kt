@@ -173,6 +173,7 @@ class DrawerLayoutDelegateConcrete(
             R.id.menu_pms -> runnable = Runnable { this.onWhispersMenuSelected() }
             R.id.menu_note -> runnable = Runnable { this.onNoteMenuSelected() }
             R.id.menu_history -> runnable = Runnable { this.onHistoryMenuSelected() }
+            R.id.menu_post_backups -> runnable = Runnable { this.onPostBackupsMenuSelected() }
             R.id.menu_blacklist -> runnable = Runnable { this.onBlackListMenuSelected() }
             R.id.menu_settings -> runnable = Runnable { this.onSettingsMenuSelected() }
             R.id.menu_help -> runnable = Runnable { this.onHelpMenuSelected() }
@@ -270,6 +271,10 @@ class DrawerLayoutDelegateConcrete(
 
     private fun onHistoryMenuSelected() {
         HistoryActivity.start(mFragmentActivity)
+    }
+
+    private fun onPostBackupsMenuSelected() {
+        HistoryActivity.startPostBackups(mFragmentActivity)
     }
 
     private fun onBlackListMenuSelected() {
