@@ -17,6 +17,7 @@ import com.github.ykrank.androidtools.widget.EventBus
 import kotlinx.coroutines.launch
 import me.ykrank.s1next.App
 import me.ykrank.s1next.R
+import me.ykrank.s1next.binding.TextViewBindingAdapter
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.ApiCacheProvider
 import me.ykrank.s1next.data.api.model.Post
@@ -109,6 +110,7 @@ class PostAdapterDelegate(private val fragment: Fragment, context: Context) :
             val newGoose = bundle.getString(KEY_GOOSE_UPDATE)
             // 只更新 goose 对应的 TextView
             viewHolder.binding.goose.text = newGoose
+            TextViewBindingAdapter.setGoose(viewHolder.binding.goose, newGoose)
         }
     }
 
@@ -237,4 +239,3 @@ class PostAdapterDelegate(private val fragment: Fragment, context: Context) :
     }
 
 }
-

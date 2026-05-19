@@ -6,5 +6,6 @@ package me.ykrank.s1next.data.cache
  */
 object CacheConstants {
     const val GROUP_EMPTY = ""
+    const val GROUP_PROFILE = "Profile"
     const val GROUP_POST_BACKUP = "PostBackup"
 }

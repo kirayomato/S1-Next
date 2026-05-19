@@ -9,6 +9,8 @@ interface ProfileProvider {
 
     fun getProfileCaches(userId: String): Profile?
 
+    suspend fun getProfile(userId: String, forceRefresh: Boolean = false): Profile?
+
     fun getProfiles(
         authorIds: List<String>, onProfileUpdate: ((uid: String, profile: Profile) -> Unit)? = null
     )

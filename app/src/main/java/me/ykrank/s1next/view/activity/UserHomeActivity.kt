@@ -28,7 +28,7 @@ import kotlinx.coroutines.withContext
 import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.Api
-import me.ykrank.s1next.data.api.S1Service
+import me.ykrank.s1next.data.api.ProfileProvider
 import me.ykrank.s1next.data.api.model.Profile
 import me.ykrank.s1next.data.db.biz.BlackListBiz
 import me.ykrank.s1next.databinding.ActivityHomeBinding
@@ -47,7 +47,7 @@ import javax.inject.Inject
 class UserHomeActivity : BaseActivity() {
 
     @Inject
-    internal lateinit var s1Service: S1Service
+    internal lateinit var profileProvider: ProfileProvider
 
     private lateinit var binding: ActivityHomeBinding
     private var uid: String? = null
@@ -228,24 +228,28 @@ class UserHomeActivity : BaseActivity() {
     }
 
     private fun loadData() {
-        binding.data?.let { profile ->
-            lifecycleScope.launch(L.report) {
-                try {
-                    val profile = withContext(Dispatchers.IO) {
-                        val html = s1Service.getProfileWeb(
-                            "${Api.BASE_URL}space-uid-${profile.homeUid}.html",
-                            profile.homeUid
-                        )
-                        Profile.fromHtml(html)
-                    }
-
-                    binding.data = profile
-                    adapter.swapDataSet(profile.stats)
-                } catch (e: Exception) {
-                    L.e(e)
-                }
+        val profileUid = binding.data?.homeUid ?: return
+        lifecycleScope.launch(L.report) {
+            try {
+                val profile = withContext(Dispatchers.IO) {
+                    profileProvider.getProfile(profileUid)
+                } ?: return@launch
+                renderProfile(profile)
+            } catch (e: Exception) {
+                L.e(e)
             }
         }
+    }
+
+    private fun renderProfile(profile: Profile) {
+        if (profile.homeUid.isNullOrEmpty()) {
+            profile.homeUid = uid
+        }
+        if (profile.homeUsername.isNullOrEmpty()) {
+            profile.homeUsername = name
+        }
+        binding.data = profile
+        adapter.swapDataSet(profile.stats)
     }
 
     @MainThread

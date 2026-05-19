@@ -154,8 +154,12 @@ class AppModule {
 
     @Provides
     @AppLife
-    fun providerProfileProvider(s1Service: S1Service): ProfileProvider {
-        return S1ProfileProvider(s1Service)
+    fun providerProfileProvider(
+        s1Service: S1Service,
+        cacheBiz: CacheBiz,
+        downloadPreferencesManager: DownloadPreferencesManager,
+    ): ProfileProvider {
+        return S1ProfileProvider(s1Service, cacheBiz, downloadPreferencesManager)
     }
 
     @Provides
