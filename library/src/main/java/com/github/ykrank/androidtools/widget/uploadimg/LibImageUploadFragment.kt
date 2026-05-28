@@ -1,25 +1,27 @@
 package com.github.ykrank.androidtools.widget.uploadimg
 
+import android.content.Context
 import android.content.res.AssetFileDescriptor
+import android.net.Uri
 import android.os.Bundle
+import android.provider.OpenableColumns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.MimeTypeMap
 import androidx.annotation.MainThread
-import com.github.ykrank.androidautodispose.AndroidRxDispose
-import com.github.ykrank.androidlifecycle.event.FragmentEvent
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.github.ykrank.androidtools.databinding.FragmentUploadedImageBinding
 import com.github.ykrank.androidtools.extension.toast
 import com.github.ykrank.androidtools.util.L
-import com.github.ykrank.androidtools.util.LooperUtil
-import com.github.ykrank.androidtools.util.RxJavaUtil
 import com.github.ykrank.androidtools.widget.imagepicker.LibImagePickerFragment
 import com.github.ykrank.androidtools.widget.imagepicker.LocalMedia
-import io.reactivex.Observable
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.internal.schedulers.ExecutorScheduler
-import java.io.FileDescriptor
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.concurrent.LinkedBlockingDeque
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
@@ -29,7 +31,7 @@ open class LibImageUploadFragment : LibImagePickerFragment() {
     private lateinit var binding: FragmentUploadedImageBinding
     private lateinit var adapter: ImageUploadAdapter
 
-    private lateinit var imageUploadManager: ImageUploadManager
+    protected lateinit var imageUploadManager: ImageUploadManager
 
     val images = arrayListOf<ModelImageUpload>()
     private val modelAdd = ModelImageUploadAdd()
@@ -42,10 +44,10 @@ open class LibImageUploadFragment : LibImagePickerFragment() {
 
         adapter = ImageUploadAdapter(this, imageClickListener)
         binding.recyclerView.adapter = adapter
-        binding.recyclerView.layoutManager = androidx.recyclerview.widget.GridLayoutManager(
+        binding.recyclerView.layoutManager = GridLayoutManager(
             context,
-            2,
-            androidx.recyclerview.widget.RecyclerView.VERTICAL,
+            imageGridSpanCount(),
+            RecyclerView.VERTICAL,
             false
         )
 
@@ -67,6 +69,10 @@ open class LibImageUploadFragment : LibImagePickerFragment() {
         refreshDataSet()
 
         imageUploadManager = provideImageUploadManager()
+        createUploadOptionsView(inflater, binding.uploadOptionsContainer)?.let {
+            binding.uploadOptionsContainer.visibility = View.VISIBLE
+            binding.uploadOptionsContainer.addView(it)
+        }
 
         return binding.root
     }
@@ -81,6 +87,20 @@ open class LibImageUploadFragment : LibImagePickerFragment() {
         dataset.addAll(images)
         dataset.add(modelAdd)
         adapter.refreshDataSet(dataset, true)
+    }
+
+    protected fun addUploadedImages(uploadedImages: List<ModelImageUpload>) {
+        if (uploadedImages.isEmpty()) {
+            return
+        }
+        val existingKeys = images.mapNotNull { it.remoteId ?: it.url ?: it.localUri?.toString() }.toHashSet()
+        uploadedImages.forEach { image ->
+            val key = image.remoteId ?: image.url ?: image.localUri?.toString()
+            if (key != null && existingKeys.add(key)) {
+                images.add(image)
+            }
+        }
+        refreshDataSet()
     }
 
     override fun afterPickImage(medias: List<LocalMedia>) {
@@ -106,55 +126,110 @@ open class LibImageUploadFragment : LibImagePickerFragment() {
         return SmmsImageUploadManager()
     }
 
-    private fun uploadPickedImage() {
-        val assetFileDescriptors = mutableListOf<AssetFileDescriptor>()
-        Observable.fromIterable(images)
-            .filter { it.state == ModelImageUpload.STATE_INIT }
-            .flatMapSingle { model ->
-                model.state = ModelImageUpload.STATE_UPLOADING
-                val fileDescriptor: FileDescriptor? = model.localUri?.let {
-                    val assetFileDescriptor =
-                        requireContext().contentResolver.openAssetFileDescriptor(it, "r")?.apply {
-                            assetFileDescriptors.add(this)
-                        }
-                    assetFileDescriptor?.fileDescriptor
-                }
-                if (fileDescriptor == null) {
-                    Single.just(PickedAndUploadImage(model, null, null))
-                } else {
-                    imageUploadManager.uploadImage(fileDescriptor)
-                        .map { PickedAndUploadImage(model, it, fileDescriptor) }
-                }
-            }
-            .doOnDispose {
-                assetFileDescriptors.forEach {
-                    it.close()
-                }
-            }
-            .subscribeOn(uploadScheduler)
-            .observeOn(AndroidSchedulers.mainThread())
-            .to(AndroidRxDispose.withObservable(this, FragmentEvent.DESTROY))
-            .subscribe({
-                L.d(it.upload.toString())
-                if (it.upload?.success == true) {
-                    it.model.state = ModelImageUpload.STATE_DONE
-                    it.model.url = it.upload.url
-                    it.model.deleteUrl = it.upload.deleteUrl
-                } else {
-                    it.model.state = ModelImageUpload.STATE_ERROR
-                    context?.toast(it.upload?.msg)
-                    L.report(ImageUploadError("Upload image error: ${it.model}, ${it.upload}"))
-                }
-                adapter.dataSet.indexOf(it.model).also { index ->
-                    if (index >= 0) {
-                        adapter.notifyItemChanged(index)
-                    } else {
-                        //If image removed from list, remove it from server
-                        delPickedImage(it.model)
-                    }
-                }
-            }, L::report)
+    open fun createUploadOptionsView(inflater: LayoutInflater, container: ViewGroup): View? {
+        return null
+    }
 
+    protected open fun imageGridSpanCount(): Int {
+        val displayMetrics = resources.displayMetrics
+        val widthDp = displayMetrics.widthPixels / displayMetrics.density
+        return (widthDp / 88f).toInt().coerceIn(3, 5)
+    }
+
+    private fun uploadPickedImage() {
+        val appContext = requireContext().applicationContext
+        images.filter { it.state == ModelImageUpload.STATE_INIT }
+            .forEach { model ->
+                val uploadManager = imageUploadManager
+                model.state = ModelImageUpload.STATE_UPLOADING
+                notifyModelChanged(model)
+                lifecycleScope.launch {
+                    val upload = runCatching {
+                        withContext(uploadDispatcher) {
+                            uploadImage(appContext, uploadManager, model)
+                        }
+                    }.getOrElse { error ->
+                        if (error is CancellationException) {
+                            throw error
+                        }
+                        L.report(error)
+                        ImageUpload().apply {
+                            success = false
+                            msg = error.message
+                        }
+                    }
+                    handleUploadResult(model, upload)
+                }
+            }
+    }
+
+    private suspend fun uploadImage(
+        context: Context,
+        uploadManager: ImageUploadManager,
+        model: ModelImageUpload,
+    ): ImageUpload? {
+        val uri = model.localUri ?: return null
+        return context.contentResolver.openAssetFileDescriptor(uri, "r")?.use { assetFileDescriptor ->
+            val metadata = buildUploadMetadata(context, uri, assetFileDescriptor)
+            uploadManager.uploadImage(assetFileDescriptor.fileDescriptor, metadata)
+        }
+    }
+
+    private fun handleUploadResult(model: ModelImageUpload, upload: ImageUpload?) {
+        L.d(upload.toString())
+        if (upload?.success == true) {
+            model.state = ModelImageUpload.STATE_DONE
+            model.url = upload.url
+            model.deleteUrl = upload.deleteUrl
+            model.insertText = upload.insertText
+        } else {
+            model.state = ModelImageUpload.STATE_ERROR
+            context?.toast(upload?.msg)
+            L.report(ImageUploadError("Upload image error: $model, $upload"))
+        }
+        adapter.dataSet.indexOf(model).also { index ->
+            if (index >= 0) {
+                adapter.notifyItemChanged(index)
+            } else {
+                // If image removed from list, remove it from server.
+                delPickedImage(model)
+            }
+        }
+    }
+
+    private fun notifyModelChanged(model: ModelImageUpload) {
+        adapter.dataSet.indexOf(model).also { index ->
+            if (index >= 0) {
+                adapter.notifyItemChanged(index)
+            }
+        }
+    }
+
+    private fun buildUploadMetadata(
+        context: Context,
+        uri: Uri,
+        assetFileDescriptor: AssetFileDescriptor?,
+    ): ImageUploadMetadata {
+        val resolver = context.contentResolver
+        val queried = runCatching {
+            resolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE), null, null, null)
+                ?.use { cursor ->
+                    if (!cursor.moveToFirst()) {
+                        return@use null
+                    }
+                    val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
+                    val name = if (nameIndex >= 0) cursor.getString(nameIndex) else null
+                    val size = if (sizeIndex >= 0 && !cursor.isNull(sizeIndex)) cursor.getLong(sizeIndex) else null
+                    name to size
+                }
+        }.getOrNull()
+        val fileName = queried?.first ?: uri.lastPathSegment?.substringAfterLast('/')
+        val size = assetFileDescriptor?.length?.takeIf { it >= 0 } ?: queried?.second
+        val mimeType = resolver.getType(uri) ?: fileName?.substringAfterLast('.', "")
+            ?.takeIf { it.isNotEmpty() }
+            ?.let { MimeTypeMap.getSingleton().getMimeTypeFromExtension(it.lowercase()) }
+        return ImageUploadMetadata(fileName, mimeType, size)
     }
 
     @MainThread
@@ -164,26 +239,32 @@ open class LibImageUploadFragment : LibImagePickerFragment() {
             if (deleteUrl == null) {
                 removeUploadedImage(model)
             } else {
-                imageUploadManager.delUploadedImage(deleteUrl)
-                    .compose(RxJavaUtil.iOSingleTransformer())
-                    .doAfterTerminate {
-                        LooperUtil.workInMainThread {
-                            removeUploadedImage(model)
+                lifecycleScope.launch {
+                    val delete = runCatching {
+                        withContext(uploadDispatcher) {
+                            imageUploadManager.delUploadedImage(deleteUrl)
                         }
+                    }.getOrElse { error ->
+                        if (error is CancellationException) {
+                            throw error
+                        }
+                        L.report(error)
+                        null
                     }
-                    .to(AndroidRxDispose.withSingle(this, FragmentEvent.DESTROY))
-                    .subscribe({
+                    removeUploadedImage(model)
+                    delete?.let {
                         context?.toast(it.msg)
                         if (!it.success) {
                             L.report(ImageUploadError("Delete image error: $model, $it"))
                         }
-                    }, L::report)
+                    }
+                }
             }
         }
     }
 
     @MainThread
-    private fun removeUploadedImage(model: ModelImageUpload) {
+    protected fun removeUploadedImage(model: ModelImageUpload) {
         images.remove(model)
         adapter.dataSet.indexOf(model).also {
             if (it >= 0) {
@@ -193,17 +274,12 @@ open class LibImageUploadFragment : LibImagePickerFragment() {
         }
     }
 
-    private data class PickedAndUploadImage(
-        val model: ModelImageUpload,
-        val upload: ImageUpload?,
-        val fileDescriptor: FileDescriptor?
-    )
     companion object {
         val TAG = LibImageUploadFragment::class.java.simpleName
 
         val Extras_Upload_Images = "extras_upload_images"
 
         val uploadExecutor = ThreadPoolExecutor(1, 3, 1, TimeUnit.SECONDS, LinkedBlockingDeque(32))
-        val uploadScheduler = ExecutorScheduler(uploadExecutor, true)
+        val uploadDispatcher = uploadExecutor.asCoroutineDispatcher()
     }
 }

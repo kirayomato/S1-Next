@@ -18,12 +18,14 @@ import io.reactivex.disposables.Disposable
 import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.S1Service
+import me.ykrank.s1next.data.api.model.PostEditor
 import me.ykrank.s1next.data.api.model.ThreadType
 import me.ykrank.s1next.data.cache.exmodel.NewThreadCacheModel
 import me.ykrank.s1next.databinding.FragmentNewThreadBinding
 import me.ykrank.s1next.view.adapter.SimpleSpinnerAdapter
 import me.ykrank.s1next.view.dialog.requestdialog.NewThreadRequestDialogFragment
 import me.ykrank.s1next.view.event.RequestDialogSuccessEvent
+import me.ykrank.s1next.widget.uploadimg.ForumAttachmentUploadTarget
 import javax.inject.Inject
 
 /**
@@ -41,6 +43,18 @@ class NewThreadFragment : BasePostEditFragment() {
     private lateinit var typeSpinner: Spinner
 
     private var cacheModel: NewThreadCacheModel? = null
+    private var parsedPostEditor: PostEditor? = null
+    private var parsedForumAttachmentUploadInfo: PostEditor.ForumAttachmentUploadInfo? = null
+    private var parsedForumAttachments: List<PostEditor.ForumAttachment> = emptyList()
+
+    override val forumAttachmentUploadTarget: ForumAttachmentUploadTarget?
+        get() = ForumAttachmentUploadTarget.NewThread(arguments!!.getInt(ARG_FORUM_ID))
+
+    override val forumAttachmentUploadInfo: PostEditor.ForumAttachmentUploadInfo?
+        get() = parsedForumAttachmentUploadInfo
+
+    override val forumAttachments: List<PostEditor.ForumAttachment>
+        get() = parsedForumAttachments
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val newThreadBinding = DataBindingUtil.inflate<FragmentNewThreadBinding>(inflater, R.layout.fragment_new_thread, container, false)
@@ -83,7 +97,16 @@ class NewThreadFragment : BasePostEditFragment() {
             return true
         }
 
-        NewThreadRequestDialogFragment.newInstance(mForumId, typeId, title, message, cacheKey)
+        NewThreadRequestDialogFragment.newInstance(
+            mForumId,
+            typeId,
+            title,
+            message,
+            cacheKey,
+            parsedPostEditor?.formAction,
+            parsedPostEditor?.formHash,
+            parsedPostEditor?.postTime,
+        )
                 .show(fragmentManager!!, NewThreadRequestDialogFragment.TAG)
 
         return true
@@ -136,15 +159,20 @@ class NewThreadFragment : BasePostEditFragment() {
     }
 
     private fun init() {
-        mS1Service.getNewThreadInfo(mForumId)
-                .map<List<ThreadType>>(ThreadType.Companion::fromXmlString)
+        mS1Service.getNewThreadEditorInfo(mForumId)
+                .map<PostEditor> { PostEditor.fromHtml(it) }
                 .compose(RxJavaUtil.iOSingleTransformer())
                 .to(AndroidRxDispose.withSingle(this, FragmentEvent.DESTROY))
-                .subscribe({
-                    if (it.isEmpty()) {
+                .subscribe({ postEditor ->
+                    parsedPostEditor = postEditor
+                    parsedForumAttachmentUploadInfo = postEditor.forumAttachmentUploadInfo
+                    parsedForumAttachments = postEditor.forumAttachments
+                    notifyForumAttachmentsChanged()
+                    val threadTypes = postEditor.threadTypes ?: emptyList()
+                    if (threadTypes.isEmpty()) {
                         showRetrySnackbar(getString(R.string.message_network_error), View.OnClickListener { v -> init() })
                     } else {
-                        setSpinner(it)
+                        setSpinner(threadTypes)
                     }
                 }, {
                     L.report(it)

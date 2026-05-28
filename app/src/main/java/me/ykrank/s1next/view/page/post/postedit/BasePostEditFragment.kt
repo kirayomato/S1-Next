@@ -29,6 +29,7 @@ import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import me.ykrank.s1next.App
 import me.ykrank.s1next.R
+import me.ykrank.s1next.data.api.model.PostEditor
 import me.ykrank.s1next.data.pref.GeneralPreferencesManager
 import me.ykrank.s1next.databinding.FragmentPostBinding
 import me.ykrank.s1next.view.event.EmoticonClickEvent
@@ -38,13 +39,17 @@ import me.ykrank.s1next.view.fragment.BaseFragment
 import me.ykrank.s1next.view.page.post.postedit.toolstab.ImageUploadFragment
 import me.ykrank.s1next.view.page.post.postedit.toolstab.PostToolsExtrasFragment
 import me.ykrank.s1next.view.page.post.postedit.toolstab.emoticon.EmotionFragment
+import me.ykrank.s1next.widget.uploadimg.FORUM_ATTACHMENT_REMOTE_PREFIX
+import me.ykrank.s1next.widget.uploadimg.ForumAttachmentUploadTarget
+import me.ykrank.s1next.widget.uploadimg.ForumAttachmentUploadTargetProvider
 import javax.inject.Inject
 
 /**
  * Created by ykrank on 2016/7/31 0031.
  */
 abstract class BasePostEditFragment : BaseFragment(),
-    PostToolsExtrasFragment.PostToolsExtrasContextProvider {
+    PostToolsExtrasFragment.PostToolsExtrasContextProvider,
+    ForumAttachmentUploadTargetProvider {
     protected lateinit var mFragmentPostBinding: FragmentPostBinding
     protected lateinit var mReplyView: EditText
     protected lateinit var mImePanelView: KPSwitchPanelFrameLayout
@@ -71,9 +76,17 @@ abstract class BasePostEditFragment : BaseFragment(),
     private var toolsFirstInit = false
 
     private val addImages: HashSet<String> = hashSetOf()
-
     override val currentEditText: EditText
         get() = mFragmentPostBinding.reply
+
+    override val forumAttachmentUploadTarget: ForumAttachmentUploadTarget?
+        get() = null
+
+    override val forumAttachmentUploadInfo: PostEditor.ForumAttachmentUploadInfo?
+        get() = null
+
+    override val forumAttachments: List<PostEditor.ForumAttachment>
+        get() = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -154,7 +167,7 @@ abstract class BasePostEditFragment : BaseFragment(),
                 .subscribe { event ->
                     addImages.add(event.url)
                     mReplyView.text.replace(mReplyView.selectionStart,
-                            mReplyView.selectionEnd, "[img]${event.url}[/img]")
+                            mReplyView.selectionEnd, event.insertText)
                 }
 
         RxJavaUtil.disposeIfNotNull(mCacheDisposable)
@@ -200,7 +213,7 @@ abstract class BasePostEditFragment : BaseFragment(),
                         showSnackbar("请先等待图片上传完成")
                         return false
                     }
-                    if (!addImages.contains(url)) {
+                    if (!addImages.contains(url) && image.forumAttachmentId() == null) {
                         showSnackbar("点击上传完成的图片，才能插入到帖子中")
                         return false
                     }
@@ -236,6 +249,12 @@ abstract class BasePostEditFragment : BaseFragment(),
 
     open fun onRequestDialogSuccess() {
 
+    }
+
+    protected fun notifyForumAttachmentsChanged() {
+        if (::toolsFragments.isInitialized) {
+            (toolsFragments.getOrNull(1)?.second as? ImageUploadFragment)?.refreshForumAttachments()
+        }
     }
 
     private fun bindRequestDialog() {
@@ -332,4 +351,14 @@ abstract class BasePostEditFragment : BaseFragment(),
         get() {
             return (toolsFragments[1].second as ImageUploadFragment).images
         }
+
+    private fun ModelImageUpload.forumAttachmentId(): String? {
+        remoteId?.removePrefix(FORUM_ATTACHMENT_REMOTE_PREFIX)
+            ?.takeIf { it != remoteId && it.matches(Regex("""\d+""")) }
+            ?.let { return it }
+        val aid = deleteUrl?.takeIf { it.matches(Regex("""\d+""")) } ?: return null
+        return aid.takeIf {
+            insertText?.contains("aid=$aid") == true || url?.contains("aid=$aid") == true
+        }
+    }
 }

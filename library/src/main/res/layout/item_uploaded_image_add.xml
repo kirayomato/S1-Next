@@ -11,7 +11,7 @@
             android:id="@+id/iv_corners"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_margin="@dimen/spacing_big"
+            android:layout_margin="@dimen/spacing_normal"
             android:src="@drawable/shape_stroke_corners"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="W,4:3"
@@ -21,8 +21,8 @@
 
 
         <ImageView
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"

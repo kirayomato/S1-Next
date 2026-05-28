@@ -17,6 +17,9 @@ abstract class LibImagePickerFragment : LibBaseFragment() {
 
     private val imagePicker = ImagePicker()
 
+    protected open val compressPickedImages: Boolean
+        get() = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         imagePicker.initPicker(this, 5) { uris ->
@@ -24,6 +27,9 @@ abstract class LibImagePickerFragment : LibBaseFragment() {
                 val medias = withContext(Dispatchers.IO) {
                     val context = requireContext()
                     uris.map {
+                        if (!compressPickedImages) {
+                            return@map LocalMedia(it)
+                        }
                         try {
                             val cacheFileName = FileUtil.createRandomFileName(
                                 context,

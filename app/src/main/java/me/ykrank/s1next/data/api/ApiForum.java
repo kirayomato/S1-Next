@@ -33,12 +33,13 @@ public class ApiForum {
 
     static final String URL_EDIT_POST_HELPER = "forum.php?mod=post&action=edit";
     static final String URL_EDIT_POST = "forum.php?mod=post&action=edit&editsubmit=yes&inajax=yes&wysiwyg=1&delete=0";
+    static final String URL_FORUM_ATTACHMENT_LIST = "forum.php?mod=ajax&action=attachlist&inajax=1";
     static final String URL_QUOTE_POST_REDIRECT = "forum.php?mod=redirect&goto=findpost";
     /**
      * A URL to get the quoted user identification and processed quoted
      * content (with some HTML tags and its origin redirect hyperlink).
      */
-    static final String URL_QUOTE_HELPER = "forum.php?mod=post&action=reply&inajax=yes";
+    static final String URL_REPLY_EDITOR_HELPER = "forum.php?mod=post&action=reply&inajax=yes";
 
     static final String URL_SEARCH_FORUM = "search.php?searchsubmit=yes&mod=forum";
     static final String URL_SEARCH_USER = "search.php?searchsubmit=yes&mod=user";

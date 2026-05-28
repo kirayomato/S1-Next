@@ -1,14 +1,22 @@
 package com.github.ykrank.androidtools.widget.uploadimg
 
-import io.reactivex.Single
 import java.io.File
 import java.io.FileDescriptor
 
 interface ImageUploadManager {
-    fun uploadImage(imageFile: File): Single<ImageUpload>
+    suspend fun uploadImage(imageFile: File): ImageUpload
 
-    fun uploadImage(imageFile: FileDescriptor): Single<ImageUpload>
+    suspend fun uploadImage(imageFile: FileDescriptor): ImageUpload
 
-    fun delUploadedImage(url: String): Single<ImageDelete>
+    suspend fun uploadImage(imageFile: FileDescriptor, metadata: ImageUploadMetadata): ImageUpload {
+        return uploadImage(imageFile)
+    }
+
+    suspend fun delUploadedImage(url: String): ImageDelete
 }
 
+data class ImageUploadMetadata(
+    val fileName: String? = null,
+    val mimeType: String? = null,
+    val size: Long? = null,
+)

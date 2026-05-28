@@ -23,6 +23,7 @@ import me.ykrank.s1next.view.adapter.SimpleSpinnerAdapter
 import me.ykrank.s1next.view.dialog.requestdialog.EditPostRequestDialogFragment
 import me.ykrank.s1next.view.event.RequestDialogSuccessEvent
 import me.ykrank.s1next.view.page.post.postedit.BasePostEditFragment
+import me.ykrank.s1next.widget.uploadimg.ForumAttachmentUploadTarget
 import javax.inject.Inject
 
 /**
@@ -38,6 +39,28 @@ class EditPostFragment : BasePostEditFragment() {
     private var isHost: Boolean = false
 
     private lateinit var binding: FragmentEditPostBinding
+    private var parsedPostEditor: PostEditor? = null
+    private var parsedForumAttachmentUploadInfo: PostEditor.ForumAttachmentUploadInfo? = null
+    private var parsedForumAttachments: List<PostEditor.ForumAttachment> = emptyList()
+
+    override val forumAttachmentUploadTarget: ForumAttachmentUploadTarget?
+        get() = if (::mThread.isInitialized && ::mPost.isInitialized) {
+            val fid = mThread.fid?.toIntOrNull()
+            val tid = mThread.id?.toIntOrNull()
+            if (fid != null && tid != null) {
+                ForumAttachmentUploadTarget.EditPost(fid, tid, mPost.id)
+            } else {
+                null
+            }
+        } else {
+            null
+        }
+
+    override val forumAttachmentUploadInfo: PostEditor.ForumAttachmentUploadInfo?
+        get() = parsedForumAttachmentUploadInfo
+
+    override val forumAttachments: List<PostEditor.ForumAttachment>
+        get() = parsedForumAttachments
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -91,7 +114,17 @@ class EditPostFragment : BasePostEditFragment() {
             return true
         }
 
-        EditPostRequestDialogFragment.newInstance(mThread, mPost, typeId, readPerm, title!!, message!!)
+        EditPostRequestDialogFragment.newInstance(
+            mThread,
+            mPost,
+            typeId,
+            readPerm,
+            title!!,
+            message!!,
+            parsedPostEditor?.formAction,
+            parsedPostEditor?.formHash,
+            parsedPostEditor?.postTime,
+        )
                 .show(parentFragmentManager, EditPostRequestDialogFragment.TAG)
 
         return true
@@ -118,11 +151,15 @@ class EditPostFragment : BasePostEditFragment() {
     }
 
     private fun init() {
-        mS1Service.getEditPostInfo(mThread.fid!!.toInt(), mThread.id!!.toInt(), mPost.id)
+        mS1Service.getEditPostEditorInfo(mThread.fid!!.toInt(), mThread.id!!.toInt(), mPost.id)
                 .map<PostEditor> { PostEditor.fromHtml(it) }
                 .compose(RxJavaUtil.iOSingleTransformer())
                 .to(AndroidRxDispose.withSingle(this, FragmentEvent.DESTROY))
                 .subscribe({ postEditor ->
+                    parsedPostEditor = postEditor
+                    parsedForumAttachmentUploadInfo = postEditor.forumAttachmentUploadInfo
+                    parsedForumAttachments = postEditor.forumAttachments
+                    notifyForumAttachmentsChanged()
                     if (isHost) {
                         setSpinnerType(postEditor.threadTypes)
                         binding.spinnerType.setSelection(postEditor.typeIndex)

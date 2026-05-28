@@ -84,6 +84,7 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
 
     private lateinit var mThreadId: String
     private var mThreadTitle: String? = null
+    private var mForumId: Int? = null
 
     private var mThreadAttachment: Posts.ThreadAttachment? = null
     private var mMenuThreadAttachment: MenuItem? = null
@@ -118,6 +119,7 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
         // thread title is null if this thread comes from ThreadLink
         mThreadTitle = thread.title
         mThreadId = thread.id!!
+        mForumId = thread.fid?.toIntOrNull()
 
         trackAgent.post(
             ViewThreadTrackEvent(
@@ -636,7 +638,7 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
 
         ReplyActivity.startReplyActivityForResultMessage(
             activity, mThreadId, mThreadTitle,
-            quotePostId, quotePostCount
+            quotePostId, quotePostCount, mForumId, currentPage + 1
         )
     }
 

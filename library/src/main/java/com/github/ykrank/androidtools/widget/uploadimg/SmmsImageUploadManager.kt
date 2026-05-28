@@ -2,7 +2,6 @@ package com.github.ykrank.androidtools.widget.uploadimg
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.github.ykrank.androidtools.util.L
-import io.reactivex.Single
 import okhttp3.ExperimentalOkHttpApi
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -11,7 +10,6 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.jsoup.Jsoup
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.jackson.JacksonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import retrofit2.http.GET
@@ -40,7 +38,6 @@ class SmmsImageUploadManager(_okHttpClient: OkHttpClient? = null) : ImageUploadM
                 .baseUrl("https://sm.ms/")
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(JacksonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build()
                 .create(SmmsImageUploadApiService::class.java)
     }
@@ -48,22 +45,21 @@ class SmmsImageUploadManager(_okHttpClient: OkHttpClient? = null) : ImageUploadM
     /**
      * Force upload to sm.ms
      */
-    override fun uploadImage(imageFile: File): Single<ImageUpload> {
+    override suspend fun uploadImage(imageFile: File): ImageUpload {
         val requestFile = imageFile.asRequestBody("image/*".toMediaTypeOrNull())
         val body = MultipartBody.Part.createFormData("smfile", imageFile.name, requestFile)
-        return uploadApiService.postSmmsImage(body).map { it.toCommon() }
+        return uploadApiService.postSmmsImage(body).toCommon()
     }
 
     @OptIn(ExperimentalOkHttpApi::class)
-    override fun uploadImage(imageFile: FileDescriptor): Single<ImageUpload> {
+    override suspend fun uploadImage(imageFile: FileDescriptor): ImageUpload {
         val requestFile = imageFile.toRequestBody("image/*".toMediaTypeOrNull())
         val body = MultipartBody.Part.createFormData("smfile", "image.jpg", requestFile)
-        return uploadApiService.postSmmsImage(body).map { it.toCommon() }
+        return uploadApiService.postSmmsImage(body).toCommon()
     }
 
-    override fun delUploadedImage(url: String): Single<ImageDelete> {
-        return uploadApiService.deldSmmsImage(url)
-                .map { SmmsImageDelete.fromHtml(it).toCommon() }
+    override suspend fun delUploadedImage(url: String): ImageDelete {
+        return SmmsImageDelete.fromHtml(uploadApiService.deldSmmsImage(url)).toCommon()
     }
 }
 
@@ -71,11 +67,11 @@ interface SmmsImageUploadApiService {
     @Headers("Accept:*/*", "Accept-Language:zh-CN,zh;q=0.8", "User-Agent:Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36")
     @Multipart
     @POST("https://sm.ms/api/upload")
-    fun postSmmsImage(@Part image: MultipartBody.Part?): Single<SmmsImageUpload>
+    suspend fun postSmmsImage(@Part image: MultipartBody.Part?): SmmsImageUpload
 
     @Headers("Accept:*/*", "Accept-Language:zh-CN,zh;q=0.8", "User-Agent:Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36")
     @GET
-    fun deldSmmsImage(@Url url: String?): Single<String>
+    suspend fun deldSmmsImage(@Url url: String?): String
 }
 
 

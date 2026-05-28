@@ -110,6 +110,15 @@
     <string name="post_page_search_scope_cached_hint">Scope: locally cached pages; results may jump to another page</string>
     <string name="post_page_search_scope_cached_hint_loaded">Scope: %1$d locally cached pages; results may jump to another page</string>
     <string name="post_backup_success">Thread backup complete</string>
+    <string name="image_upload_options_title">Image upload settings</string>
+    <string name="image_upload_options_summary">%1$s · %2$s</string>
+    <string name="image_upload_source_forum_attachment">Forum attachment upload</string>
+    <string name="image_upload_source_forum_attachment_hint">Insert as a forum attachment and submit through the web form</string>
+    <string name="image_upload_source_external">External image host</string>
+    <string name="image_upload_source_external_hint">Insert as a normal image URL from the external image host</string>
+    <string name="image_upload_original_resolution">Original resolution</string>
+    <string name="image_upload_original_resolution_hint">Upload the selected image without converting it to WebP first</string>
+    <string name="image_upload_compressed_resolution">Compressed upload</string>
     <string name="prompt_thread_link_or_id">Thread link/ID</string>
     <string name="error_field_invalid_or_unsupported_thread_link_or_id">Invalid or unsupported link/ID format</string>
 

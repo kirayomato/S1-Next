@@ -23,7 +23,9 @@ class ReplyActivity : BaseActivity() {
         val intent = intent
         val threadId = intent.getStringExtra(ARG_THREAD_ID)
         val quotePostId = intent.getStringExtra(ARG_QUOTE_POST_ID)
-        leavePageMsg("ReplyActivity##threadId:$threadId,quotePostId:$quotePostId")
+        val forumId = intent.getIntExtra(ARG_FORUM_ID, 0).takeIf { it > 0 }
+        val pageNum = intent.getIntExtra(ARG_PAGE_NUM, 1).coerceAtLeast(1)
+        leavePageMsg("ReplyActivity##threadId:$threadId,quotePostId:$quotePostId,forumId:$forumId,pageNum:$pageNum")
 
         val titlePrefix = if (TextUtils.isEmpty(quotePostId))
             getString(R.string.reply_activity_title_prefix)
@@ -36,7 +38,7 @@ class ReplyActivity : BaseActivity() {
         val fragment = fragmentManager.findFragmentByTag(ReplyFragment.TAG)
         if (fragment == null) {
             mReplyFragment = ReplyFragment.newInstance(threadId!!,
-                    quotePostId)
+                    quotePostId, forumId, pageNum)
             fragmentManager.beginTransaction().add(R.id.frame_layout, mReplyFragment,
                     ReplyFragment.TAG).commit()
         } else {
@@ -59,15 +61,22 @@ class ReplyActivity : BaseActivity() {
 
         private const val ARG_THREAD_ID = "thread_id"
         private const val ARG_THREAD_TITLE = "thread_title"
+        private const val ARG_FORUM_ID = "forum_id"
+        private const val ARG_PAGE_NUM = "page_num"
 
         private const val ARG_QUOTE_POST_ID = "quote_post_id"
         private const val ARG_QUOTE_POST_COUNT = "quote_post_count"
 
         fun startReplyActivityForResultMessage(activity: Activity, threadId: String, threadTitle: String?,
-                                               quotePostId: String?, quotePostCount: String?) {
+                                               quotePostId: String?, quotePostCount: String?, forumId: Int? = null,
+                                               pageNum: Int = 1) {
             val intent = Intent(activity, ReplyActivity::class.java)
             intent.putExtra(ARG_THREAD_ID, threadId)
             intent.putExtra(ARG_THREAD_TITLE, threadTitle)
+            if (forumId != null && forumId > 0) {
+                intent.putExtra(ARG_FORUM_ID, forumId)
+            }
+            intent.putExtra(ARG_PAGE_NUM, pageNum.coerceAtLeast(1))
 
             intent.putExtra(ARG_QUOTE_POST_ID, quotePostId)
             intent.putExtra(ARG_QUOTE_POST_COUNT, quotePostCount)

@@ -246,8 +246,9 @@ class AppPostListFragment : BaseViewPagerFragment(), AppPostListPagerFragment.Pa
             return
         }
 
+        val forumId = (activity as? AppPostListActivity)?.threadInfo?.fid?.takeIf { it > 0 }
         ReplyActivity.startReplyActivityForResultMessage(activity, mThreadId, mThreadTitle,
-                quotePostId, quotePostCount)
+                quotePostId, quotePostCount, forumId, currentPage + 1)
     }
 
     private fun startRateActivity(threadId: String, postId: String) {

@@ -11,14 +11,19 @@ import me.ykrank.s1next.data.api.model.wrapper.AccountResultWrapper
 import me.ykrank.s1next.data.api.model.wrapper.BaseDataWrapper
 import me.ykrank.s1next.data.api.model.wrapper.BaseResultWrapper
 import me.ykrank.s1next.data.api.model.wrapper.PmsWrapper
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FieldMap
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Query
+import retrofit2.http.Url
 
 interface S1Service {
     @GET(ApiForum.URL_FORUM)
@@ -99,8 +104,8 @@ interface S1Service {
         @Field("message") reply: String?
     ): Single<AccountResultWrapper>
 
-    @GET(ApiForum.URL_QUOTE_HELPER)
-    fun getQuoteInfo(
+    @GET(ApiForum.URL_REPLY_EDITOR_HELPER)
+    fun getReplyEditorInfo(
         @Query("tid") threadId: String?,
         @Query("repquote") quotePostId: String?
     ): Single<String>
@@ -137,6 +142,12 @@ interface S1Service {
     @GET(ApiForum.URL_NEW_THREAD_HELPER)
     fun getNewThreadInfo(@Query("fid") fid: Int): Single<String>
 
+    @GET(ApiForum.URL_NEW_THREAD_HELPER)
+    fun getNewThreadEditorInfo(
+        @Query("fid") fid: Int,
+        @Query("inajax") inAjax: String = "yes"
+    ): Single<String>
+
     @FormUrlEncoded
     @POST(ApiForum.URL_NEW_THREAD)
     fun newThread(
@@ -153,10 +164,40 @@ interface S1Service {
 
     //endregion
     @GET(ApiForum.URL_EDIT_POST_HELPER)
-    fun getEditPostInfo(
+    fun getEditPostEditorInfo(
         @Query("fid") fid: Int,
         @Query("tid") tid: Int,
-        @Query("pid") pid: Int
+        @Query("pid") pid: Int,
+        @Query("inajax") inAjax: String = "yes"
+    ): Single<String>
+
+    @Multipart
+    @POST
+    suspend fun uploadForumAttachment(
+        @Url uploadUrl: String,
+        @Header("Origin") origin: String,
+        @Header("Referer") referer: String,
+        @Part("uid") uid: RequestBody,
+        @Part("hash") hash: RequestBody,
+        @Part("id") id: RequestBody,
+        @Part("type") type: RequestBody,
+        @Part("size") size: RequestBody,
+        @Part("filetype") fileType: RequestBody,
+        @Part file: MultipartBody.Part,
+    ): String
+
+    @GET(ApiForum.URL_FORUM_ATTACHMENT_LIST)
+    suspend fun getForumAttachmentList(
+        @Query("aids") aids: String,
+        @Query("fid") fid: Int,
+        @Query("ajaxtarget") ajaxTarget: String? = null,
+    ): String
+
+    @FormUrlEncoded
+    @POST
+    fun submitPostForm(
+        @Url url: String,
+        @FieldMap fields: Map<String, String>,
     ): Single<String>
 
     @FormUrlEncoded

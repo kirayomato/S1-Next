@@ -173,6 +173,15 @@
     <string name="post_page_search_scope_cached_hint">范围：本主题已缓存页面，结果可能跳转到其他页</string>
     <string name="post_page_search_scope_cached_hint_loaded">范围：本主题已缓存%1$d页，结果可能跳转到其他页</string>
     <string name="post_backup_success">帖子备份完成</string>
+    <string name="image_upload_options_title">图片上传设置</string>
+    <string name="image_upload_options_summary">%1$s · %2$s</string>
+    <string name="image_upload_source_forum_attachment">论坛附件上传</string>
+    <string name="image_upload_source_forum_attachment_hint">插入为论坛附件，并随网页表单提交消费</string>
+    <string name="image_upload_source_external">外链图床上传</string>
+    <string name="image_upload_source_external_hint">插入为普通图片链接，使用外部图床</string>
+    <string name="image_upload_original_resolution">原图分辨率</string>
+    <string name="image_upload_original_resolution_hint">开启后不先转 WebP 压缩，直接上传所选图片</string>
+    <string name="image_upload_compressed_resolution">压缩上传</string>
     <string name="search_type_entry_forum">帖子</string>
     <string name="search_type_entry_user">用户</string>
     <string name="edit_post_succeed">编辑帖子成功</string>

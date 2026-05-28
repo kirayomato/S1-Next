@@ -327,6 +327,15 @@
     <string name="post_page_search_scope_cached_hint">範圍：本主題已快取頁面，結果可能跳轉到其他頁</string>
     <string name="post_page_search_scope_cached_hint_loaded">範圍：本主題已快取%1$d頁，結果可能跳轉到其他頁</string>
     <string name="post_backup_success">帖子備份完成</string>
+    <string name="image_upload_options_title">圖片上傳設定</string>
+    <string name="image_upload_options_summary">%1$s · %2$s</string>
+    <string name="image_upload_source_forum_attachment">論壇附件上傳</string>
+    <string name="image_upload_source_forum_attachment_hint">插入為論壇附件，並隨網頁表單提交消費</string>
+    <string name="image_upload_source_external">外鏈圖床上傳</string>
+    <string name="image_upload_source_external_hint">插入為普通圖片連結，使用外部圖床</string>
+    <string name="image_upload_original_resolution">原圖解析度</string>
+    <string name="image_upload_original_resolution_hint">開啟後不先轉 WebP 壓縮，直接上傳所選圖片</string>
+    <string name="image_upload_compressed_resolution">壓縮上傳</string>
     <string name="search_type_entry_forum">帖子</string>
         
     <string name="search_type_entry_user">用戶</string>
