@@ -193,6 +193,14 @@ interface S1Service {
         @Query("ajaxtarget") ajaxTarget: String? = null,
     ): String
 
+    @GET(ApiForum.URL_FORUM_ATTACHMENT_DELETE)
+    suspend fun deleteForumAttachment(
+        @Query("formhash") formHash: String,
+        @Query("tid") tid: String,
+        @Query("pid") pid: Int,
+        @Query("aids[]") aids: List<String>,
+    ): String
+
     @FormUrlEncoded
     @POST
     fun submitPostForm(

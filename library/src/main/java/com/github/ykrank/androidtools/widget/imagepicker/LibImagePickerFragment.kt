@@ -1,6 +1,7 @@
 package com.github.ykrank.androidtools.widget.imagepicker
 
 import android.os.Bundle
+import android.util.Size
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import com.github.ykrank.androidtools.ui.LibBaseFragment
@@ -17,8 +18,8 @@ abstract class LibImagePickerFragment : LibBaseFragment() {
 
     private val imagePicker = ImagePicker()
 
-    protected open val compressPickedImages: Boolean
-        get() = true
+    protected open val maxCompressedImageSize: Size?
+        get() = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,9 +28,6 @@ abstract class LibImagePickerFragment : LibBaseFragment() {
                 val medias = withContext(Dispatchers.IO) {
                     val context = requireContext()
                     uris.map {
-                        if (!compressPickedImages) {
-                            return@map LocalMedia(it)
-                        }
                         try {
                             val cacheFileName = FileUtil.createRandomFileName(
                                 context,
@@ -39,7 +37,8 @@ abstract class LibImagePickerFragment : LibBaseFragment() {
                             ImageCompress.compressImage(
                                 context,
                                 it,
-                                FileOutputStream(cacheFile)
+                                FileOutputStream(cacheFile),
+                                maxCompressedImageSize,
                             )
                             LocalMedia(it, isCompressed = true, compressPath = cacheFile.toUri())
                         } catch (e: Exception) {

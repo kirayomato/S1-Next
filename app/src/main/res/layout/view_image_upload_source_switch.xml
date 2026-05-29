@@ -15,50 +15,32 @@
             android:layout_height="wrap_content"
             android:foreground="?attr/selectableItemBackground"
             android:gravity="center_vertical"
-            android:minHeight="48dp"
+            android:minHeight="32dp"
             android:orientation="horizontal"
             android:paddingLeft="@dimen/item_padding"
-            android:paddingTop="@dimen/spacing_micro"
             android:paddingRight="@dimen/item_padding_small"
-            android:paddingBottom="@dimen/spacing_micro"
             android:paddingStart="@dimen/item_padding"
             android:paddingEnd="@dimen/item_padding_small">
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/upload_options_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/upload_options_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:includeFontPadding="false"
-                    android:text="@string/image_upload_options_title"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/upload_options_summary"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/spacing_mill"
-                    android:ellipsize="end"
-                    android:includeFontPadding="false"
-                    android:maxLines="1"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                    android:textColor="?android:attr/textColorSecondary"
-                    tools:text="论坛附件上传 · 压缩上传" />
-
-            </LinearLayout>
+                android:ellipsize="end"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textStyle="bold"
+                tools:text="论坛附件上传 · 限制大图" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/expand_icon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:padding="8dp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:padding="4dp"
+                app:tint="?android:attr/textColorPrimary"
                 app:srcCompat="@drawable/ic_expand_more" />
 
         </LinearLayout>
@@ -153,7 +135,7 @@
                 </LinearLayout>
 
                 <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/original_image_switch"
+                    android:id="@+id/original_resolution_switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/item_padding_small"

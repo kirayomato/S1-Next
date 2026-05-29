@@ -179,9 +179,11 @@
     <string name="image_upload_source_forum_attachment_hint">插入为论坛附件，并随网页表单提交消费</string>
     <string name="image_upload_source_external">外链图床上传</string>
     <string name="image_upload_source_external_hint">插入为普通图片链接，使用外部图床</string>
-    <string name="image_upload_original_resolution">原图分辨率</string>
-    <string name="image_upload_original_resolution_hint">开启后不先转 WebP 压缩，直接上传所选图片</string>
-    <string name="image_upload_compressed_resolution">压缩上传</string>
+    <string name="image_upload_original_resolution">原始分辨率</string>
+    <string name="image_upload_original_resolution_hint">关闭时限 2000</string>
+    <string name="image_upload_limit_large_resolution">限 2000</string>
+    <string name="image_upload_limit_large_resolution_hint">超过 2000 时等比缩小</string>
+    <string name="image_upload_forum_attachment_used">正文已使用该图片</string>
     <string name="search_type_entry_forum">帖子</string>
     <string name="search_type_entry_user">用户</string>
     <string name="edit_post_succeed">编辑帖子成功</string>

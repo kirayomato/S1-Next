@@ -25,6 +25,7 @@ class ForumAttachmentUploadManager(
     private val user: User,
     private val s1Service: S1Service,
     private val parsedUploadInfoProvider: () -> PostEditor.ForumAttachmentUploadInfo? = { null },
+    private val formHashProvider: () -> String? = { null },
 ) : ImageUploadManager {
 
     private var uploadInfoCache: ForumAttachmentUploadInfo? = null
@@ -47,7 +48,35 @@ class ForumAttachmentUploadManager(
     }
 
     override suspend fun delUploadedImage(url: String): ImageDelete {
-        return ImageDelete().apply { success = true }
+        return runCatching {
+            val aid = url.takeIf { it.matches(Regex("""\d+""")) }
+                ?: throw IllegalStateException("无效的论坛附件")
+            val formHash = formHashProvider()?.takeIf { it.isNotBlank() }
+                ?: user.authenticityToken?.takeIf { it.isNotBlank() }
+                ?: throw IllegalStateException("无法获取删除参数")
+            val deletedCount = parseDeleteCount(
+                s1Service.deleteForumAttachment(
+                    formHash = formHash,
+                    tid = target.deleteThreadId(),
+                    pid = target.deletePostId(),
+                    aids = listOf(aid),
+                )
+            )
+            ImageDelete().apply {
+                success = deletedCount > 0
+                msg = if (success) {
+                    "图片已删除"
+                } else {
+                    "图片删除失败"
+                }
+            }
+        }.getOrElse { error ->
+            L.report(error)
+            ImageDelete().apply {
+                success = false
+                msg = error.message ?: "图片删除失败"
+            }
+        }
     }
 
     private suspend fun upload(image: RequestBody, metadata: ImageUploadMetadata): ImageUpload {
@@ -129,6 +158,30 @@ class ForumAttachmentUploadManager(
                 ?.toLongOrNull()
                 ?.takeIf { it > 0 }
             ?: throw IllegalStateException(uploadErrorMessage(parts, response))
+    }
+
+    private fun parseDeleteCount(response: String): Int {
+        val text = Regex("""(?s)<!\[CDATA\[(.*)]]>""")
+            .find(response)
+            ?.groupValues
+            ?.getOrNull(1)
+            ?: response
+        return text.trim().toIntOrNull() ?: 0
+    }
+
+    private fun ForumAttachmentUploadTarget.deleteThreadId(): String {
+        return when (this) {
+            is ForumAttachmentUploadTarget.NewThread -> "0"
+            is ForumAttachmentUploadTarget.Reply -> tid
+            is ForumAttachmentUploadTarget.EditPost -> tid.toString()
+        }
+    }
+
+    private fun ForumAttachmentUploadTarget.deletePostId(): Int {
+        return when (this) {
+            is ForumAttachmentUploadTarget.EditPost -> pid
+            else -> 0
+        }
     }
 
     private suspend fun loadUploadedImageUrl(aid: Long, fid: Int, uploadId: String): String? {

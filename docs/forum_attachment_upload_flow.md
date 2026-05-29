@@ -303,8 +303,8 @@ GET https://stage1st.com/2b/forum.php?mod=ajax&action=deleteattach&inajax=yes&fo
 
 已验证：删除成功后，原本可访问的 `forum.php?mod=image&aid=...&key=...` 图片 URL 会失效，`attachlist` 也不再返回该附件。因此当前 App 的图片选择页应区分两种行为：
 
-- 从编辑器里移除：只做本地移除，不调用删除接口。
-- 明确删除服务端附件：调用 `deleteattach`，并从本地历史未消费附件列表移除。
+- 已插入正文：不允许删除，提示“正文已使用该图片”。
+- 未插入正文：调用 `deleteattach` 删除服务端附件，并从本地历史未消费附件列表移除。
 
 ## App 实现建议
 
@@ -313,14 +313,14 @@ GET https://stage1st.com/2b/forum.php?mod=ajax&action=deleteattach&inajax=yes&fo
 3. 上传成功响应必须校验为正整数 aid，负数或其他文本视为失败。
 4. 上传成功后请求 `attachlist` 获取预览 URL；用于 App 内展示时移除 `nocache`、`ramdom`、`random` 等随机参数。
 5. editor helper 返回的未消费附件列表可展示在图片上传页，方便用户复用上次上传但未删除/未消费的图片。多个 aid 请求 `attachlist` 时必须使用 `|aid1|aid2` 格式。
-6. 图片选择页里的移除操作默认只做本地移除，不调用 `deleteattach`。真实删除需要单独的用户确认或独立入口。
+6. 图片选择页里的论坛附件删除需要先判断是否已插入正文；已插入时只提示，未插入时调用 `deleteattach`。
 7. 提交时按内容路由：
    - 正文没有论坛附件 aid：继续走现有移动 API。
    - 正文包含论坛附件 aid：走标准网页表单提交，正文使用 `[attachimg]aid[/attachimg]`，并携带 `attachnew[aid][description]`、`attachnew[aid][readperm]`。
 8. 网页表单提交成功后，直接刷新/退出编辑页；不要维护独立的本地“已使用附件”状态。
 9. 图片上传页设置收进默认折叠的设置条，当前包含：
    - 论坛附件上传 / 外链图床上传。
-   - 原图分辨率 / 压缩上传。
+   - 原始分辨率开关，默认关闭；关闭时限 2000。
 10. 已上传图片列表使用更密的网格展示，一行按屏幕宽度显示 3 到 5 个缩略图。
 
 ## 待验证点

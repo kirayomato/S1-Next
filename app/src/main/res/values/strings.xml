@@ -117,8 +117,10 @@
     <string name="image_upload_source_external">External image host</string>
     <string name="image_upload_source_external_hint">Insert as a normal image URL from the external image host</string>
     <string name="image_upload_original_resolution">Original resolution</string>
-    <string name="image_upload_original_resolution_hint">Upload the selected image without converting it to WebP first</string>
-    <string name="image_upload_compressed_resolution">Compressed upload</string>
+    <string name="image_upload_original_resolution_hint">Off: limit 2000</string>
+    <string name="image_upload_limit_large_resolution">Limit 2000</string>
+    <string name="image_upload_limit_large_resolution_hint">Scale down when either side exceeds 2000 px</string>
+    <string name="image_upload_forum_attachment_used">This image is used in the post body</string>
     <string name="prompt_thread_link_or_id">Thread link/ID</string>
     <string name="error_field_invalid_or_unsupported_thread_link_or_id">Invalid or unsupported link/ID format</string>
 

@@ -85,6 +85,9 @@ abstract class BasePostEditFragment : BaseFragment(),
     override val forumAttachmentUploadInfo: PostEditor.ForumAttachmentUploadInfo?
         get() = null
 
+    override val forumAttachmentFormHash: String?
+        get() = null
+
     override val forumAttachments: List<PostEditor.ForumAttachment>
         get() = emptyList()
 

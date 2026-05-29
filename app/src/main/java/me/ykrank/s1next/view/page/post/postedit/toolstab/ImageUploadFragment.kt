@@ -1,10 +1,12 @@
 package me.ykrank.s1next.view.page.post.postedit.toolstab
 
 import android.os.Bundle
+import android.util.Size
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
+import com.github.ykrank.androidtools.extension.toast
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.widget.EventBus
 import com.github.ykrank.androidtools.widget.uploadimg.ImageUploadManager
@@ -72,15 +74,19 @@ class ImageUploadFragment : LibImageUploadFragment() {
         val targetProvider = parentFragment as? ForumAttachmentUploadTargetProvider
         val target = targetProvider?.forumAttachmentUploadTarget
         if (useForumAttachment && target != null) {
-            return ForumAttachmentUploadManager(target, mUser, mS1Service) {
-                targetProvider.forumAttachmentUploadInfo
-            }
+            return ForumAttachmentUploadManager(
+                target,
+                mUser,
+                mS1Service,
+                { targetProvider.forumAttachmentUploadInfo },
+                { targetProvider.forumAttachmentFormHash },
+            )
         }
         return RIPImageUploadManager(_okHttpClient = mOkHttpClient)
     }
 
-    override val compressPickedImages: Boolean
-        get() = !useOriginalResolution
+    override val maxCompressedImageSize: Size?
+        get() = if (useOriginalResolution) null else MAX_COMPRESSED_IMAGE_SIZE
 
     override fun createUploadOptionsView(inflater: LayoutInflater, container: ViewGroup): View? {
         if ((parentFragment as? ForumAttachmentUploadTargetProvider)?.forumAttachmentUploadTarget == null) {
@@ -94,8 +100,8 @@ class ImageUploadFragment : LibImageUploadFragment() {
             imageUploadManager = provideImageUploadManager()
             updateUploadSourceText()
         }
-        binding.originalImageSwitch.isChecked = useOriginalResolution
-        binding.originalImageSwitch.setOnCheckedChangeListener { _, checked ->
+        binding.originalResolutionSwitch.isChecked = useOriginalResolution
+        binding.originalResolutionSwitch.setOnCheckedChangeListener { _, checked ->
             useOriginalResolution = checked
             updateUploadSourceText()
         }
@@ -117,6 +123,15 @@ class ImageUploadFragment : LibImageUploadFragment() {
         syncForumAttachments()
     }
 
+    override fun delPickedImage(model: ModelImageUpload?) {
+        val aid = model?.forumAttachmentId()
+        if (aid != null && isForumAttachmentInserted(aid)) {
+            context?.toast(R.string.image_upload_forum_attachment_used)
+            return
+        }
+        super.delPickedImage(model)
+    }
+
     private fun updateUploadSourceText() {
         val binding = sourceBinding ?: return
         binding.uploadSourceTitle.setText(
@@ -133,7 +148,7 @@ class ImageUploadFragment : LibImageUploadFragment() {
                 R.string.image_upload_source_external_hint
             }
         )
-        binding.uploadOptionsSummary.text = getString(
+        binding.uploadOptionsTitle.text = getString(
             R.string.image_upload_options_summary,
             getString(
                 if (useForumAttachment) {
@@ -146,7 +161,7 @@ class ImageUploadFragment : LibImageUploadFragment() {
                 if (useOriginalResolution) {
                     R.string.image_upload_original_resolution
                 } else {
-                    R.string.image_upload_compressed_resolution
+                    R.string.image_upload_limit_large_resolution
                 }
             ),
         )
@@ -253,8 +268,21 @@ class ImageUploadFragment : LibImageUploadFragment() {
         }
     }
 
+    private fun isForumAttachmentInserted(aid: String): Boolean {
+        val content = (parentFragment as? PostToolsExtrasFragment.PostToolsExtrasContextProvider)
+            ?.currentEditText
+            ?.text
+            ?.toString()
+            .orEmpty()
+        if (Regex("""(?i)\[attachimg]\s*$aid\s*\[/attachimg]""").containsMatchIn(content)) {
+            return true
+        }
+        return Regex("""(?i)(?:[?&]|&amp;)aid=$aid(?:\D|$)""").containsMatchIn(content)
+    }
+
     companion object {
         val TAG: String = ImageUploadFragment::class.java.simpleName
+        private val MAX_COMPRESSED_IMAGE_SIZE = Size(2000, 2000)
 
         fun newInstance(): ImageUploadFragment {
             return ImageUploadFragment()

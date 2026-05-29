@@ -14,6 +14,8 @@ interface ForumAttachmentUploadTargetProvider {
     val forumAttachmentUploadTarget: ForumAttachmentUploadTarget?
     val forumAttachmentUploadInfo: PostEditor.ForumAttachmentUploadInfo?
         get() = null
+    val forumAttachmentFormHash: String?
+        get() = null
     val forumAttachments: List<PostEditor.ForumAttachment>
         get() = emptyList()
 }

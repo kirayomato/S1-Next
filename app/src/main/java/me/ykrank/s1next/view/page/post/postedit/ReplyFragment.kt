@@ -40,6 +40,9 @@ class ReplyFragment : BasePostEditFragment() {
     override val forumAttachmentUploadInfo: PostEditor.ForumAttachmentUploadInfo?
         get() = parsedForumAttachmentUploadInfo
 
+    override val forumAttachmentFormHash: String?
+        get() = parsedReplyEditor?.formHash
+
     override val forumAttachments: List<PostEditor.ForumAttachment>
         get() = parsedForumAttachments
 

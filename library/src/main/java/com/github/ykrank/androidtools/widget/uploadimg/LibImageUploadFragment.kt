@@ -233,7 +233,7 @@ open class LibImageUploadFragment : LibImagePickerFragment() {
     }
 
     @MainThread
-    fun delPickedImage(model: ModelImageUpload?) {
+    open fun delPickedImage(model: ModelImageUpload?) {
         if (model != null) {
             val deleteUrl = model.deleteUrl
             if (deleteUrl == null) {
