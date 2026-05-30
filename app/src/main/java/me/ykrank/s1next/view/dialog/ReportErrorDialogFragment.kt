@@ -22,6 +22,7 @@ class ReportErrorDialogFragment : BaseDialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val binding = DataBindingUtil.inflate<DialogReportErrorBinding>(activity!!.layoutInflater,
                 R.layout.dialog_report_error, null, false)
+        binding.etErrorMsg.setText(arguments?.getString(ARG_MESSAGE).orEmpty())
         val alertDialog = AlertDialog.Builder(activity!!)
                 .setTitle(R.string.menu_send_report)
                 .setView(binding.root)
@@ -52,5 +53,18 @@ class ReportErrorDialogFragment : BaseDialogFragment() {
             positionButton.isEnabled = !binding.etErrorMsg.text.isNullOrBlank()
         }
         return alertDialog
+    }
+
+    companion object {
+        val TAG: String = ReportErrorDialogFragment::class.java.simpleName
+        private const val ARG_MESSAGE = "message"
+
+        fun newInstance(message: String): ReportErrorDialogFragment {
+            return ReportErrorDialogFragment().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_MESSAGE, message)
+                }
+            }
+        }
     }
 }

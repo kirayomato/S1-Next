@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import type="android.view.View" />
+
+        <variable
+            name="postViewModel"
+            type="me.ykrank.s1next.view.page.post.viewmodel.PostViewModel" />
+
+        <variable
+            name="quickSidebarEnable"
+            type="boolean" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+        style="?attr/materialCardViewStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/spacing_micro"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/item_padding"
+            android:paddingRight="@dimen/item_padding"
+            android:paddingBottom="@dimen/item_padding"
+            app:marginEnd="@{quickSidebarEnable?(int)@dimen/spacing_normal:0}">
+
+            <TextView
+                android:id="@+id/tv_show_trade"
+                style="?attr/buttonBarPositiveButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:onClick="@{postViewModel::onExtraHtmlClick}"
+                android:text="@string/click_to_trade_html"
+                android:visibility="@{postViewModel.post.trade?View.VISIBLE:View.GONE}" />
+
+            <TextView
+                android:id="@+id/tv_show_vote"
+                style="?attr/buttonBarPositiveButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:onClick="@{postViewModel::onVoteClick}"
+                android:text="@string/click_to_vote"
+                android:visibility="@{postViewModel.vote!=null?View.VISIBLE:View.GONE}" />
+
+            <TextView
+                android:id="@+id/tv_cast_magic"
+                style="?attr/buttonBarPositiveButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:onClick="@{postViewModel::onAppPostClick}"
+                android:text="@string/click_to_cast_dark_magic"
+                android:visibility="@{postViewModel.post.banned?View.VISIBLE:View.GONE}" />
+
+            <LinearLayout
+                android:id="@+id/layout_rates"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_big"
+                android:background="@drawable/shape_stroke_corners"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/spacing_micro"
+                    android:background="?attr/divideLineColor">
+
+                    <TextView
+                        android:id="@+id/tv_rate_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/spacing_micro"
+                        android:padding="@dimen/spacing_micro"
+                        android:text="@string/rate"
+                        android:textSize="@dimen/text_size_caption"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/tv_rate_view_all"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/spacing_micro"
+                        android:layout_marginRight="@dimen/spacing_micro"
+                        android:text="@string/view_all"
+                        android:textSize="@dimen/text_size_caption"
+                        app:layout_constraintBottom_toBottomOf="@id/tv_rate_title"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/tv_rate_title" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycle_view_rates"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</layout>
+

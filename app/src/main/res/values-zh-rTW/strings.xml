@@ -208,6 +208,14 @@
     <string name="dialog_message_post_selectable_warn">如果帖子文本可選，則切換頁面時帖子文本將自動滾動到頂部（用來複製文本）</string>
         
     <string name="dialog_message_post_unselectable_warn">如果帖子文本不可選，則帖子在切換頁面時將不再自動滾動到頂部（閱讀時推薦）</string>
+    <string name="pref_hybrid_post_render">新版帖子渲染</string>
+    <string name="pref_hybrid_post_render_summary">優化多圖滾動和複製體驗，顯示異常時可關閉</string>
+    <string name="post_action_copy">複製</string>
+    <string name="post_action_feedback">反饋</string>
+    <string name="title_post_copy">複製帖子</string>
+    <string name="post_copy_text_only">僅文本</string>
+    <string name="post_copy_image_placeholder">[圖片]</string>
+    <string name="post_feedback_link_copied">已複製樓層鏈接用於反饋</string>
         
     <string name="dialog_message_text_switch">切換</string>
         

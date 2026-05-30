@@ -43,16 +43,18 @@ import me.ykrank.s1next.data.api.model.wrapper.PostsWrapper
 import me.ykrank.s1next.data.db.biz.ReadProgressBiz
 import me.ykrank.s1next.data.db.dbmodel.ReadProgress
 import me.ykrank.s1next.data.pref.GeneralPreferencesManager
+import me.ykrank.s1next.data.pref.ReadPreferencesManager
 import me.ykrank.s1next.databinding.FragmentBaseWithQuickSideBarBinding
 import me.ykrank.s1next.view.event.BlackListChangeEvent
-import me.ykrank.s1next.view.event.PostSelectableChangeEvent
 import me.ykrank.s1next.view.event.QuickSidebarEnableChangeEvent
+import me.ykrank.s1next.view.adapter.BaseRecyclerViewAdapter
 import me.ykrank.s1next.view.fragment.BaseRecyclerViewFragment
 import me.ykrank.s1next.view.internal.LoadingViewModelBindingDelegateQuickSidebarImpl
 import me.ykrank.s1next.view.internal.PagerScrollState
 import me.ykrank.s1next.view.page.app.AppPostListActivity
 import me.ykrank.s1next.view.page.post.adapter.PostAdapterDelegate
 import me.ykrank.s1next.view.page.post.adapter.PostListRecyclerViewAdapter
+import me.ykrank.s1next.view.page.post.adapter.render.HybridPostListRecyclerViewAdapter
 import java.util.*
 import javax.inject.Inject
 
@@ -67,6 +69,9 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
 
     @Inject
     internal lateinit var mGeneralPreferencesManager: GeneralPreferencesManager
+
+    @Inject
+    internal lateinit var mReadPreferencesManager: ReadPreferencesManager
 
     @Inject
     internal lateinit var objectMapper: ObjectMapper
@@ -89,7 +94,7 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
 
     private lateinit var binding: FragmentBaseWithQuickSideBarBinding
     private lateinit var mRecyclerView: RecyclerView
-    private lateinit var mRecyclerAdapter: PostListRecyclerViewAdapter
+    private lateinit var mRecyclerAdapter: BaseRecyclerViewAdapter
     private lateinit var mLayoutManager: StartSnapLinearLayoutManager
     private lateinit var quickSideBarView: QuickSideBarView
     private lateinit var quickSideBarTipsView: TextView
@@ -124,6 +129,7 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
     }
 
     private var mPagerCallback: PagerCallback? = null
+    private var currentPosts: List<Post> = emptyList()
 
     private var refreshAfterBlacklistChangeDisposable: Disposable? = null
 
@@ -161,11 +167,11 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
             SEARCH_RESULT_HIGHLIGHT_ALPHA
         )
         mRecyclerView.addItemDecoration(searchHighlightDecoration)
-        mRecyclerAdapter =
-            PostListRecyclerViewAdapter(
-                this,
-                requireContext()
-            )
+        mRecyclerAdapter = if (mReadPreferencesManager.hybridPostRender) {
+            HybridPostListRecyclerViewAdapter(this, requireContext())
+        } else {
+            PostListRecyclerViewAdapter(this, requireContext())
+        }
         mRecyclerView.adapter = mRecyclerAdapter
 
         // add pull up to refresh to RecyclerView
@@ -189,11 +195,6 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
         })
 
         quickSideBarView.setOnQuickSideBarTouchListener(this)
-
-        mEventBus.get()
-            .ofType(PostSelectableChangeEvent::class.java)
-            .to(AndroidRxDispose.withObservable(this, FragmentEvent.DESTROY_VIEW))
-            .subscribe({ mRecyclerAdapter.notifyDataSetChanged() }, { super.onError(it) })
 
         mEventBus.get()
             .ofType(QuickSidebarEnableChangeEvent::class.java)
@@ -266,6 +267,7 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
             if (totalItemCount <= 0) {
                 return
             }
+            position = resolveReadProgressAdapterPosition(position)
             if (totalItemCount <= position) {
                 position = totalItemCount - 1
             }
@@ -312,7 +314,7 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
     }
 
     internal fun buildPageSearchSnapshot(): PostPageSearchActivity.PageSnapshot? {
-        val posts = ArrayList(mRecyclerAdapter.dataSet.filterIsInstance<Post>())
+        val posts = ArrayList(currentPosts)
         if (posts.isEmpty()) {
             return null
         }
@@ -320,17 +322,29 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
     }
 
     internal fun scrollToPostPosition(position: Int, highlight: Boolean = false): Boolean {
-        if (position == RecyclerView.NO_POSITION ||
-            position < 0 ||
-            position >= mRecyclerAdapter.itemCount
+        val adapterPosition = resolveAdapterPosition(position)
+        if (adapterPosition == RecyclerView.NO_POSITION ||
+            adapterPosition < 0 ||
+            adapterPosition >= mRecyclerAdapter.itemCount
         ) {
             return false
         }
-        mLayoutManager.scrollToPositionWithOffset(position, 0)
+        mLayoutManager.scrollToPositionWithOffset(adapterPosition, 0)
         if (highlight) {
-            highlightPostPosition(position)
+            highlightPostPosition(adapterPosition)
         }
         return true
+    }
+
+    private fun resolveAdapterPosition(postPosition: Int): Int {
+        val hybrid = mRecyclerAdapter as? HybridPostListRecyclerViewAdapter ?: return postPosition
+        val post = currentPosts.getOrNull(postPosition) ?: return RecyclerView.NO_POSITION
+        return hybrid.firstPositionForPostId(post.id) ?: RecyclerView.NO_POSITION
+    }
+
+    private fun resolveReadProgressAdapterPosition(postPosition: Int): Int {
+        val resolved = resolveAdapterPosition(postPosition)
+        return if (resolved == RecyclerView.NO_POSITION) postPosition else resolved
     }
 
     private fun highlightPostPosition(position: Int) {
@@ -377,6 +391,15 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
 
             offset = top - start
         }
+        val hybrid = mRecyclerAdapter as? HybridPostListRecyclerViewAdapter
+        if (hybrid != null) {
+            val postPosition = hybrid.postPositionForAdapterPosition(itemPosition)
+            if (postPosition != null) {
+                val postId = currentPosts.getOrNull(postPosition)?.id
+                val postStartPosition = postId?.let { hybrid.firstPositionForPostId(it) }
+                return Pair(postPosition, if (postStartPosition == itemPosition) offset else 0)
+            }
+        }
         return Pair(itemPosition, offset)
     }
 
@@ -385,24 +408,31 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
             mThreadId ?: "", mPageNum, mAuthorId,
             ignoreCache = isIgnoreCache,
             { pid, rates ->
-                mRecyclerAdapter.dataSet.forEachIndexed { index, item ->
-                    val post = item as? Post ?: return@forEachIndexed
+                currentPosts.forEachIndexed { index, post ->
                     if (post.id == pid) {
                         post.rates = rates
-                        mRecyclerAdapter.notifyItemChanged(index)
+                        val hybrid = mRecyclerAdapter as? HybridPostListRecyclerViewAdapter
+                        if (hybrid != null) {
+                            hybrid.notifyRatesChanged(pid, rates)
+                        } else {
+                            mRecyclerAdapter.notifyItemChanged(index)
+                        }
                     }
                 }
             },
             { uid, profile ->
-                mRecyclerAdapter.dataSet.forEachIndexed { index, item ->
-                    val post = item as? Post ?: return@forEachIndexed
+                currentPosts.forEachIndexed { index, post ->
                     if (post.authorId == uid) {
                         post.profile = profile
-                        val payload = Bundle().apply {
-                            putString(PostAdapterDelegate.KEY_GOOSE_UPDATE, profile.goose)
+                        val hybrid = mRecyclerAdapter as? HybridPostListRecyclerViewAdapter
+                        if (hybrid != null) {
+                            hybrid.notifyProfileChanged(uid, profile)
+                        } else {
+                            val payload = Bundle().apply {
+                                putString(PostAdapterDelegate.KEY_GOOSE_UPDATE, profile.goose)
+                            }
+                            mRecyclerAdapter.notifyItemChanged(index, payload)
                         }
-
-                        mRecyclerAdapter.notifyItemChanged(index, payload)
                     }
                 }
             }
@@ -455,15 +485,9 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
         } else {
             //Thread info must not null, or exception
             val postListInfo = posts?.postListInfo as Thread
+            currentPosts = postList
             mThreadInfo = postListInfo
-            initQuickSidebar(postList)
-            mRecyclerAdapter.setThreadInfo(postListInfo, mPageNum)
-
-            posts.vote?.let {
-                mRecyclerAdapter.setVoteInfo(it)
-            }
-
-            mRecyclerAdapter.diffNewDataSet(postList, true) {
+            val submitCallback: () -> Unit = {
                 if (blacklistChanged) {
                     blacklistChanged = false
                 } else if (pullUpToRefresh) {
@@ -475,7 +499,7 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
                         scrollToPostPosition(searchResultPosition, true)
                     } else if (readProgress != null && scrollState?.state == PagerScrollState.BEFORE_SCROLL_POSITION) {
                         mLayoutManager.scrollToPositionWithOffset(
-                            readProgress!!.position,
+                            resolveReadProgressAdapterPosition(readProgress!!.position),
                             readProgress!!.offset
                         )
                         readProgress = null
@@ -486,7 +510,10 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
                             for (i in postList.indices) {
                                 if (quotePostId?.toInt() == postList[i].id) {
                                     // scroll to post post
-                                    mLayoutManager.scrollToPositionWithOffset(i, 0)
+                                    mLayoutManager.scrollToPositionWithOffset(
+                                        resolveAdapterPosition(i),
+                                        0
+                                    )
                                     break
                                 }
                             }
@@ -495,6 +522,24 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
                         }
                     }
                 }
+            }
+            val hybrid = mRecyclerAdapter as? HybridPostListRecyclerViewAdapter
+            if (hybrid != null) {
+                hybrid.setThreadInfo(postListInfo, mPageNum)
+                hybrid.setVoteInfo(posts.vote)
+                val renderResult = hybrid.buildRenderResult(postList)
+                initQuickSidebar(postList) { pid, fallback ->
+                    renderResult.index.firstPosition(pid) ?: fallback
+                }
+                hybrid.submitRenderResult(renderResult, true, submitCallback)
+            } else {
+                val legacy = mRecyclerAdapter as PostListRecyclerViewAdapter
+                legacy.setThreadInfo(postListInfo, mPageNum)
+                posts.vote?.let {
+                    legacy.setVoteInfo(it)
+                }
+                initQuickSidebar(postList) { _, fallback -> fallback }
+                legacy.diffNewDataSet(postList, true, submitCallback)
             }
 
             mPagerCallback?.setThreadInfo(postListInfo)
@@ -509,11 +554,25 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
         if (blacklistChanged) {
             blacklistChanged = false
             RxJavaUtil.disposeIfNotNull(refreshAfterBlacklistChangeDisposable)
-            val dataSet = mRecyclerAdapter.dataSet
-            refreshAfterBlacklistChangeDisposable = Single.just(dataSet)
+            val posts = if (currentPosts.isNotEmpty()) currentPosts else mRecyclerAdapter.dataSet
+            refreshAfterBlacklistChangeDisposable = Single.just(posts)
                 .map { filterPostAfterBlacklistChanged(it) }
                 .compose(RxJavaUtil.iOSingleTransformer())
-                .subscribe({ mRecyclerAdapter.diffNewDataSet(it, false) }, { L.report(it) })
+                .subscribe({
+                    val filteredPosts = it.filterIsInstance<Post>()
+                    currentPosts = filteredPosts
+                    val hybrid = mRecyclerAdapter as? HybridPostListRecyclerViewAdapter
+                    if (hybrid != null) {
+                        val result = hybrid.buildRenderResult(filteredPosts)
+                        initQuickSidebar(filteredPosts) { pid, fallback ->
+                            result.index.firstPosition(pid) ?: fallback
+                        }
+                        hybrid.submitRenderResult(result, false)
+                    } else {
+                        initQuickSidebar(filteredPosts) { _, fallback -> fallback }
+                        mRecyclerAdapter.diffNewDataSet(it, false)
+                    }
+                }, { L.report(it) })
         } else if (isPullUpToRefresh) {
             mRecyclerAdapter.hideFooterProgress()
         }
@@ -532,7 +591,7 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
         return enable
     }
 
-    private fun initQuickSidebar(posts: List<Post>) {
+    private fun initQuickSidebar(posts: List<Post>, positionResolver: (pid: Int, fallback: Int) -> Int) {
         invalidateQuickSidebarVisible()
         letters.clear()
         val customLetters = ArrayList<String>()
@@ -543,7 +602,7 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
             } else {
                 it.number?.apply {
                     customLetters.add(this)
-                    letters[this] = i
+                    letters[this] = positionResolver(it.id, i)
                 }
             }
             i++

@@ -107,6 +107,14 @@
     <string name="menu_post_selectable">帖子可复制</string>
     <string name="dialog_message_post_selectable_warn">如果帖子文本可选，则切换页面时帖子文本将自动滚动到顶部（用来复制文本）</string>
     <string name="dialog_message_post_unselectable_warn">如果帖子文本不可选，则帖子在切换页面时将不再自动滚动到顶部（阅读时推荐）</string>
+    <string name="pref_hybrid_post_render">新版帖子渲染</string>
+    <string name="pref_hybrid_post_render_summary">优化多图滚动和复制体验，显示异常时可关闭</string>
+    <string name="post_action_copy">复制</string>
+    <string name="post_action_feedback">反馈</string>
+    <string name="title_post_copy">复制帖子</string>
+    <string name="post_copy_text_only">仅文本</string>
+    <string name="post_copy_image_placeholder">[图片]</string>
+    <string name="post_feedback_link_copied">已复制楼层链接用于反馈</string>
     <string name="dialog_message_text_switch">切换</string>
     <string name="dialog_button_text_confirm">确定</string>
     <string name="prompt_blacklist_remark">抹布备注</string>

@@ -26,7 +26,6 @@ import me.ykrank.s1next.view.activity.NewRateActivity
 import me.ykrank.s1next.view.activity.NewReportActivity
 import me.ykrank.s1next.view.activity.ReplyActivity
 import me.ykrank.s1next.view.dialog.LoginPromptDialogFragment
-import me.ykrank.s1next.view.dialog.PostSelectableChangeDialogFragment
 import me.ykrank.s1next.view.dialog.ThreadFavouritesAddDialogFragment
 import me.ykrank.s1next.view.dialog.VoteDialogFragment
 import me.ykrank.s1next.view.event.*
@@ -129,8 +128,6 @@ class AppPostListFragment : BaseViewPagerFragment(), AppPostListPagerFragment.Pa
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
-        val mMenuPostSelectable = menu.findItem(R.id.menu_post_selectable)
-        mMenuPostSelectable?.isChecked = mGeneralPreferencesManager.isPostSelectable
         val mMenuQuickSideBarEnable = menu.findItem(R.id.menu_quick_side_bar_enable)
         mMenuQuickSideBarEnable?.isChecked = mGeneralPreferencesManager.isQuickSideBarEnable
     }
@@ -175,18 +172,6 @@ class AppPostListFragment : BaseViewPagerFragment(), AppPostListPagerFragment.Pa
                 IntentUtil.startViewIntentExcludeOurApp(requireContext(), Uri.parse(
                         Api.getPostListUrlForBrowser(mThreadId, currentPage + 1)))
 
-                return true
-            }
-            R.id.menu_post_selectable -> {
-                //Switch text selectable
-                PostSelectableChangeDialogFragment.newInstance(!item.isChecked)
-                        .setPositiveListener { dialog, which ->
-                            //reload all data
-                            item.isChecked = !item.isChecked
-                            mGeneralPreferencesManager.isPostSelectable = item.isChecked
-                            mEventBus.postDefault(PostSelectableChangeEvent())
-                        }
-                        .show(childFragmentManager, null)
                 return true
             }
             R.id.menu_quick_side_bar_enable -> {

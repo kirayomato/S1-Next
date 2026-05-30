@@ -132,7 +132,7 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
                         "SignatureEnabled",
                         mGeneralPreferencesManager.isSignatureEnabled.toString()
                     ),
-                    Pair("PostSelectable", mGeneralPreferencesManager.isPostSelectable.toString()),
+                    Pair("HybridPostRender", mReadPrefManager.hybridPostRender.toString()),
                     Pair(
                         "QuickSideBarEnable",
                         mGeneralPreferencesManager.isQuickSideBarEnable.toString()
@@ -296,8 +296,6 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
-        val mMenuPostSelectable = menu.findItem(R.id.menu_post_selectable)
-        mMenuPostSelectable?.isChecked = mGeneralPreferencesManager.isPostSelectable
         val mMenuQuickSideBarEnable = menu.findItem(R.id.menu_quick_side_bar_enable)
         mMenuQuickSideBarEnable?.isChecked = mGeneralPreferencesManager.isQuickSideBarEnable
     }
@@ -384,19 +382,6 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
 
             R.id.menu_load_progress -> {
                 loadReadProgress()
-                return true
-            }
-
-            R.id.menu_post_selectable -> {
-                //Switch text selectable
-                PostSelectableChangeDialogFragment.newInstance(!item.isChecked)
-                    .setPositiveListener { dialog, which ->
-                        //reload all data
-                        item.isChecked = !item.isChecked
-                        mGeneralPreferencesManager.isPostSelectable = item.isChecked
-                        mEventBus.postDefault(PostSelectableChangeEvent())
-                    }
-                    .show(childFragmentManager, null)
                 return true
             }
 

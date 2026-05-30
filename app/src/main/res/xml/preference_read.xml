@@ -23,6 +23,13 @@
         android:title="@string/pref_volume_key_paging"
         app:iconSpaceReserved="false" />
 
+    <SwitchPreference
+        android:defaultValue="@bool/pref_hybrid_post_render_default_value"
+        android:key="@string/pref_key_hybrid_post_render"
+        android:summary="@string/pref_hybrid_post_render_summary"
+        android:title="@string/pref_hybrid_post_render"
+        app:iconSpaceReserved="false" />
+
     <EditTextPreference
         android:defaultValue="12"
         android:key="@string/pref_key_thread_padding"

@@ -227,6 +227,14 @@
     <string name="menu_post_selectable">Post Selectable</string>
     <string name="dialog_message_post_selectable_warn">If post text selectable, post text will auto scroll to top after switch pages (for copy text)</string>
     <string name="dialog_message_post_unselectable_warn">If post text unselectable, post text will not auto scroll to top  after switch pages (recommend for reading)</string>
+    <string name="pref_hybrid_post_render">New post renderer</string>
+    <string name="pref_hybrid_post_render_summary">Improve image-heavy scrolling and copy flow. Turn off if a post looks wrong.</string>
+    <string name="post_action_copy">Copy</string>
+    <string name="post_action_feedback">Feedback</string>
+    <string name="title_post_copy">Copy post</string>
+    <string name="post_copy_text_only">Text only</string>
+    <string name="post_copy_image_placeholder">[image]</string>
+    <string name="post_feedback_link_copied">Post link copied for feedback</string>
     <string name="dialog_message_text_switch">Switch</string>
     <string name="dialog_button_text_confirm">Confirm</string>
     <string name="prompt_blacklist_remark">Blacklist remark</string>

@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import type="android.view.View" />
+
+        <variable
+            name="postViewModel"
+            type="me.ykrank.s1next.view.page.post.viewmodel.PostViewModel" />
+
+        <variable
+            name="quickSidebarEnable"
+            type="boolean" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+        style="?attr/materialCardViewStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_micro"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="0dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/item_padding"
+            app:marginEnd="@{quickSidebarEnable?(int)@dimen/spacing_normal:0}">
+
+            <TextView
+                android:id="@+id/thread_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/item_padding_small"
+                android:lineSpacingExtra="@dimen/text_line_spacing_extra"
+                android:text="@{postViewModel.thread.title}"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textStyle="bold"
+                android:visibility="@{postViewModel.pageNum == 1 &amp;&amp; postViewModel.post.isFirst &amp;&amp; postViewModel.thread.title != null ? View.VISIBLE : View.GONE}"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="这里是一条很长很长的帖子标题，作为主贴内容卡片的一部分自然展示"
+                tools:visibility="visible" />
+
+            <ImageView
+                android:id="@+id/avatar"
+                android:layout_width="@dimen/avatar_size"
+                android:layout_height="@dimen/avatar_size"
+                android:layout_marginStart="@dimen/spacing_micro"
+                android:layout_marginTop="@dimen/item_padding"
+                android:contentDescription="@string/avatar_content_desc"
+                android:onClick="@{postViewModel::onAvatarClick}"
+                android:onLongClick="@{postViewModel::onAvatarLongClick}"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/thread_title"
+                app:layout_goneMarginTop="0dp"
+                app:uid="@{postViewModel.post.authorId}"
+                tools:src="@drawable/ic_avatar_placeholder" />
+
+            <TextView
+                android:id="@+id/author_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/item_padding"
+                android:includeFontPadding="false"
+                android:lines="1"
+                android:text="@{postViewModel.post.authorName}"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                app:layout_constraintLeft_toRightOf="@id/avatar"
+                app:layout_constraintTop_toTopOf="@id/avatar"
+                tools:text="name" />
+
+            <TextView
+                android:id="@+id/goose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:text="@{postViewModel.post.profile.goose}"
+                android:textColor="?android:textColorPrimary"
+                android:textSize="12sp"
+                app:goose="@{postViewModel.post.profile.goose}"
+                app:layout_constraintBottom_toBottomOf="@id/author_name"
+                app:layout_constraintLeft_toRightOf="@id/author_name"
+                app:layout_constraintTop_toTopOf="@id/author_name"
+                tools:text="203" />
+
+            <TextView
+                android:id="@+id/original_poster_tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_micro"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:lines="1"
+                android:paddingLeft="2dp"
+                android:paddingRight="2dp"
+                android:text="@string/original_poster"
+                android:textColor="?attr/colorAccent"
+                android:textSize="@dimen/text_size_caption"
+                android:visibility="@{postViewModel.post.isOpPost?View.VISIBLE:View.GONE}"
+                app:layout_constraintBottom_toBottomOf="@id/author_name"
+                app:layout_constraintLeft_toRightOf="@id/goose"
+                app:layout_constraintTop_toTopOf="@id/author_name"
+                tools:text="楼"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/tv_only_see_him"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/item_padding"
+                android:includeFontPadding="false"
+                android:lines="1"
+                android:onClick="@{postViewModel::onOnlySeeHimClick}"
+                android:text="@string/only_see_him"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                app:layout_constraintBottom_toBottomOf="@id/author_name"
+                app:layout_constraintLeft_toRightOf="@id/original_poster_tag"
+                app:layout_constraintTop_toTopOf="@id/author_name" />
+
+            <TextView
+                android:id="@+id/tv_datetime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/subtitle_margin_top"
+                android:includeFontPadding="false"
+                android:lines="1"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                app:layout_constraintLeft_toLeftOf="@id/author_name"
+                app:layout_constraintTop_toBottomOf="@id/author_name"
+                app:relativeDateTime="@{postViewModel.post.dateTime*1000}"
+                tools:text="2017-5-17" />
+
+            <com.github.ykrank.androidtools.widget.uglyfix.FixTextView
+                android:id="@+id/tv_floor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:onClick="@{postViewModel::showFloorActionMenu}"
+                android:text="@{postViewModel.floor}"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textColor="?attr/colorAccent"
+                android:textStyle="bold"
+                android:typeface="serif"
+                app:increaseClickingArea="@{@dimen/minimum_touch_target_size}"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="@id/avatar"
+                tools:text="#28" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+</layout>
+

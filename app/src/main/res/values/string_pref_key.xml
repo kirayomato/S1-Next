@@ -39,6 +39,7 @@
     <string name="pref_key_last_read_progress" translatable="false">pref_key_last_read_progress</string>
     <string name="pref_key_volume_key_paging" translatable="false">pref_key_volume_key_paging</string>
     <string name="pref_key_thread_padding" translatable="false">pref_key_thread_padding</string>
+    <string name="pref_key_hybrid_post_render" translatable="false">pref_key_hybrid_post_render</string>
     <!-- Data -->
     <string name="pref_key_has_new_pm" translatable="false">pref_key_has_new_pm</string>
     <string name="pref_key_has_new_notice" translatable="false">pref_key_has_new_notice</string>

@@ -53,6 +53,9 @@ class ReadPreferencesImpl(context: Context, sharedPreferences: SharedPreferences
 
     override var threadPadding: String? by PreferenceDelegates.string(
             R.string.pref_key_thread_padding, null)
+
+    override val hybridPostRender: Boolean by PreferenceDelegates.bool(
+            R.string.pref_key_hybrid_post_render, R.bool.pref_hybrid_post_render_default_value)
 }
 
 interface ReadPreferences {
@@ -61,6 +64,7 @@ interface ReadPreferences {
     var lastReadProgress: ReadProgress?
     var volumeKeyPaging: Boolean
     var threadPadding: String?
+    val hybridPostRender: Boolean
 }
 
 class ReadPreferencesManager(private val mPreferencesProvider: ReadPreferences) {
@@ -81,6 +85,9 @@ class ReadPreferencesManager(private val mPreferencesProvider: ReadPreferences) 
     val threadPadding: Int?
         get() = mPreferencesProvider.threadPadding?.toIntOrNull()
 
+    val hybridPostRender: Boolean
+        get() = mPreferencesProvider.hybridPostRender
+
     val lastReadProgress: ReadProgress?
         get() = mLastReadProgressMemorized.get()
 
@@ -92,4 +99,3 @@ class ReadPreferencesManager(private val mPreferencesProvider: ReadPreferences) 
         mPreferencesProvider.lastReadProgress = readProgress
     }
 }
-

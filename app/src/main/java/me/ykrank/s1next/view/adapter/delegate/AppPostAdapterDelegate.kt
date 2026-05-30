@@ -56,9 +56,7 @@ class AppPostAdapterDelegate(
                 R.layout.item_app_post, parent, false)
         binding.postViewModel = AppPostViewModel(lifecycleOwner, mEventBus, mUser)
 
-        //If setTextIsSelectable, then should reset movement
-        val selectable = mGeneralPreferencesManager.isPostSelectable
-        setTextSelectable(binding, selectable)
+        setTextSelectable(binding, false)
 
         return SimpleRecycleViewHolder(binding)
     }
@@ -66,7 +64,7 @@ class AppPostAdapterDelegate(
     override fun onBindViewHolderData(post: AppPost, position: Int, holder: SimpleRecycleViewHolder<ItemAppPostBinding>, payloads: List<Any>) {
         val binding = holder.binding
 
-        val selectable = mGeneralPreferencesManager.isPostSelectable
+        val selectable = false
         if (selectable != binding.tvReply.isTextSelectable) {
             setTextSelectable(binding, selectable)
         }
@@ -87,7 +85,7 @@ class AppPostAdapterDelegate(
     // https://code.google.com/p/android/issues/detail?id=208169
     override fun onViewAttachedToWindow(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder) {
         super.onViewAttachedToWindow(holder)
-        if (mGeneralPreferencesManager.isPostSelectable) {
+        if (false) {
             val binding = (holder as SimpleRecycleViewHolder<ItemAppPostBinding>).binding
             binding.authorName.isEnabled = false
             binding.tvFloor.isEnabled = false

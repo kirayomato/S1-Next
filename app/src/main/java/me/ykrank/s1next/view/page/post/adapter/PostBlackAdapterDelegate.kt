@@ -64,9 +64,7 @@ class PostBlackAdapterDelegate(private val fragment: Fragment, context: Context)
 
         binding.tvReply.setSpannableFactory(FixedSpannableFactory())
 
-        //If setTextIsSelectable, then should reset movement
-        val selectable = mGeneralPreferencesManager.isPostSelectable
-        setTextSelectable(binding, selectable)
+        setTextSelectable(binding, false)
 
         return SimpleRecycleViewHolder(binding)
     }
@@ -81,7 +79,7 @@ class PostBlackAdapterDelegate(private val fragment: Fragment, context: Context)
 
         binding.quickSidebarEnable = mGeneralPreferencesManager.isQuickSideBarEnable
 
-        val selectable = mGeneralPreferencesManager.isPostSelectable
+        val selectable = false
         if (selectable != binding.tvReply.isTextSelectable) {
             setTextSelectable(binding, selectable)
         }
@@ -105,7 +103,7 @@ class PostBlackAdapterDelegate(private val fragment: Fragment, context: Context)
     // https://code.google.com/p/android/issues/detail?id=208169
     override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
         super.onViewAttachedToWindow(holder)
-        if (mGeneralPreferencesManager.isPostSelectable) {
+        if (false) {
             val binding = (holder as SimpleRecycleViewHolder<ItemPostBlackBinding>).binding
             binding.authorName.isEnabled = false
             binding.tvReply.isEnabled = false
@@ -124,4 +122,3 @@ class PostBlackAdapterDelegate(private val fragment: Fragment, context: Context)
     }
 
 }
-
