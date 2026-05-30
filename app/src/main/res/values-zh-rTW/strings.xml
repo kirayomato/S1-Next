@@ -212,6 +212,8 @@
     <string name="pref_hybrid_post_render_summary">優化多圖滾動和複製體驗，顯示異常時可關閉</string>
     <string name="post_action_copy">複製</string>
     <string name="post_action_feedback">反饋</string>
+    <string name="post_action_app_feedback">APP反饋</string>
+    <string name="post_action_forum_report">論壇舉報</string>
     <string name="title_post_copy">複製帖子</string>
     <string name="post_copy_text_only">僅文本</string>
     <string name="post_copy_image_placeholder">[圖片]</string>

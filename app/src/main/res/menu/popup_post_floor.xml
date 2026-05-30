@@ -24,4 +24,25 @@
         android:orderInCategory="31"
         android:title="@string/menu_report"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/menu_popup_copy"
+        android:orderInCategory="32"
+        android:title="@string/post_action_copy"
+        android:visible="false"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/menu_popup_share"
+        android:orderInCategory="33"
+        android:title="@string/menu_share"
+        android:visible="false"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/menu_popup_feedback"
+        android:orderInCategory="34"
+        android:title="@string/post_action_feedback"
+        android:visible="false"
+        app:showAsAction="ifRoom" />
 </menu>

@@ -23,6 +23,7 @@ import me.ykrank.s1next.view.page.post.render.PostRenderActions
 import me.ykrank.s1next.view.page.post.render.PostRenderItem
 import me.ykrank.s1next.widget.image.ImageBiz
 import me.ykrank.s1next.widget.image.image
+import me.ykrank.s1next.view.page.post.render.PostActionMenuPopup
 import kotlin.math.roundToInt
 
 class PostRenderImageAdapterDelegate(
@@ -60,9 +61,17 @@ class PostRenderImageAdapterDelegate(
             val urls = ArrayList(imageUrlsProvider())
             GalleryActivity.start(it.context, urls, urls.indexOf(t.url).coerceAtLeast(0))
         }
-        holder.itemView.setOnLongClickListener {
+        val longClickListener = View.OnLongClickListener {
             PostRenderActions.showPostActionMenu(it, fragment, threadInfo, pageNum, t.post)
         }
+        val touchListener = View.OnTouchListener { view, event ->
+            PostActionMenuPopup.recordTouchPoint(view, event)
+            false
+        }
+        holder.itemView.setOnTouchListener(touchListener)
+        holder.image.setOnTouchListener(touchListener)
+        holder.itemView.setOnLongClickListener(longClickListener)
+        holder.image.setOnLongClickListener(longClickListener)
 
         val imageBiz = ImageBiz(downloadPreferencesManager)
         Glide.with(holder.image)

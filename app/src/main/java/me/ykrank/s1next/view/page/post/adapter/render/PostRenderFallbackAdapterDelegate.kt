@@ -10,6 +10,7 @@ import me.ykrank.s1next.R
 import me.ykrank.s1next.binding.TextViewBindingAdapter
 import me.ykrank.s1next.data.api.model.Thread
 import me.ykrank.s1next.view.adapter.delegate.BaseAdapterDelegate
+import me.ykrank.s1next.view.page.post.render.PostActionMenuPopup
 import me.ykrank.s1next.view.page.post.render.PostRenderActions
 import me.ykrank.s1next.view.page.post.render.PostRenderItem
 import me.ykrank.s1next.widget.span.FixedSpannableFactory
@@ -44,9 +45,17 @@ class PostRenderFallbackAdapterDelegate(private val fragment: Fragment, context:
             t.html
         )
         holder.boundHtml = t.html
-        holder.itemView.setOnLongClickListener {
+        val longClickListener = View.OnLongClickListener {
             PostRenderActions.showPostActionMenu(it, fragment, threadInfo, pageNum, t.post)
         }
+        val touchListener = View.OnTouchListener { view, event ->
+            PostActionMenuPopup.recordTouchPoint(view, event)
+            false
+        }
+        holder.itemView.setOnTouchListener(touchListener)
+        holder.text.setOnTouchListener(touchListener)
+        holder.itemView.setOnLongClickListener(longClickListener)
+        holder.text.setOnLongClickListener(longClickListener)
     }
 
     fun setThreadInfo(threadInfo: Thread, pageNum: Int) {

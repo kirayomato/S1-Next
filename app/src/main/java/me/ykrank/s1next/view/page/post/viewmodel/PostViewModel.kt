@@ -27,6 +27,7 @@ import me.ykrank.s1next.view.event.VotePostEvent
 import me.ykrank.s1next.view.internal.BlacklistMenuAction
 import me.ykrank.s1next.view.page.app.AppPostListActivity
 import me.ykrank.s1next.view.page.post.postlist.PostListActivity
+import me.ykrank.s1next.view.page.post.render.PostRenderActions
 
 class PostViewModel(
     val lifecycleOwner: LifecycleOwner,
@@ -105,33 +106,19 @@ class PostViewModel(
 
     //click floor textView, show popup menu
     fun showFloorActionMenu(v: View) {
-        val popup = PopupMenu(v.context, v)
-        popup.setOnMenuItemClickListener { menuitem: MenuItem ->
-            when (menuitem.itemId) {
-                R.id.menu_popup_reply -> {
-                    onReplyClick(v)
-                    return@setOnMenuItemClickListener true
-                }
-                R.id.menu_popup_rate -> {
-                    onRateClick(v)
-                    return@setOnMenuItemClickListener true
-                }
-                R.id.menu_popup_edit -> {
-                    onEditClick(v)
-                    return@setOnMenuItemClickListener true
-                }
-                R.id.menu_popup_report -> {
-                    onReportClick(v)
-                    return@setOnMenuItemClickListener true
-                }
-                else -> return@setOnMenuItemClickListener false
-            }
-        }
-        popup.inflate(R.menu.popup_post_floor)
-
-        val editPostMenuItem = popup.menu.findItem(R.id.menu_popup_edit)
-        editPostMenuItem.isVisible = user.isLogged && user.uid == post.get()?.authorId
-        popup.show()
+        val postData = post.get() ?: return
+        PostRenderActions.showPostActionMenu(
+            anchor = v,
+            fragment = null,
+            user = user,
+            thread = thread.get(),
+            pageNum = pageNum.get(),
+            post = postData,
+            onReply = { onReplyClick(v) },
+            onRate = { onRateClick(v) },
+            onEdit = { onEditClick(v) },
+            onReport = { onReportClick(v) },
+        )
     }
 
     fun onReplyClick(v: View) {

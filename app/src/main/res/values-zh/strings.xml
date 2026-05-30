@@ -111,6 +111,8 @@
     <string name="pref_hybrid_post_render_summary">优化多图滚动和复制体验，显示异常时可关闭</string>
     <string name="post_action_copy">复制</string>
     <string name="post_action_feedback">反馈</string>
+    <string name="post_action_app_feedback">APP反馈</string>
+    <string name="post_action_forum_report">论坛举报</string>
     <string name="title_post_copy">复制帖子</string>
     <string name="post_copy_text_only">仅文本</string>
     <string name="post_copy_image_placeholder">[图片]</string>
