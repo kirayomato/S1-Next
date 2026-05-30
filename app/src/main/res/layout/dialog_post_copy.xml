@@ -14,9 +14,10 @@
             android:checked="true"
             android:text="@string/post_copy_text_only" />
 
-        <ScrollView
+        <me.ykrank.s1next.widget.MaxHeightScrollView
             android:layout_width="match_parent"
-            android:layout_height="360dp"
+            android:layout_height="wrap_content"
+            android:maxHeight="360dp"
             android:fillViewport="true">
 
             <TextView
@@ -26,7 +27,6 @@
                 android:lineSpacingExtra="@dimen/text_line_spacing_extra"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:textIsSelectable="true" />
-        </ScrollView>
+        </me.ykrank.s1next.widget.MaxHeightScrollView>
     </LinearLayout>
 </layout>
-
