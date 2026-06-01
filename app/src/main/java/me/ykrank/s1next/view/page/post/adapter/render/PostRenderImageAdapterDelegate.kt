@@ -64,6 +64,7 @@ class PostRenderImageAdapterDelegate(
         val hasKnownRatio = t.hasKnownRatio()
         val requestHeight = if (hasKnownRatio) bindHeight else Target.SIZE_ORIGINAL
         holder.setImageHeight(bindHeight)
+        holder.setImageVerticalSpacing(t.previousImageBlock)
         bindShareSelection(t, holder)
 
         val imageBiz = ImageBiz(downloadPreferencesManager)
@@ -161,6 +162,7 @@ class PostRenderImageAdapterDelegate(
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val imageContainer: View = itemView.findViewById(R.id.post_image_container)
         val image: ImageView = itemView.findViewById(R.id.post_image)
         val shareScrim: View = itemView.findViewById(R.id.post_share_scrim)
         var boundUrl: String? = null
@@ -181,11 +183,30 @@ class PostRenderImageAdapterDelegate(
                 image.layoutParams = lp
             }
         }
+
+        fun setImageVerticalSpacing(previousImageBlock: Boolean) {
+            val topPadding = dp(if (previousImageBlock) GROUPED_IMAGE_TOP_PADDING_DP else SINGLE_IMAGE_VERTICAL_PADDING_DP)
+            val bottomPadding = dp(SINGLE_IMAGE_VERTICAL_PADDING_DP)
+            if (imageContainer.paddingTop != topPadding || imageContainer.paddingBottom != bottomPadding) {
+                imageContainer.setPadding(
+                    imageContainer.paddingLeft,
+                    topPadding,
+                    imageContainer.paddingRight,
+                    bottomPadding
+                )
+            }
+        }
+
+        private fun dp(value: Int): Int {
+            return (value * itemView.resources.displayMetrics.density).roundToInt()
+        }
     }
 
     companion object {
         private const val DEFAULT_RATIO = 0.75f
         private const val MIN_HEIGHT_PX = 96
         private const val HEIGHT_UPDATE_THRESHOLD = 12
+        private const val SINGLE_IMAGE_VERTICAL_PADDING_DP = 2
+        private const val GROUPED_IMAGE_TOP_PADDING_DP = 14
     }
 }

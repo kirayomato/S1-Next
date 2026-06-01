@@ -41,6 +41,7 @@ sealed class PostRenderItem(
         val width: Int?,
         val height: Int?,
         val index: Int,
+        val previousImageBlock: Boolean = false,
     ) : PostRenderItem(data, TYPE_IMAGE, index)
 
     data class FallbackHtmlBlock(
@@ -82,4 +83,3 @@ data class PostRenderResult(
 )
 
 data class PostRatePayload(val rates: List<Rate>)
-

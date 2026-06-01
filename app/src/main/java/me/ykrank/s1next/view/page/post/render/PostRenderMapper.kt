@@ -55,7 +55,7 @@ class PostRenderMapper {
             fun flushText() {
                 val part = buffer.toString()
                 buffer.clear()
-                if (part.isBlank()) {
+                if (isBlankTextBlock(part)) {
                     return
                 }
                 val item = if (isComplexHtml(part)) {
@@ -83,6 +83,7 @@ class PostRenderMapper {
                                 image.attr("width").toPositiveIntOrNull(),
                                 image.attr("height").toPositiveIntOrNull(),
                                 blockIndex++,
+                                blocks.lastOrNull() is PostRenderItem.ImageBlock,
                             )
                         }
                     }
@@ -145,6 +146,16 @@ class PostRenderMapper {
             COMPLEX_CLASS_PARTS.any { lower.contains("class=\"") && lower.contains(it) }
     }
 
+    private fun isBlankTextBlock(html: String): Boolean {
+        if (html.isBlank()) {
+            return true
+        }
+        val body = Jsoup.parseBodyFragment(html).body()
+        body.select("br").remove()
+        val text = body.text().replace('\u00A0', ' ')
+        return text.isBlank() && body.select(MEDIA_TAGS_SELECTOR).isEmpty()
+    }
+
     private fun normalizeImageUrl(src: String?): String? {
         if (src.isNullOrBlank()) {
             return null
@@ -175,5 +186,6 @@ class PostRenderMapper {
     companion object {
         private val COMPLEX_TAGS = setOf("blockquote", "table", "pre", "code")
         private val COMPLEX_CLASS_PARTS = setOf("quote", "blockcode")
+        private const val MEDIA_TAGS_SELECTOR = "img,video,iframe,object,embed"
     }
 }
