@@ -14,6 +14,7 @@ import me.ykrank.s1next.view.page.post.render.PostRenderItem
 import me.ykrank.s1next.view.page.post.render.PostRenderMapper
 import me.ykrank.s1next.view.page.post.render.PostRenderResult
 import me.ykrank.s1next.view.page.post.share.PostShareSelectionOwner
+import me.ykrank.s1next.view.page.post.share.PostShareSelectionPayload
 
 class HybridPostListRecyclerViewAdapter(
     fragment: Fragment,
@@ -101,12 +102,12 @@ class HybridPostListRecyclerViewAdapter(
 
     fun notifyPostShareSelectionChanged(postIds: Set<Int>?) {
         if (postIds == null) {
-            notifyDataSetChanged()
+            notifyItemRangeChanged(0, itemCount, PostShareSelectionPayload)
             return
         }
         postIds.forEach { postId ->
             renderIndex.rangeByPid[postId]?.forEach { position ->
-                notifyItemChanged(position)
+                notifyItemChanged(position, PostShareSelectionPayload)
             }
         }
     }

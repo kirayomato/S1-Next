@@ -6,5 +6,6 @@
     <color name="dark_emoticon_keyboard_background">#263238</color>
 
     <color name="foreground_material_light">#ad5151</color>
+    <color name="post_share_selection_warning">#FF9100</color>
 
 </resources>

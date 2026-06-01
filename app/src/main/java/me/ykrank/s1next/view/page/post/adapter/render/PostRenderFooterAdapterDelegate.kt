@@ -28,6 +28,7 @@ import me.ykrank.s1next.view.activity.UserHomeActivity
 import me.ykrank.s1next.view.adapter.delegate.BaseAdapterDelegate
 import me.ykrank.s1next.view.page.post.render.PostRenderItem
 import me.ykrank.s1next.view.page.post.share.PostShareSelectionOwner
+import me.ykrank.s1next.view.page.post.share.PostShareSelectionPayload
 import me.ykrank.s1next.view.page.post.viewmodel.PostViewModel
 
 class PostRenderFooterAdapterDelegate(
@@ -68,7 +69,10 @@ class PostRenderFooterAdapterDelegate(
     ) {
         val binding = holder.binding
         val post = t.post
-        val shareSelectionEnabled = postShareSelectionOwner?.postShareSelectionState?.enabled == true
+        if (payloads.contains(PostShareSelectionPayload)) {
+            bindShareSelection(binding, post)
+            return
+        }
         binding.quickSidebarEnable = generalPreferencesManager.isQuickSideBarEnable
         binding.postViewModel?.let {
             it.thread.set(threadInfo)
@@ -109,6 +113,15 @@ class PostRenderFooterAdapterDelegate(
         }
 
         binding.executePendingBindings()
+        bindShareSelection(binding, post)
+    }
+
+    private fun bindShareSelection(binding: ItemPostRenderFooterBinding, post: me.ykrank.s1next.data.api.model.Post) {
+        val state = postShareSelectionOwner?.postShareSelectionState
+        val shareSelectionEnabled = state?.enabled == true
+        binding.postShareSelectionEnabled = shareSelectionEnabled
+        binding.postShareSelected = state?.selectedPostIds?.contains(post.id) == true
+        binding.executePendingBindings()
         if (shareSelectionEnabled) {
             val toggleSelection = View.OnClickListener {
                 postShareSelectionOwner?.togglePostShareSelection(post.id)
@@ -119,8 +132,34 @@ class PostRenderFooterAdapterDelegate(
             binding.tvCastMagic.setOnClickListener(toggleSelection)
             binding.tvRateViewAll.setOnClickListener(toggleSelection)
             binding.recycleViewRates.setOnClickListener(toggleSelection)
+            binding.postShareScrim.setOnClickListener(toggleSelection)
         } else {
             binding.root.setOnClickListener(null)
+            binding.postShareScrim.setOnClickListener(null)
+            binding.postShareScrim.isClickable = false
+            binding.tvShowTrade.setOnClickListener {
+                binding.postViewModel?.onExtraHtmlClick(it)
+            }
+            binding.tvShowVote.setOnClickListener {
+                binding.postViewModel?.onVoteClick(it)
+            }
+            binding.tvCastMagic.setOnClickListener {
+                binding.postViewModel?.onAppPostClick(it)
+            }
+            binding.tvRateViewAll.setOnClickListener {
+                post.rates?.let { rates ->
+                    if (rates.isNotEmpty()) {
+                        RateDetailsListActivity.start(binding.root.context, ArrayList(rates))
+                    } else {
+                        fragment.lifecycleScope.launch(L.report) {
+                            val newRates = apiCache.getPostRates(threadInfo?.id ?: "", post.id).data
+                                ?: emptyList()
+                            post.rates = newRates
+                            updateRateList(binding, newRates)
+                        }
+                    }
+                }
+            }
             binding.recycleViewRates.setOnClickListener(null)
         }
     }

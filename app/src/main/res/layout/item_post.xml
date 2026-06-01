@@ -26,23 +26,29 @@
             type="boolean" />
     </data>
 
-    <!-- Now MaterialCardView error in 4.+ -->
-    <androidx.cardview.widget.CardView
-        style="?attr/materialCardViewStyle"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_micro"
-        android:layout_marginBottom="@dimen/spacing_micro"
-        app:cardCornerRadius="0dp"
-        app:cardElevation="0dp">
+        android:clipChildren="false"
+        android:clipToPadding="false">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <!-- Now MaterialCardView error in 4.+ -->
+        <androidx.cardview.widget.CardView
+            style="?attr/materialCardViewStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/item_padding"
-            app:marginEnd="@{quickSidebarEnable?(int)@dimen/spacing_normal:0}">
+            android:layout_marginTop="@dimen/spacing_micro"
+            android:layout_marginBottom="@dimen/spacing_micro"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp">
 
-            <TextView
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/item_padding"
+                app:marginEnd="@{quickSidebarEnable?(int)@dimen/spacing_normal:0}">
+
+                <TextView
                 android:id="@+id/thread_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -58,7 +64,7 @@
                 tools:text="这里是一条很长很长的帖子标题，作为主贴内容卡片的一部分自然展示"
                 tools:visibility="visible" />
 
-            <ImageView
+                <ImageView
                 android:id="@+id/avatar"
                 android:layout_width="@dimen/avatar_size"
                 android:layout_height="@dimen/avatar_size"
@@ -74,7 +80,7 @@
                 app:uid="@{postViewModel.post.authorId}"
                 tools:src="@drawable/ic_avatar_placeholder" />
 
-            <TextView
+                <TextView
                 android:id="@+id/author_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -88,7 +94,7 @@
                 app:layout_constraintTop_toTopOf="@id/avatar"
                 tools:text="name" />
 
-            <TextView
+                <TextView
                 android:id="@+id/goose"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -102,7 +108,7 @@
                 app:layout_constraintTop_toTopOf="@id/author_name"
                 tools:text="203" />
 
-            <TextView
+                <TextView
                 android:id="@+id/original_poster_tag"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -123,7 +129,7 @@
                 tools:text="楼"
                 tools:visibility="visible" />
 
-            <TextView
+                <TextView
                 android:id="@+id/tv_only_see_him"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -139,7 +145,7 @@
                 app:layout_constraintTop_toTopOf="@id/author_name"
                 tools:text="只看它" />
 
-            <TextView
+                <TextView
                 android:id="@+id/tv_datetime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -152,9 +158,9 @@
                 app:relativeDateTime="@{postViewModel.post.dateTime*1000}"
                 tools:text="2017-5-17" />
 
-            <!-- enable `textIsSelectable` in order to add click effect -->
-            <!-- see https://code.google.com/p/android/issues/detail?id=13895 -->
-            <com.github.ykrank.androidtools.widget.uglyfix.FixTextView
+                <!-- enable `textIsSelectable` in order to add click effect -->
+                <!-- see https://code.google.com/p/android/issues/detail?id=13895 -->
+                <com.github.ykrank.androidtools.widget.uglyfix.FixTextView
                 android:id="@+id/tv_floor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -168,26 +174,13 @@
                 android:textStyle="bold"
                 android:typeface="serif"
                 app:increaseClickingArea="@{@dimen/minimum_touch_target_size}"
-                app:layout_constraintRight_toLeftOf="@id/post_share_checkbox"
+                app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="@id/avatar"
                 tools:text="#28" />
 
-            <CheckBox
-                android:id="@+id/post_share_checkbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="@{postShareSelected}"
-                android:clickable="false"
-                android:focusable="false"
-                android:visibility="@{postShareSelectionEnabled ? View.VISIBLE : View.GONE}"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="@id/avatar"
-                tools:checked="true"
-                tools:visibility="visible" />
-
-            <!-- layout_marginTop = 72dp (two line height with avatar) - 16dp (RelativeLayout's top padding) -->
-            <!-- use custom movement method to provides selection and click -->
-            <com.github.ykrank.androidtools.widget.uglyfix.FixTextView
+                <!-- layout_marginTop = 72dp (two line height with avatar) - 16dp (RelativeLayout's top padding) -->
+                <!-- use custom movement method to provides selection and click -->
+                <com.github.ykrank.androidtools.widget.uglyfix.FixTextView
                 android:id="@+id/tv_reply"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -201,7 +194,7 @@
                 app:reply="@{postViewModel.post}"
                 tools:text="主贴" />
 
-            <TextView
+                <TextView
                 android:id="@+id/tv_show_trade"
                 style="?attr/buttonBarPositiveButtonStyle"
                 android:layout_width="wrap_content"
@@ -214,7 +207,7 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_reply" />
 
-            <TextView
+                <TextView
                 android:id="@+id/tv_show_vote"
                 style="?attr/buttonBarPositiveButtonStyle"
                 android:layout_width="wrap_content"
@@ -227,7 +220,7 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_show_trade" />
 
-            <TextView
+                <TextView
                 android:id="@+id/tv_cast_magic"
                 style="?attr/buttonBarPositiveButtonStyle"
                 android:layout_width="wrap_content"
@@ -240,7 +233,7 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_show_vote" />
 
-            <LinearLayout
+                <LinearLayout
                 android:id="@+id/layout_rates"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -309,10 +302,54 @@
                     tools:itemCount="3"
                     tools:listitem="@layout/item_rate_detail"
                     tools:visibility="visible" />
-            </LinearLayout>
+                </LinearLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.cardview.widget.CardView>
+        </androidx.cardview.widget.CardView>
+
+        <View
+            android:id="@+id/post_share_scrim"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/spacing_micro"
+            android:layout_marginBottom="@dimen/spacing_micro"
+            android:alpha="0.16"
+            android:background="?attr/colorAccent"
+            android:clickable="false"
+            android:focusable="false"
+            android:importantForAccessibility="no"
+            android:visibility="@{postShareSelectionEnabled &amp;&amp; postShareSelected ? View.VISIBLE : View.GONE}"
+            tools:visibility="visible" />
+
+        <FrameLayout
+            android:id="@+id/post_share_checkbox_container"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_gravity="top|end"
+            android:layout_marginTop="@dimen/post_share_checkbox_margin_top"
+            android:background="@drawable/bg_post_share_checkbox"
+            android:clickable="false"
+            android:elevation="6dp"
+            android:focusable="false"
+            app:marginEnd="@{quickSidebarEnable?(int)@dimen/post_share_checkbox_margin_end_with_quick_sidebar:(int)@dimen/post_share_checkbox_margin_end}"
+            android:visibility="@{postShareSelectionEnabled ? View.VISIBLE : View.GONE}"
+            tools:visibility="visible">
+
+            <CheckBox
+                android:id="@+id/post_share_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:buttonTint="@color/post_share_selection_checkbox_tint"
+                android:checked="@{postShareSelected}"
+                android:clickable="false"
+                android:focusable="false"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                tools:checked="true" />
+        </FrameLayout>
+
+    </FrameLayout>
 
 </layout>

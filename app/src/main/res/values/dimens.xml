@@ -2,4 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <dimen name="preference_category_padding_start" tools:override="true">0dp</dimen>
+    <dimen name="post_share_checkbox_margin_top">12dp</dimen>
+    <dimen name="post_share_checkbox_margin_end">8dp</dimen>
+    <dimen name="post_share_checkbox_margin_end_with_quick_sidebar">32dp</dimen>
 </resources>

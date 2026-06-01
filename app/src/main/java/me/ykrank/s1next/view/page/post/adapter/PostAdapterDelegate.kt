@@ -30,6 +30,7 @@ import me.ykrank.s1next.view.activity.RateDetailsListActivity
 import me.ykrank.s1next.view.activity.UserHomeActivity
 import me.ykrank.s1next.view.adapter.delegate.BaseAdapterDelegate
 import me.ykrank.s1next.view.page.post.share.PostShareSelectionOwner
+import me.ykrank.s1next.view.page.post.share.PostShareSelectionPayload
 import me.ykrank.s1next.view.page.post.viewmodel.PostViewModel
 import me.ykrank.s1next.widget.span.FixedSpannableFactory
 import me.ykrank.s1next.widget.span.PostMovementMethod
@@ -104,6 +105,11 @@ class PostAdapterDelegate(
             super.onBindViewHolder(items, position, holder, payloads)
             return
         }
+        if (payloads.contains(PostShareSelectionPayload)) {
+            val post = items[position] as? Post ?: return
+            bindShareSelection(viewHolder.binding, post)
+            return
+        }
         val bundle = payloads[0] as? Bundle
         if (bundle == null) {
             super.onBindViewHolder(items, position, holder, payloads)
@@ -126,10 +132,6 @@ class PostAdapterDelegate(
         val binding = holder.binding
 
         binding.quickSidebarEnable = mGeneralPreferencesManager.isQuickSideBarEnable
-        val shareSelectionState = postShareSelectionOwner?.postShareSelectionState
-        val shareSelectionEnabled = shareSelectionState?.enabled == true
-        binding.postShareSelectionEnabled = shareSelectionEnabled
-        binding.postShareSelected = shareSelectionState?.selectedPostIds?.contains(post.id) == true
 
         val selectable = false
         if (selectable != binding.tvReply.isTextSelectable) {
@@ -217,14 +219,57 @@ class PostAdapterDelegate(
         }
 
         binding.executePendingBindings()
+        bindShareSelection(binding, post)
+    }
+
+    private fun bindShareSelection(binding: ItemPostBinding, post: Post) {
+        val shareSelectionState = postShareSelectionOwner?.postShareSelectionState
+        val shareSelectionEnabled = shareSelectionState?.enabled == true
+        binding.postShareSelectionEnabled = shareSelectionEnabled
+        binding.postShareSelected = shareSelectionState?.selectedPostIds?.contains(post.id) == true
+        binding.executePendingBindings()
+        val headerViews = listOf(
+            binding.root,
+            binding.threadTitle,
+            binding.avatar,
+            binding.authorName,
+            binding.goose,
+            binding.originalPosterTag,
+            binding.tvOnlySeeHim,
+            binding.tvDatetime,
+            binding.tvFloor
+        )
         if (shareSelectionEnabled) {
             val toggleSelection = View.OnClickListener {
                 postShareSelectionOwner?.togglePostShareSelection(post.id)
             }
-            binding.root.setOnClickListener(toggleSelection)
-            binding.tvFloor.setOnClickListener(toggleSelection)
+            headerViews.forEach {
+                it.setOnClickListener(toggleSelection)
+                it.setOnLongClickListener(null)
+            }
+            binding.postShareScrim.setOnClickListener(toggleSelection)
         } else {
             binding.root.setOnClickListener(null)
+            binding.threadTitle.setOnClickListener(null)
+            binding.authorName.setOnClickListener(null)
+            binding.goose.setOnClickListener(null)
+            binding.originalPosterTag.setOnClickListener(null)
+            binding.tvDatetime.setOnClickListener(null)
+            binding.avatar.setOnClickListener {
+                binding.postViewModel?.onAvatarClick(it)
+            }
+            binding.tvOnlySeeHim.setOnClickListener {
+                binding.postViewModel?.onOnlySeeHimClick(it)
+            }
+            binding.postShareScrim.setOnClickListener(null)
+            binding.postShareScrim.isClickable = false
+            val showPostActionMenu = View.OnLongClickListener {
+                binding.postViewModel?.showFloorActionMenu(it)
+                true
+            }
+            headerViews.forEach {
+                it.setOnLongClickListener(showPostActionMenu)
+            }
             binding.tvFloor.setOnClickListener {
                 binding.postViewModel?.showFloorActionMenu(it)
             }

@@ -14,6 +14,7 @@ import me.ykrank.s1next.view.page.post.render.PostActionMenuPopup
 import me.ykrank.s1next.view.page.post.render.PostRenderActions
 import me.ykrank.s1next.view.page.post.render.PostRenderItem
 import me.ykrank.s1next.view.page.post.share.PostShareSelectionOwner
+import me.ykrank.s1next.view.page.post.share.PostShareSelectionPayload
 import me.ykrank.s1next.widget.span.FixedSpannableFactory
 import me.ykrank.s1next.widget.span.PostMovementMethod
 
@@ -40,6 +41,10 @@ class PostRenderFallbackAdapterDelegate(
         holder: ViewHolder,
         payloads: List<Any>
     ) {
+        if (payloads.contains(PostShareSelectionPayload)) {
+            bindShareSelection(t, holder)
+            return
+        }
         holder.text.setSpannableFactory(FixedSpannableFactory())
         holder.text.movementMethod = PostMovementMethod.instance
         TextViewBindingAdapter.setHtmlWithImage(
@@ -50,6 +55,11 @@ class PostRenderFallbackAdapterDelegate(
             t.html
         )
         holder.boundHtml = t.html
+        bindShareSelection(t, holder)
+    }
+
+    private fun bindShareSelection(t: PostRenderItem.FallbackHtmlBlock, holder: ViewHolder) {
+        holder.shareScrim.bindPostShareSelectionScrim(postShareSelectionOwner, t.post.id)
         if (postShareSelectionOwner?.postShareSelectionState?.enabled == true) {
             val clickListener = View.OnClickListener {
                 postShareSelectionOwner.togglePostShareSelection(t.post.id)
@@ -58,6 +68,7 @@ class PostRenderFallbackAdapterDelegate(
             holder.text.setOnTouchListener(null)
             holder.itemView.setOnClickListener(clickListener)
             holder.text.setOnClickListener(clickListener)
+            holder.shareScrim.setOnClickListener(clickListener)
             holder.itemView.setOnLongClickListener(null)
             holder.text.setOnLongClickListener(null)
         } else {
@@ -72,6 +83,8 @@ class PostRenderFallbackAdapterDelegate(
             holder.text.setOnTouchListener(touchListener)
             holder.itemView.setOnClickListener(null)
             holder.text.setOnClickListener(null)
+            holder.shareScrim.setOnClickListener(null)
+            holder.shareScrim.isClickable = false
             holder.itemView.setOnLongClickListener(longClickListener)
             holder.text.setOnLongClickListener(longClickListener)
         }
@@ -84,6 +97,7 @@ class PostRenderFallbackAdapterDelegate(
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val text: TextView = itemView.findViewById(R.id.post_text)
+        val shareScrim: View = itemView.findViewById(R.id.post_share_scrim)
         var boundHtml: String? = null
     }
 }

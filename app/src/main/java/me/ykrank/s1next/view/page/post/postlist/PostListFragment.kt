@@ -13,6 +13,8 @@ import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.addCallback
 import androidx.annotation.MainThread
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
@@ -23,6 +25,8 @@ import com.github.ykrank.androidtools.ui.dialog.PageJumpDialogFragment
 import com.github.ykrank.androidtools.ui.internal.CoordinatorLayoutAnchorDelegate
 import com.github.ykrank.androidtools.util.*
 import com.github.ykrank.androidtools.widget.EventBus
+import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import io.reactivex.Single
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
@@ -91,6 +95,7 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
     private var mThreadAttachment: Posts.ThreadAttachment? = null
     private var mMenuThreadAttachment: MenuItem? = null
     private var toolbarPageJumpView: TextView? = null
+    private var toolbarScrollFlags: Int? = null
     private var postShareBackPressedCallback: OnBackPressedCallback? = null
     private var isPostShareSelectionMode = false
     private var postShareSelectedCount = 0
@@ -428,13 +433,26 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
             R.id.menu_backup_thread,
         )
         ordinaryPostMenuIds.forEach { menu.findItem(it)?.isVisible = !isPostShareSelectionMode }
-        menu.findItem(R.id.menu_post_share_confirm)?.isVisible = isPostShareSelectionMode
+        menu.findItem(R.id.menu_post_share_confirm)?.let {
+            it.isVisible = isPostShareSelectionMode
+            tintPostShareConfirmMenuItem(it)
+        }
         if (!isPostShareSelectionMode) {
             menu.findItem(R.id.menu_thread_attachment)?.isVisible = mThreadAttachment != null
             if (mReadPrefManager.isSaveAuto) {
                 menu.findItem(R.id.menu_save_progress)?.isVisible = false
             }
         }
+    }
+
+    private fun tintPostShareConfirmMenuItem(item: MenuItem) {
+        val icon = item.icon ?: return
+        val wrapped = DrawableCompat.wrap(icon.mutate())
+        DrawableCompat.setTint(
+            wrapped,
+            ContextCompat.getColor(requireContext(), R.color.post_share_selection_warning)
+        )
+        item.icon = wrapped
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -512,7 +530,44 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
         } else {
             setTitleWithPosition(currentPage)
         }
+        setTitleBarScrollEnabled(!enabled)
+        setReplyFabVisible(!enabled)
         activity?.invalidateOptionsMenu()
+    }
+
+    override fun onDestroyView() {
+        setTitleBarScrollEnabled(true)
+        setReplyFabVisible(true)
+        super.onDestroyView()
+    }
+
+    private fun setTitleBarScrollEnabled(enabled: Boolean) {
+        val toolbar = activity?.findViewById<View>(R.id.toolbar) ?: return
+        val layoutParams = toolbar.layoutParams as? AppBarLayout.LayoutParams ?: return
+        if (toolbarScrollFlags == null) {
+            toolbarScrollFlags = layoutParams.scrollFlags
+        }
+        val targetFlags = if (enabled) {
+            toolbarScrollFlags ?: layoutParams.scrollFlags
+        } else {
+            0
+        }
+        if (layoutParams.scrollFlags != targetFlags) {
+            layoutParams.scrollFlags = targetFlags
+            toolbar.layoutParams = layoutParams
+        }
+        if (!enabled) {
+            (toolbar.parent as? AppBarLayout)?.setExpanded(true, false)
+        }
+    }
+
+    private fun setReplyFabVisible(visible: Boolean) {
+        val fab = activity?.findViewById<FloatingActionButton>(R.id.floating_action_button) ?: return
+        if (visible) {
+            fab.show()
+        } else {
+            fab.hide()
+        }
     }
 
     private fun jumpToSearchResult(pageNum: Int, position: Int) {
