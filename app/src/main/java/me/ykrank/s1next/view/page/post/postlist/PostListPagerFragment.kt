@@ -46,6 +46,7 @@ import me.ykrank.s1next.data.pref.GeneralPreferencesManager
 import me.ykrank.s1next.data.pref.ReadPreferencesManager
 import me.ykrank.s1next.databinding.FragmentBaseWithQuickSideBarBinding
 import me.ykrank.s1next.view.event.BlackListChangeEvent
+import me.ykrank.s1next.view.event.EnterPostShareSelectionEvent
 import me.ykrank.s1next.view.event.QuickSidebarEnableChangeEvent
 import me.ykrank.s1next.view.adapter.BaseRecyclerViewAdapter
 import me.ykrank.s1next.view.fragment.BaseRecyclerViewFragment
@@ -55,6 +56,11 @@ import me.ykrank.s1next.view.page.app.AppPostListActivity
 import me.ykrank.s1next.view.page.post.adapter.PostAdapterDelegate
 import me.ykrank.s1next.view.page.post.adapter.PostListRecyclerViewAdapter
 import me.ykrank.s1next.view.page.post.adapter.render.HybridPostListRecyclerViewAdapter
+import me.ykrank.s1next.view.page.post.share.PostShareCardRenderer
+import me.ykrank.s1next.view.page.post.share.PostSharePreviewActivity
+import me.ykrank.s1next.view.page.post.share.PostShareRequest
+import me.ykrank.s1next.view.page.post.share.PostShareSelectionOwner
+import me.ykrank.s1next.view.page.post.share.PostShareSelectionState
 import java.util.*
 import javax.inject.Inject
 
@@ -65,7 +71,8 @@ import javax.inject.Inject
  * Activity or Fragment containing this must implement [PagerCallback].
  */
 class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
-    OnQuickSideBarTouchListener {
+    OnQuickSideBarTouchListener,
+    PostShareSelectionOwner {
 
     @Inject
     internal lateinit var mGeneralPreferencesManager: GeneralPreferencesManager
@@ -130,6 +137,8 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
 
     private var mPagerCallback: PagerCallback? = null
     private var currentPosts: List<Post> = emptyList()
+    override var postShareSelectionState: PostShareSelectionState = PostShareSelectionState()
+        private set
 
     private var refreshAfterBlacklistChangeDisposable: Disposable? = null
 
@@ -168,9 +177,9 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
         )
         mRecyclerView.addItemDecoration(searchHighlightDecoration)
         mRecyclerAdapter = if (mReadPreferencesManager.hybridPostRender) {
-            HybridPostListRecyclerViewAdapter(this, requireContext())
+            HybridPostListRecyclerViewAdapter(this, requireContext(), this)
         } else {
-            PostListRecyclerViewAdapter(this, requireContext())
+            PostListRecyclerViewAdapter(this, requireContext(), this)
         }
         mRecyclerView.adapter = mRecyclerAdapter
 
@@ -205,6 +214,18 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
             .ofType(BlackListChangeEvent::class.java)
             .to(AndroidRxDispose.withObservable(this, FragmentEvent.DESTROY_VIEW))
             .subscribe { startBlackListRefresh() }
+
+        mEventBus.get()
+            .ofType(EnterPostShareSelectionEvent::class.java)
+            .to(AndroidRxDispose.withObservable(this, FragmentEvent.DESTROY_VIEW))
+            .subscribe({ event ->
+                if ((event.threadId == null || event.threadId == mThreadId) &&
+                    event.pageNum == mPageNum &&
+                    currentPosts.any { it.id == event.postId }
+                ) {
+                    startPostShareSelection(event.postId)
+                }
+            }, { super.onError(it) })
     }
 
     override fun onDestroy() {
@@ -310,6 +331,124 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
             mPagerCallback?.getTotalPages() ?: mPageNum,
             snapshot.posts,
             arrayListOf(snapshot)
+        )
+    }
+
+    fun startPostShareSelection(sourcePostId: Int?) {
+        val sourcePost = sourcePostId?.let { id ->
+            currentPosts.firstOrNull { it.id == id && it.hide == Post.HIDE_NO }
+        }
+        val defaultPost = sourcePost ?: defaultShareSelectionPost()
+        if (defaultPost == null) {
+            showSnackbar(R.string.post_share_no_data)
+            return
+        }
+
+        postShareSelectionState = PostShareSelectionState(
+            enabled = true,
+            selectedPostIds = setOf(defaultPost.id),
+            sourcePostId = sourcePostId,
+        )
+        notifyPostShareSelectionChanged(null)
+    }
+
+    fun cancelPostShareSelection() {
+        if (!postShareSelectionState.enabled) {
+            return
+        }
+        postShareSelectionState = PostShareSelectionState()
+        notifyPostShareSelectionChanged(null)
+    }
+
+    fun confirmPostShareSelection() {
+        val posts = selectedSharePosts()
+        if (posts.isEmpty()) {
+            showSnackbar(R.string.post_share_no_data)
+            return
+        }
+        val threadId = mThreadId ?: mThreadInfo?.id
+        if (threadId.isNullOrBlank()) {
+            showSnackbar(R.string.post_share_image_failed)
+            return
+        }
+        lifecycleScope.launch {
+            try {
+                showSnackbar(R.string.post_share_generating)
+                val uri = PostShareCardRenderer(requireContext().applicationContext).renderToUri(
+                    PostShareRequest(
+                        threadId = threadId,
+                        threadTitle = mThreadInfo?.title,
+                        page = mPageNum,
+                        posts = posts,
+                    )
+                )
+                PostSharePreviewActivity.start(requireContext(), uri)
+                cancelPostShareSelection()
+            } catch (e: Exception) {
+                L.report(e)
+                showSnackbar(R.string.post_share_image_failed)
+            }
+        }
+    }
+
+    override fun togglePostShareSelection(postId: Int) {
+        val state = postShareSelectionState
+        if (!state.enabled || currentPosts.none { it.id == postId && it.hide == Post.HIDE_NO }) {
+            return
+        }
+        val selectedPostIds = state.selectedPostIds
+        val newSelectedPostIds = if (postId in selectedPostIds) {
+            if (selectedPostIds.size == 1) {
+                showSnackbar(R.string.post_share_at_least_one)
+                return
+            }
+            selectedPostIds - postId
+        } else {
+            selectedPostIds + postId
+        }
+        postShareSelectionState = state.copy(selectedPostIds = newSelectedPostIds)
+        notifyPostShareSelectionChanged(setOf(postId))
+    }
+
+    private fun selectedSharePosts(): List<Post> {
+        val selectedPostIds = postShareSelectionState.selectedPostIds
+        if (selectedPostIds.isEmpty()) {
+            return emptyList()
+        }
+        return currentPosts.filter { it.hide == Post.HIDE_NO && it.id in selectedPostIds }
+    }
+
+    private fun defaultShareSelectionPost(): Post? {
+        val adapterPosition = mLayoutManager.findFirstVisibleItemPosition()
+        val postPosition = if (adapterPosition != RecyclerView.NO_POSITION) {
+            val hybrid = mRecyclerAdapter as? HybridPostListRecyclerViewAdapter
+            hybrid?.postPositionForAdapterPosition(adapterPosition) ?: adapterPosition
+        } else {
+            RecyclerView.NO_POSITION
+        }
+        return currentPosts.getOrNull(postPosition)?.takeIf { it.hide == Post.HIDE_NO }
+            ?: currentPosts.firstOrNull { it.hide == Post.HIDE_NO }
+    }
+
+    private fun notifyPostShareSelectionChanged(changedPostIds: Set<Int>? = null) {
+        if (this::mRecyclerAdapter.isInitialized) {
+            val hybrid = mRecyclerAdapter as? HybridPostListRecyclerViewAdapter
+            if (hybrid != null) {
+                hybrid.notifyPostShareSelectionChanged(changedPostIds)
+            } else if (changedPostIds == null) {
+                mRecyclerAdapter.notifyDataSetChanged()
+            } else {
+                changedPostIds.forEach { postId ->
+                    val index = currentPosts.indexOfFirst { it.id == postId }
+                    if (index >= 0) {
+                        mRecyclerAdapter.notifyItemChanged(index)
+                    }
+                }
+            }
+        }
+        mPagerCallback?.onPostShareSelectionChanged(
+            postShareSelectionState.enabled,
+            postShareSelectionState.selectedPostIds.size
         )
     }
 
@@ -634,6 +773,8 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
         fun setThreadInfo(thread: Thread?)
 
         fun consumePendingSearchResultPosition(pageNum: Int): Int?
+
+        fun onPostShareSelectionChanged(enabled: Boolean, selectedCount: Int)
     }
 
     companion object {

@@ -27,9 +27,14 @@ import me.ykrank.s1next.view.activity.RateDetailsListActivity
 import me.ykrank.s1next.view.activity.UserHomeActivity
 import me.ykrank.s1next.view.adapter.delegate.BaseAdapterDelegate
 import me.ykrank.s1next.view.page.post.render.PostRenderItem
+import me.ykrank.s1next.view.page.post.share.PostShareSelectionOwner
 import me.ykrank.s1next.view.page.post.viewmodel.PostViewModel
 
-class PostRenderFooterAdapterDelegate(private val fragment: Fragment, context: Context) :
+class PostRenderFooterAdapterDelegate(
+    private val fragment: Fragment,
+    context: Context,
+    private val postShareSelectionOwner: PostShareSelectionOwner? = null
+) :
     BaseAdapterDelegate<PostRenderItem.Footer, SimpleRecycleViewHolder<ItemPostRenderFooterBinding>>(
         context,
         PostRenderItem.Footer::class.java
@@ -63,6 +68,7 @@ class PostRenderFooterAdapterDelegate(private val fragment: Fragment, context: C
     ) {
         val binding = holder.binding
         val post = t.post
+        val shareSelectionEnabled = postShareSelectionOwner?.postShareSelectionState?.enabled == true
         binding.quickSidebarEnable = generalPreferencesManager.isQuickSideBarEnable
         binding.postViewModel?.let {
             it.thread.set(threadInfo)
@@ -103,6 +109,20 @@ class PostRenderFooterAdapterDelegate(private val fragment: Fragment, context: C
         }
 
         binding.executePendingBindings()
+        if (shareSelectionEnabled) {
+            val toggleSelection = View.OnClickListener {
+                postShareSelectionOwner?.togglePostShareSelection(post.id)
+            }
+            binding.root.setOnClickListener(toggleSelection)
+            binding.tvShowTrade.setOnClickListener(toggleSelection)
+            binding.tvShowVote.setOnClickListener(toggleSelection)
+            binding.tvCastMagic.setOnClickListener(toggleSelection)
+            binding.tvRateViewAll.setOnClickListener(toggleSelection)
+            binding.recycleViewRates.setOnClickListener(toggleSelection)
+        } else {
+            binding.root.setOnClickListener(null)
+            binding.recycleViewRates.setOnClickListener(null)
+        }
     }
 
     private fun ensureRatesAdapter(binding: ItemPostRenderFooterBinding) {
@@ -153,4 +173,3 @@ class PostRenderFooterAdapterDelegate(private val fragment: Fragment, context: C
         this.voteInfo = voteInfo
     }
 }
-

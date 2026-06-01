@@ -51,6 +51,16 @@
             android:name="TD_CHANNEL_ID"
             android:value="${APP_CHANNEL}" />
 
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/share_file_paths" />
+        </provider>
+
         <activity
             android:name=".view.activity.LoginActivity"
             android:colorMode="wideColorGamut"
@@ -113,6 +123,11 @@
             android:colorMode="wideColorGamut"
             android:configChanges="uiMode"
             android:windowSoftInputMode="stateVisible|adjustResize" />
+
+        <activity
+            android:name=".view.page.post.share.PostSharePreviewActivity"
+            android:colorMode="wideColorGamut"
+            android:configChanges="uiMode" />
 
         <activity
             android:name=".view.page.app.AppPostListActivity"

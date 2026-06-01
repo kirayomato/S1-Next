@@ -10,6 +10,8 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
 import androidx.annotation.MainThread
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
@@ -89,6 +91,9 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
     private var mThreadAttachment: Posts.ThreadAttachment? = null
     private var mMenuThreadAttachment: MenuItem? = null
     private var toolbarPageJumpView: TextView? = null
+    private var postShareBackPressedCallback: OnBackPressedCallback? = null
+    private var isPostShareSelectionMode = false
+    private var postShareSelectedCount = 0
 
     private var readProgress: ReadProgress? = null
     private var tempReadProgress: ReadProgress? = null
@@ -186,6 +191,12 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        postShareBackPressedCallback = requireActivity().onBackPressedDispatcher.addCallback(
+            this,
+            enabled = false
+        ) {
+            handlePostShareSelectionBackPressed()
+        }
         lifecycleScope.launch(L.report) {
             mLastThreadInfoFlow
                 .throttleFirst(1000L)
@@ -298,6 +309,7 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
         super.onPrepareOptionsMenu(menu)
         val mMenuQuickSideBarEnable = menu.findItem(R.id.menu_quick_side_bar_enable)
         mMenuQuickSideBarEnable?.isChecked = mGeneralPreferencesManager.isQuickSideBarEnable
+        applyPostShareSelectionMenuState(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -341,20 +353,13 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
             }
 
             R.id.menu_share -> {
-                val value: String
-                val url = Api.getPostListUrlForBrowser(mThreadId, currentPage)
-                if (TextUtils.isEmpty(mThreadTitle)) {
-                    value = url
-                } else {
-                    value = StringUtils.concatWithTwoSpaces(mThreadTitle, url)
-                }
+                curPostPageFragment?.startPostShareSelection(null)
+                    ?: showSnackbar(R.string.post_share_no_data)
+                return true
+            }
 
-                val intent = Intent(Intent.ACTION_SEND)
-                intent.putExtra(Intent.EXTRA_TEXT, value)
-                intent.type = "text/plain"
-
-                startActivity(Intent.createChooser(intent, getString(R.string.menu_title_share)))
-
+            R.id.menu_post_share_confirm -> {
+                curPostPageFragment?.confirmPostShareSelection()
                 return true
             }
 
@@ -408,6 +413,30 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
         }
     }
 
+    private fun applyPostShareSelectionMenuState(menu: Menu) {
+        val ordinaryPostMenuIds = intArrayOf(
+            R.id.menu_thread_attachment,
+            R.id.menu_search_current_page,
+            R.id.menu_favourites_add,
+            R.id.menu_link,
+            R.id.menu_share,
+            R.id.menu_browser,
+            R.id.menu_save_progress,
+            R.id.menu_load_progress,
+            R.id.menu_quick_side_bar_enable,
+            R.id.menu_prefetch_after_posts,
+            R.id.menu_backup_thread,
+        )
+        ordinaryPostMenuIds.forEach { menu.findItem(it)?.isVisible = !isPostShareSelectionMode }
+        menu.findItem(R.id.menu_post_share_confirm)?.isVisible = isPostShareSelectionMode
+        if (!isPostShareSelectionMode) {
+            menu.findItem(R.id.menu_thread_attachment)?.isVisible = mThreadAttachment != null
+            if (mReadPrefManager.isSaveAuto) {
+                menu.findItem(R.id.menu_save_progress)?.isVisible = false
+            }
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             RequestCode.REQUEST_CODE_EDIT_POST -> {
@@ -448,6 +477,11 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
     }
 
     override fun setTitleWithPosition(position: Int) {
+        if (isPostShareSelectionMode) {
+            activity?.title = getString(R.string.post_share_selected_count, postShareSelectedCount)
+            toolbarPageJumpView?.visibility = View.GONE
+            return
+        }
         activity?.title = mThreadTitle
         renderToolbarPageJump(position)
     }
@@ -466,6 +500,19 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
         }
         pendingSearchResult = null
         return jump.position
+    }
+
+    override fun onPostShareSelectionChanged(enabled: Boolean, selectedCount: Int) {
+        isPostShareSelectionMode = enabled
+        postShareSelectedCount = selectedCount
+        postShareBackPressedCallback?.isEnabled = enabled
+        if (enabled) {
+            toolbarPageJumpView?.visibility = View.GONE
+            activity?.title = getString(R.string.post_share_selected_count, selectedCount)
+        } else {
+            setTitleWithPosition(currentPage)
+        }
+        activity?.invalidateOptionsMenu()
     }
 
     private fun jumpToSearchResult(pageNum: Int, position: Int) {
@@ -538,6 +585,10 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
 
     private fun renderToolbarPageJump(position: Int = currentPage) {
         toolbarPageJumpView?.apply {
+            if (isPostShareSelectionMode) {
+                visibility = View.GONE
+                return
+            }
             visibility = View.VISIBLE
             text = "${position + 1}/${maxOf(getTotalPages(), 1)}"
         }
@@ -570,6 +621,32 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
      */
     internal val curPostPageFragment: PostListPagerFragment?
         get() = mPostListPagerAdapter.currentFragment
+
+    fun dispatchPostShareSelectionBackPressed(): Boolean {
+        if (!isPostShareSelectionMode) {
+            return false
+        }
+        requireActivity().onBackPressedDispatcher.onBackPressed()
+        return true
+    }
+
+    private fun handlePostShareSelectionBackPressed() {
+        activePostShareSelectionFragment()?.cancelPostShareSelection()
+            ?: onPostShareSelectionChanged(false, 0)
+    }
+
+    private fun activePostShareSelectionFragment(): PostListPagerFragment? {
+        curPostPageFragment
+            ?.takeIf { it.postShareSelectionState.enabled }
+            ?.let { return it }
+        for (page in 0 until getTotalPages()) {
+            val fragment = mPostListPagerAdapter.getCachedFragment(page)
+            if (fragment?.postShareSelectionState?.enabled == true) {
+                return fragment
+            }
+        }
+        return null
+    }
 
     /**
      * 读取阅读进度

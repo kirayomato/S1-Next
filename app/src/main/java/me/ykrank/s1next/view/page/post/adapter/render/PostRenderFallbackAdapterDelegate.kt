@@ -13,10 +13,15 @@ import me.ykrank.s1next.view.adapter.delegate.BaseAdapterDelegate
 import me.ykrank.s1next.view.page.post.render.PostActionMenuPopup
 import me.ykrank.s1next.view.page.post.render.PostRenderActions
 import me.ykrank.s1next.view.page.post.render.PostRenderItem
+import me.ykrank.s1next.view.page.post.share.PostShareSelectionOwner
 import me.ykrank.s1next.widget.span.FixedSpannableFactory
 import me.ykrank.s1next.widget.span.PostMovementMethod
 
-class PostRenderFallbackAdapterDelegate(private val fragment: Fragment, context: Context) :
+class PostRenderFallbackAdapterDelegate(
+    private val fragment: Fragment,
+    context: Context,
+    private val postShareSelectionOwner: PostShareSelectionOwner? = null
+) :
     BaseAdapterDelegate<PostRenderItem.FallbackHtmlBlock, PostRenderFallbackAdapterDelegate.ViewHolder>(
         context,
         PostRenderItem.FallbackHtmlBlock::class.java
@@ -45,17 +50,31 @@ class PostRenderFallbackAdapterDelegate(private val fragment: Fragment, context:
             t.html
         )
         holder.boundHtml = t.html
-        val longClickListener = View.OnLongClickListener {
-            PostRenderActions.showPostActionMenu(it, fragment, threadInfo, pageNum, t.post)
+        if (postShareSelectionOwner?.postShareSelectionState?.enabled == true) {
+            val clickListener = View.OnClickListener {
+                postShareSelectionOwner.togglePostShareSelection(t.post.id)
+            }
+            holder.itemView.setOnTouchListener(null)
+            holder.text.setOnTouchListener(null)
+            holder.itemView.setOnClickListener(clickListener)
+            holder.text.setOnClickListener(clickListener)
+            holder.itemView.setOnLongClickListener(null)
+            holder.text.setOnLongClickListener(null)
+        } else {
+            val longClickListener = View.OnLongClickListener {
+                PostRenderActions.showPostActionMenu(it, fragment, threadInfo, pageNum, t.post)
+            }
+            val touchListener = View.OnTouchListener { view, event ->
+                PostActionMenuPopup.recordTouchPoint(view, event)
+                false
+            }
+            holder.itemView.setOnTouchListener(touchListener)
+            holder.text.setOnTouchListener(touchListener)
+            holder.itemView.setOnClickListener(null)
+            holder.text.setOnClickListener(null)
+            holder.itemView.setOnLongClickListener(longClickListener)
+            holder.text.setOnLongClickListener(longClickListener)
         }
-        val touchListener = View.OnTouchListener { view, event ->
-            PostActionMenuPopup.recordTouchPoint(view, event)
-            false
-        }
-        holder.itemView.setOnTouchListener(touchListener)
-        holder.text.setOnTouchListener(touchListener)
-        holder.itemView.setOnLongClickListener(longClickListener)
-        holder.text.setOnLongClickListener(longClickListener)
     }
 
     fun setThreadInfo(threadInfo: Thread, pageNum: Int) {

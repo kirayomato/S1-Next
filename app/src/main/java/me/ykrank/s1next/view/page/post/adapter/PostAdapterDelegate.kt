@@ -29,12 +29,17 @@ import me.ykrank.s1next.databinding.ItemRateDetailBinding
 import me.ykrank.s1next.view.activity.RateDetailsListActivity
 import me.ykrank.s1next.view.activity.UserHomeActivity
 import me.ykrank.s1next.view.adapter.delegate.BaseAdapterDelegate
+import me.ykrank.s1next.view.page.post.share.PostShareSelectionOwner
 import me.ykrank.s1next.view.page.post.viewmodel.PostViewModel
 import me.ykrank.s1next.widget.span.FixedSpannableFactory
 import me.ykrank.s1next.widget.span.PostMovementMethod
 import javax.inject.Inject
 
-class PostAdapterDelegate(private val fragment: Fragment, context: Context) :
+class PostAdapterDelegate(
+    private val fragment: Fragment,
+    context: Context,
+    private val postShareSelectionOwner: PostShareSelectionOwner? = null
+) :
     BaseAdapterDelegate<Post, SimpleRecycleViewHolder<ItemPostBinding>>(context, Post::class.java) {
 
     @Inject
@@ -121,6 +126,10 @@ class PostAdapterDelegate(private val fragment: Fragment, context: Context) :
         val binding = holder.binding
 
         binding.quickSidebarEnable = mGeneralPreferencesManager.isQuickSideBarEnable
+        val shareSelectionState = postShareSelectionOwner?.postShareSelectionState
+        val shareSelectionEnabled = shareSelectionState?.enabled == true
+        binding.postShareSelectionEnabled = shareSelectionEnabled
+        binding.postShareSelected = shareSelectionState?.selectedPostIds?.contains(post.id) == true
 
         val selectable = false
         if (selectable != binding.tvReply.isTextSelectable) {
@@ -208,6 +217,18 @@ class PostAdapterDelegate(private val fragment: Fragment, context: Context) :
         }
 
         binding.executePendingBindings()
+        if (shareSelectionEnabled) {
+            val toggleSelection = View.OnClickListener {
+                postShareSelectionOwner?.togglePostShareSelection(post.id)
+            }
+            binding.root.setOnClickListener(toggleSelection)
+            binding.tvFloor.setOnClickListener(toggleSelection)
+        } else {
+            binding.root.setOnClickListener(null)
+            binding.tvFloor.setOnClickListener {
+                binding.postViewModel?.showFloorActionMenu(it)
+            }
+        }
     }
 
     // Bug workaround for losing text selection ability, see:

@@ -25,17 +25,23 @@
 - 第一版不自动跨页加载并选择楼层。
 - 第一版不做复杂图片编辑、涂抹、水印自定义。
 - 第一版不保证所有复杂 HTML 结构都 100% 自定义渲染；复杂块允许局部 fallback。
-- 第一版不改变现有普通文本分享入口以外的系统分享行为。
+- 第一版不新增独立的纯文本分享入口；帖子页分享统一进入长图选择分享流程，生成失败时可按需降级到现有文本分享。
 
 ## 交互设计
 
 ### 入口
 
-帖子楼层菜单点击“分享”后，不再立即调起系统分享，而是进入选择模式。
+帖子页的两个分享入口统一进入同一个选择分享流程：
+
+- 顶部 toolbar 的“分享”。
+- 楼层菜单中的“分享”。
+
+两者不再立即调起纯文本系统分享，而是先进入楼层选择模式。
 
 ### 选择模式
 
-- 默认选中当前楼层。
+- 从楼层菜单进入时，默认选中触发分享的当前楼层。
+- 从顶部 toolbar 进入时，默认选中当前页第一个可见楼层；如果当前页尚无已加载楼层，则提示暂无可分享内容。
 - 只允许选择当前已加载页内的楼层。
 - Toolbar 切换为选择态：
   - 左侧：取消。
@@ -107,6 +113,28 @@ data class PostShareSelectionState(
 )
 ```
 
+其中 `sourcePostId` 只表示触发分享的来源楼层：
+
+- 楼层菜单入口：`sourcePostId` 为该楼层 pid，并默认选中该 pid。
+- 顶部 toolbar 入口：`sourcePostId` 为 `null`，默认选中当前页第一个可见楼层。
+- 最终生成 `PostShareRequest.posts` 时，不使用 `selectedPostIds` 的 set 顺序，而是按当前页 `currentPosts` 的自然顺序筛出选中楼层，保证长图顺序稳定。
+
+新增分享选择事件：
+
+```kotlin
+data class EnterPostShareSelectionEvent(
+    val threadId: String?,
+    val pageNum: Int,
+    val postId: Int,
+)
+```
+
+楼层菜单没有稳定持有 `PostListPagerFragment`，因此用 EventBus 从楼层 action 发事件。`PostListPagerFragment` 收到事件后需要同时校验：
+
+- `threadId == null || threadId == mThreadId`
+- `pageNum == mPageNum`
+- `postId` 存在于当前 `currentPosts`
+
 新增分享请求模型：
 
 ```kotlin
@@ -137,10 +165,12 @@ data class PostShareCode(
 - 旧路径：`PostListRecyclerViewAdapter` + `PostAdapterDelegate`
 - 新路径：`HybridPostListRecyclerViewAdapter` + `PostRenderItem`
 
-选择模式建议放在页面层统一管理，adapter 只接收状态并渲染选择 UI：
+选择模式建议放在页面层统一管理，adapter 只接收状态并渲染选择 UI。顶部 toolbar 分享和楼层菜单分享共用同一套入口：
 
-- `PostListFragment` 或 `PostListPagerFragment` 持有选择状态。
-- 触发楼层分享时发起 `EnterPostShareSelectionEvent(postId)` 或直接回调页面。
+- `PostListPagerFragment` 持有选择状态，因为它已持有当前页 `currentPosts`、`mThreadInfo`、`mPageNum` 和 adapter。
+- `PostListFragment` 负责把顶部 toolbar 切换为选择态，并把 toolbar “分享”转发给当前 `curPostPageFragment`。
+- 顶部 toolbar 分享调用当前页 `startPostShareSelection(sourcePostId = null)`。
+- 楼层菜单分享发起 `EnterPostShareSelectionEvent(pageNum, postId)`，当前页收到后调用 `startPostShareSelection(sourcePostId = postId)`。
 - 页面更新 adapter 状态：
   - 当前页 posts。
   - selected ids。
@@ -148,6 +178,73 @@ data class PostShareCode(
 - adapter 根据 post id 显示 checkbox/选中背景。
 
 第一版可优先覆盖新渲染路径；如果旧渲染仍可配置开启，则需要旧路径也提供同样选择 UI，避免用户关闭新渲染后分享入口失效。
+
+现有代码注意点：
+
+- 楼层菜单的新渲染入口在 `PostRenderActions`，旧渲染入口通过 `PostViewModel.showFloorActionMenu()` 间接调用同一套 action。
+- `PostViewModel` 调用楼层菜单时没有直接持有 `PostListPagerFragment`，因此建议用 EventBus 发选择事件，而不是只依赖 fragment 回调。
+- 顶部 toolbar 的分享入口在 `PostListFragment`，需要通过 `curPostPageFragment` 转发到当前页，避免父 fragment 复制当前页 posts 状态。
+
+### 选择状态流
+
+建议新增一组窄接口，避免 adapter 直接依赖 fragment 具体类型：
+
+```kotlin
+interface PostShareSelectionOwner {
+    val postShareSelectionState: PostShareSelectionState
+    fun togglePostShareSelection(postId: Int)
+}
+```
+
+`PostListPagerFragment` 实现该接口，并提供：
+
+- `startPostShareSelection(sourcePostId: Int?)`
+- `cancelPostShareSelection()`
+- `confirmPostShareSelection()`
+- `selectedSharePosts(): List<Post>`
+
+默认选中规则：
+
+- `sourcePostId != null`：选中该 pid。
+- `sourcePostId == null`：优先选中当前 RecyclerView 第一个可见楼层对应的 pid；若当前可见 item 在 hybrid 渲染下是正文块/图片块，则通过 `HybridPostListRecyclerViewAdapter.postPositionForAdapterPosition()` 映射回 post；映射失败时回退到 `currentPosts.firstOrNull()`。
+- 当前页无可选楼层：提示 `post_share_no_data`，不进入选择态。
+
+选择态更新规则：
+
+- 每次选择变化后，通知 adapter 局部刷新对应 post 的所有渲染块。
+- 如果用户取消最后一个选中楼层，保留选择态但禁用确定按钮，或者直接禁止取消最后一个选中楼层。第一版建议禁止取消最后一个选中楼层，避免确定按钮和空状态分支复杂化。
+- 确定时按当前页顺序收集选中楼层，构造 `PostShareRequest`。
+
+### Toolbar 选择态
+
+`PostListFragment` 维护 toolbar 选择态显示，不持有具体 selected ids：
+
+- `isPostShareSelectionMode: Boolean`
+- `postShareSelectedCount: Int`
+
+进入选择态：
+
+- 隐藏 `toolbar_page_jump`。
+- `activity.title = getString(R.string.post_share_selected_count, count)`。
+- `onPrepareOptionsMenu()` 隐藏普通帖子菜单项，只显示“确定”菜单项。
+- `android.R.id.home` 在选择态下作为取消处理，调用 `curPostPageFragment?.cancelPostShareSelection()`，不关闭 Activity。
+
+退出选择态：
+
+- 恢复 `toolbar_page_jump`。
+- 恢复原帖子标题。
+- 恢复普通帖子菜单项。
+
+实现上可在 `fragment_post.xml` 新增默认隐藏的 `menu_post_share_confirm`，标题复用 `dialog_button_text_confirm`；选择态下只显示该 item。
+
+### Adapter 选择 UI
+
+新旧渲染路径都需要接受 `PostShareSelectionOwner`：
+
+- 旧路径：`PostListRecyclerViewAdapter` 将 owner 传给 `PostAdapterDelegate`，在 `item_post.xml` 增加选择控件和选中背景。
+- 新路径：`HybridPostListRecyclerViewAdapter` 将 owner 传给 header/text/image/fallback/footer delegates。
+- 新路径建议只在 `PostRenderItem.Header` 展示明确的 checkbox，但正文块、图片块、fallback、footer 在选择态下点击时仍切换所属 post，满足“点击卡片切换”的交互。
+- 选择态下楼层长按菜单不应再弹出；点击优先用于切换选择。
 
 ### 长图渲染管线
 
@@ -176,6 +273,60 @@ List<Post>
 - `ImageBlock`：真实加载图片，按卡片宽度缩放。
 - `FallbackHtmlBlock`：第一版使用 HtmlCompat/TextView fallback，后续跟随新渲染升级。
 
+### 长图生成实现
+
+第一版建议使用专用分享 View 离屏绘制，而不是截取当前 RecyclerView：
+
+```kotlin
+class SharePostCardRenderer(
+    private val context: Context,
+    private val imageLoader: ShareImageLoader,
+    private val qrCodeBitmapFactory: QrCodeBitmapFactory,
+) {
+    suspend fun renderToBitmap(request: PostShareRequest): Bitmap
+}
+```
+
+实现边界：
+
+- `PostListPagerFragment.confirmPostShareSelection()` 只负责构造 `PostShareRequest` 和展示 loading。
+- `SharePostCardRenderer` 负责把 `PostRenderMapper.map(request.posts)` 的结果转成分享专用布局。
+- 图片加载通过 `ShareImageLoader` 封装，内部复用 Glide + `ImageBiz`，在 `Dispatchers.IO` 预加载正文图片 bitmap。
+- View 创建、measure、layout、draw 必须回到主线程执行；文件写入在 `Dispatchers.IO` 执行。
+- 生成过程绑定 fragment `viewLifecycleOwner.lifecycleScope`，fragment destroy 后取消 coroutine，不继续持有 Activity/View。
+
+推荐输出流程：
+
+```text
+selected posts
+  -> PostShareRequest
+  -> PostRenderMapper.map(posts)
+  -> preload ImageBlock bitmaps with limits
+  -> build share-only View tree
+  -> measure/layout with fixed card width
+  -> draw to Bitmap
+  -> write PNG to cache/post_share
+  -> FileProvider Uri
+  -> ACTION_SEND image/png
+```
+
+尺寸建议：
+
+- 分享图固定内容宽度建议 1080px；在小屏或低内存设备上可降到 `min(displayMetrics.widthPixels, 1080)`。
+- UI 样式使用分享专用 dimens，不直接复用帖子页大段 padding，避免长图过高。
+- 先按限制后的图片高度估算总高度，超过 `MAX_SHARE_CARD_HEIGHT_PX` 时提前失败并提示用户减少楼层选择。
+
+缓存文件：
+
+- 目录：`context.cacheDir/post_share/`
+- 文件名：`post_share_{threadId}_{timestamp}.png`
+- 生成前可清理该目录中较旧的分享图，避免缓存持续增长。
+
+Loading：
+
+- 现有 `SimpleProgressDialogFragment` 可复用为第一版生成中提示。
+- 失败时关闭 loading，提示用户原因；如果保留文本分享降级，则降级内容应复用原来的标题 + 楼层链接格式。
+
 ### 图片约束
 
 为了避免长图过高或生成 OOM：
@@ -188,7 +339,7 @@ List<Post>
 ### Bitmap 与分享 URI
 
 - 生成 Bitmap 后写入 app cache。
-- 使用现有 FileProvider 配置暴露临时 URI；如果当前没有合适 path，需要补充 provider paths。
+- 当前仓库未发现已有 FileProvider 配置，需要新增 `androidx.core.content.FileProvider` provider 和 cache-path XML，用于暴露生成的分享图片临时 URI。
 - 分享 Intent：
 
 ```kotlin
@@ -201,9 +352,7 @@ Intent(Intent.ACTION_SEND).apply {
 
 ### 二维码
 
-需要确认当前依赖是否已有二维码库。若没有：
-
-- 优先引入稳定轻量库，例如 ZXing core。
+- 当前依赖未发现二维码库，优先引入稳定轻量库，例如 ZXing core。
 - 依赖新增到 `gradle/libs.versions.toml`。
 - 二维码生成封装为 `QrCodeBitmapFactory`，输入 URL 输出 Bitmap。
 
@@ -220,6 +369,15 @@ Intent(Intent.ACTION_SEND).apply {
 2. `ThreadLink.parse2(query)`
    - 复用现有链接、tid、tid-page 解析能力。
 3. URL 中包含 `#pidxxx` 或 redirect findpost 时继续复用 `ThreadLink.parse()`。
+
+现有 `ThreadLink.parse()` 已支持 redirect findpost 的 `pid`，但不解析 `thread-xxx-page.html#pidyyy` 这类 anchor。由于分享二维码优先生成 `#pid{post.id}` 稳定楼层链接，搜索解析阶段需要补充 `#pid(\\d+)` 解析并映射到 `quotePostId`。
+
+`PostShareCode` 的职责边界：
+
+- 只解析纯文本神秘代码，例如 `2038487-2-3681`。
+- 第三段保留为楼层号 `floor`，不写入 `ThreadLink.quotePostId`。
+- `toThreadLink()` 只输出 thread/page；如果包含 floor，第一版仍只打开对应 page，并在解析卡片展示楼层号。
+- 后续如果实现“按楼层号滚动”，再在 `PostListActivity`/`PostListFragment` intent 中新增 floor 字段，不复用 `quotePostId`。
 
 ### 搜索结果插入
 
@@ -246,6 +404,14 @@ val results = buildList<SearchResult> {
 
 用户搜索模式下是否展示解析卡片需要产品取舍。建议只在“论坛”搜索类型展示，避免用户搜 uid/name 时插入帖子结果。
 
+实现细节：
+
+- `ParsedThreadLinkSearchResult` 继承 `SearchResult`，并实现稳定 id，避免插入顶部时 RecyclerView 刷新跳动。
+- `SearchRecyclerViewAdapter` 增加 `SearchParsedThreadAdapterDelegate`，位置应早于普通 forum/user delegate 无硬性要求，但类型判断必须明确。
+- `SearchActivity.searchFor(query)` 在论坛搜索分支中先计算 `parsed`，网络结果回来后合并。网络失败时可以仍展示解析卡片并附带错误提示；第一版可保持现有失败展示逻辑，仅在网络成功时插入。
+- 解析卡片点击直接调用 `PostListGatewayActivity.start(context, threadLink)`；不要依赖卡片内 HTML span/movementMethod。
+- 卡片展示文案使用 string resource，并同步 `values`、`values-zh`、`values-zh-rTW`。
+
 ### 点击行为
 
 - 如果只有 thread/page：`PostListGatewayActivity.start(context, threadLink)`。
@@ -258,7 +424,8 @@ val results = buildList<SearchResult> {
 ### 阶段一：选择模式
 
 - 增加分享选择状态。
-- 帖子页菜单“分享”进入选择模式。
+- 顶部 toolbar “分享”和楼层菜单“分享”进入同一个选择模式。
+- 顶部 toolbar 入口默认选中当前页第一个可见楼层；楼层菜单入口默认选中当前楼层。
 - 新旧渲染路径展示选择态。
 - 确认默认选中当前楼层、取消、确定流程。
 

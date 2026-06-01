@@ -56,6 +56,14 @@
     <string name="menu_share">分享</string>
         
     <string name="menu_title_share">分享到</string>
+    <string name="post_share_selected_count">已選擇 %1$d 樓</string>
+    <string name="post_share_no_data">目前頁還沒有可分享樓層</string>
+    <string name="post_share_at_least_one">至少選擇 1 樓</string>
+    <string name="post_share_generating">正在產生分享圖片…</string>
+    <string name="post_share_image_failed">分享圖片產生失敗</string>
+    <string name="post_share_from_stage1">來自 Stage1 論壇</string>
+    <string name="post_share_code">神祕代碼：%1$s</string>
+    <string name="post_share_preview_title">分享預覽</string>
         
     <string name="menu_thread_attachment">附件</string>
         

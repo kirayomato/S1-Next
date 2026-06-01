@@ -29,6 +29,14 @@
     <string name="menu_link">链接</string>
     <string name="menu_share">分享</string>
     <string name="menu_title_share">分享到</string>
+    <string name="post_share_selected_count">已选择 %1$d 楼</string>
+    <string name="post_share_no_data">当前页还没有可分享楼层</string>
+    <string name="post_share_at_least_one">至少选择 1 楼</string>
+    <string name="post_share_generating">正在生成分享图片…</string>
+    <string name="post_share_image_failed">分享图片生成失败</string>
+    <string name="post_share_from_stage1">来自 Stage1 论坛</string>
+    <string name="post_share_code">神秘代码：%1$s</string>
+    <string name="post_share_preview_title">分享预览</string>
     <string name="menu_thread_attachment">附件</string>
     <string name="menu_emoticon">表情</string>
     <string name="menu_keyboard">键盘</string>

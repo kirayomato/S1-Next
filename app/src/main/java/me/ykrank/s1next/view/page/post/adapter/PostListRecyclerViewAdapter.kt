@@ -5,15 +5,20 @@ import androidx.fragment.app.Fragment
 import me.ykrank.s1next.data.api.model.Thread
 import me.ykrank.s1next.data.api.model.Vote
 import me.ykrank.s1next.view.adapter.BaseRecyclerViewAdapter
+import me.ykrank.s1next.view.page.post.share.PostShareSelectionOwner
 
 /**
  * This [RecyclerView.Adapter]
  * has another item type [FooterProgressAdapterDelegate]
  * in order to implement pull up to refresh.
  */
-class PostListRecyclerViewAdapter(fragment: Fragment, context: Context) :
+class PostListRecyclerViewAdapter(
+    fragment: Fragment,
+    context: Context,
+    postShareSelectionOwner: PostShareSelectionOwner? = null
+) :
     BaseRecyclerViewAdapter(context, true) {
-    private val postAdapterDelegate = PostAdapterDelegate(fragment, context)
+    private val postAdapterDelegate = PostAdapterDelegate(fragment, context, postShareSelectionOwner)
     private val postBlackAdapterDelegate = PostBlackAdapterDelegate(fragment, context)
 
     init {

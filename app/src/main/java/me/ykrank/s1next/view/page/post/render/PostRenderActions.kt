@@ -1,6 +1,5 @@
 package me.ykrank.s1next.view.page.post.render
 
-import android.content.Intent
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -17,6 +16,7 @@ import me.ykrank.s1next.data.api.model.Thread
 import me.ykrank.s1next.view.dialog.PostCopyDialogFragment
 import me.ykrank.s1next.view.dialog.ReportErrorDialogFragment
 import me.ykrank.s1next.view.event.EditPostEvent
+import me.ykrank.s1next.view.event.EnterPostShareSelectionEvent
 import me.ykrank.s1next.view.event.QuoteEvent
 import me.ykrank.s1next.view.event.RateEvent
 import me.ykrank.s1next.view.event.ReportEvent
@@ -131,16 +131,9 @@ object PostRenderActions {
     }
 
     private fun sharePost(anchor: View, thread: Thread?, pageNum: Int, post: Post) {
-        val context = anchor.context
-        val value = listOfNotNull(
-            thread?.title,
-            post.authorName?.let { "#${post.number} $it" },
-            floorLink(thread, pageNum, post)
-        ).joinToString("\n")
-        val intent = Intent(Intent.ACTION_SEND)
-        intent.putExtra(Intent.EXTRA_TEXT, value)
-        intent.type = "text/plain"
-        context.startActivity(Intent.createChooser(intent, context.getString(R.string.menu_title_share)))
+        App.preAppComponent.eventBus.postDefault(
+            EnterPostShareSelectionEvent(thread?.id, pageNum, post.id)
+        )
     }
 
     private fun feedbackPost(anchor: View, fragment: Fragment?, thread: Thread?, pageNum: Int, post: Post) {

@@ -52,6 +52,14 @@
     <string name="menu_link">Link</string>
     <string name="menu_share">Share</string>
     <string name="menu_title_share">Share via</string>
+    <string name="post_share_selected_count">Selected %1$d floor(s)</string>
+    <string name="post_share_no_data">No loaded floors to share</string>
+    <string name="post_share_at_least_one">Select at least one floor</string>
+    <string name="post_share_generating">Generating share image…</string>
+    <string name="post_share_image_failed">Could not generate share image</string>
+    <string name="post_share_from_stage1">From Stage1 Forum</string>
+    <string name="post_share_code">Code: %1$s</string>
+    <string name="post_share_preview_title">Share preview</string>
     <string name="menu_thread_attachment">Attachment</string>
     <string name="menu_emoticon">Emoticon</string>
     <string name="menu_keyboard">Keyboard</string>

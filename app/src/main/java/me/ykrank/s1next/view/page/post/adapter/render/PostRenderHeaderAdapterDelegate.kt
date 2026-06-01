@@ -1,6 +1,7 @@
 package me.ykrank.s1next.view.page.post.adapter.render
 
 import android.content.Context
+import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -15,9 +16,14 @@ import me.ykrank.s1next.data.pref.GeneralPreferencesManager
 import me.ykrank.s1next.databinding.ItemPostRenderHeaderBinding
 import me.ykrank.s1next.view.adapter.delegate.BaseAdapterDelegate
 import me.ykrank.s1next.view.page.post.render.PostRenderItem
+import me.ykrank.s1next.view.page.post.share.PostShareSelectionOwner
 import me.ykrank.s1next.view.page.post.viewmodel.PostViewModel
 
-class PostRenderHeaderAdapterDelegate(private val fragment: Fragment, context: Context) :
+class PostRenderHeaderAdapterDelegate(
+    private val fragment: Fragment,
+    context: Context,
+    private val postShareSelectionOwner: PostShareSelectionOwner? = null
+) :
     BaseAdapterDelegate<PostRenderItem.Header, SimpleRecycleViewHolder<ItemPostRenderHeaderBinding>>(
         context,
         PostRenderItem.Header::class.java
@@ -48,12 +54,28 @@ class PostRenderHeaderAdapterDelegate(private val fragment: Fragment, context: C
         payloads: List<Any>
     ) {
         holder.binding.quickSidebarEnable = generalPreferencesManager.isQuickSideBarEnable
+        val shareSelectionState = postShareSelectionOwner?.postShareSelectionState
+        val shareSelectionEnabled = shareSelectionState?.enabled == true
+        holder.binding.postShareSelectionEnabled = shareSelectionEnabled
+        holder.binding.postShareSelected = shareSelectionState?.selectedPostIds?.contains(t.post.id) == true
         holder.binding.postViewModel?.let {
             it.thread.set(threadInfo)
             it.pageNum.set(pageNum)
             it.post.set(t.post)
         }
         holder.binding.executePendingBindings()
+        if (shareSelectionEnabled) {
+            val toggleSelection = View.OnClickListener {
+                postShareSelectionOwner?.togglePostShareSelection(t.post.id)
+            }
+            holder.binding.root.setOnClickListener(toggleSelection)
+            holder.binding.tvFloor.setOnClickListener(toggleSelection)
+        } else {
+            holder.binding.root.setOnClickListener(null)
+            holder.binding.tvFloor.setOnClickListener {
+                holder.binding.postViewModel?.showFloorActionMenu(it)
+            }
+        }
     }
 
     fun setThreadInfo(threadInfo: Thread, pageNum: Int) {

@@ -31,6 +31,13 @@
         android:title="@string/menu_share"
         app:showAsAction="never" />
     <item
+        android:id="@+id/menu_post_share_confirm"
+        android:icon="@drawable/ic_check_24dp"
+        android:orderInCategory="24"
+        android:title="@string/dialog_button_text_confirm"
+        android:visible="false"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/menu_browser"
         android:orderInCategory="25"
         android:title="@string/menu_browser"

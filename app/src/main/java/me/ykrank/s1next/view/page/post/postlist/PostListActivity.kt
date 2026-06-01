@@ -97,6 +97,9 @@ class PostListActivity : BaseActivity(), WifiBroadcastReceiver.NeedMonitorWifi {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
+                if (fragment?.dispatchPostShareSelectionBackPressed() == true) {
+                    return true
+                }
                 if (intent.getBooleanExtra(ARG_COME_FROM_OTHER_APP, false)) {
                     ForumActivity.start(this)
                     return true

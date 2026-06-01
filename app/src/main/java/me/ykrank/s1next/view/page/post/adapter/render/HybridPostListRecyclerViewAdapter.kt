@@ -13,17 +13,19 @@ import me.ykrank.s1next.view.page.post.render.PostRenderIndex
 import me.ykrank.s1next.view.page.post.render.PostRenderItem
 import me.ykrank.s1next.view.page.post.render.PostRenderMapper
 import me.ykrank.s1next.view.page.post.render.PostRenderResult
+import me.ykrank.s1next.view.page.post.share.PostShareSelectionOwner
 
 class HybridPostListRecyclerViewAdapter(
     fragment: Fragment,
     context: Context,
+    postShareSelectionOwner: PostShareSelectionOwner? = null,
 ) : BaseRecyclerViewAdapter(context, true) {
     private val mapper = PostRenderMapper()
-    private val headerDelegate = PostRenderHeaderAdapterDelegate(fragment, context)
-    private val textDelegate = PostRenderTextAdapterDelegate(fragment, context)
-    private val imageDelegate = PostRenderImageAdapterDelegate(fragment, context) { imageUrls }
-    private val fallbackDelegate = PostRenderFallbackAdapterDelegate(fragment, context)
-    private val footerDelegate = PostRenderFooterAdapterDelegate(fragment, context)
+    private val headerDelegate = PostRenderHeaderAdapterDelegate(fragment, context, postShareSelectionOwner)
+    private val textDelegate = PostRenderTextAdapterDelegate(fragment, context, postShareSelectionOwner)
+    private val imageDelegate = PostRenderImageAdapterDelegate(fragment, context, postShareSelectionOwner) { imageUrls }
+    private val fallbackDelegate = PostRenderFallbackAdapterDelegate(fragment, context, postShareSelectionOwner)
+    private val footerDelegate = PostRenderFooterAdapterDelegate(fragment, context, postShareSelectionOwner)
     private val postBlackAdapterDelegate = PostBlackAdapterDelegate(fragment, context)
 
     var renderIndex: PostRenderIndex = PostRenderIndex.EMPTY
@@ -95,5 +97,17 @@ class HybridPostListRecyclerViewAdapter(
             else -> null
         } ?: return null
         return postIds.indexOf(post.id).takeIf { it >= 0 }
+    }
+
+    fun notifyPostShareSelectionChanged(postIds: Set<Int>?) {
+        if (postIds == null) {
+            notifyDataSetChanged()
+            return
+        }
+        postIds.forEach { postId ->
+            renderIndex.rangeByPid[postId]?.forEach { position ->
+                notifyItemChanged(position)
+            }
+        }
     }
 }

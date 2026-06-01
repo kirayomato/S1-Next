@@ -21,6 +21,7 @@ import me.ykrank.s1next.view.adapter.delegate.BaseAdapterDelegate
 import me.ykrank.s1next.view.page.post.render.PostImageSizeCache
 import me.ykrank.s1next.view.page.post.render.PostRenderActions
 import me.ykrank.s1next.view.page.post.render.PostRenderItem
+import me.ykrank.s1next.view.page.post.share.PostShareSelectionOwner
 import me.ykrank.s1next.widget.image.ImageBiz
 import me.ykrank.s1next.widget.image.image
 import me.ykrank.s1next.view.page.post.render.PostActionMenuPopup
@@ -29,6 +30,7 @@ import kotlin.math.roundToInt
 class PostRenderImageAdapterDelegate(
     private val fragment: Fragment,
     context: Context,
+    private val postShareSelectionOwner: PostShareSelectionOwner? = null,
     private val imageUrlsProvider: () -> List<String>,
 ) : BaseAdapterDelegate<PostRenderItem.ImageBlock, PostRenderImageAdapterDelegate.ViewHolder>(
     context,
@@ -57,21 +59,34 @@ class PostRenderImageAdapterDelegate(
         val hasKnownRatio = t.hasKnownRatio()
         val requestHeight = if (hasKnownRatio) bindHeight else Target.SIZE_ORIGINAL
         holder.setImageHeight(bindHeight)
-        holder.image.setOnClickListener {
-            val urls = ArrayList(imageUrlsProvider())
-            GalleryActivity.start(it.context, urls, urls.indexOf(t.url).coerceAtLeast(0))
+        if (postShareSelectionOwner?.postShareSelectionState?.enabled == true) {
+            val clickListener = View.OnClickListener {
+                postShareSelectionOwner.togglePostShareSelection(t.post.id)
+            }
+            holder.itemView.setOnTouchListener(null)
+            holder.image.setOnTouchListener(null)
+            holder.itemView.setOnClickListener(clickListener)
+            holder.image.setOnClickListener(clickListener)
+            holder.itemView.setOnLongClickListener(null)
+            holder.image.setOnLongClickListener(null)
+        } else {
+            holder.image.setOnClickListener {
+                val urls = ArrayList(imageUrlsProvider())
+                GalleryActivity.start(it.context, urls, urls.indexOf(t.url).coerceAtLeast(0))
+            }
+            holder.itemView.setOnClickListener(null)
+            val longClickListener = View.OnLongClickListener {
+                PostRenderActions.showPostActionMenu(it, fragment, threadInfo, pageNum, t.post)
+            }
+            val touchListener = View.OnTouchListener { view, event ->
+                PostActionMenuPopup.recordTouchPoint(view, event)
+                false
+            }
+            holder.itemView.setOnTouchListener(touchListener)
+            holder.image.setOnTouchListener(touchListener)
+            holder.itemView.setOnLongClickListener(longClickListener)
+            holder.image.setOnLongClickListener(longClickListener)
         }
-        val longClickListener = View.OnLongClickListener {
-            PostRenderActions.showPostActionMenu(it, fragment, threadInfo, pageNum, t.post)
-        }
-        val touchListener = View.OnTouchListener { view, event ->
-            PostActionMenuPopup.recordTouchPoint(view, event)
-            false
-        }
-        holder.itemView.setOnTouchListener(touchListener)
-        holder.image.setOnTouchListener(touchListener)
-        holder.itemView.setOnLongClickListener(longClickListener)
-        holder.image.setOnLongClickListener(longClickListener)
 
         val imageBiz = ImageBiz(downloadPreferencesManager)
         Glide.with(holder.image)
