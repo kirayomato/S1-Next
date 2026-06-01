@@ -35,8 +35,16 @@
     <string name="post_share_generating">正在生成分享图片…</string>
     <string name="post_share_image_failed">分享图片生成失败</string>
     <string name="post_share_from_stage1">来自 Stage1 论坛</string>
-    <string name="post_share_code">神秘代码：%1$s</string>
+    <string name="post_share_code">搜索代码：%1$s</string>
     <string name="post_share_preview_title">分享预览</string>
+    <string name="post_share_scan_hint">扫码查看帖子详情</string>
+    <string name="post_share_detail_line">帖子 %1$s · 第 %2$d 页 · #%3$s</string>
+    <string name="post_share_slogan">分享 Stage1 帖子</string>
+    <string name="post_share_brand_title">%1$s 鹅球</string>
+    <string name="post_share_brand_slogan">更好的鹅球</string>
+    <string name="post_share_brand_slogan_prefix">更好的</string>
+    <string name="post_share_brand_slogan_suffix">球</string>
+    <string name="post_share_qr_content_desc">二维码</string>
     <string name="menu_thread_attachment">附件</string>
     <string name="menu_emoticon">表情</string>
     <string name="menu_keyboard">键盘</string>

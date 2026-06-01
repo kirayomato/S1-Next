@@ -58,8 +58,16 @@
     <string name="post_share_generating">Generating share image…</string>
     <string name="post_share_image_failed">Could not generate share image</string>
     <string name="post_share_from_stage1">From Stage1 Forum</string>
-    <string name="post_share_code">Code: %1$s</string>
+    <string name="post_share_code">Search code: %1$s</string>
     <string name="post_share_preview_title">Share preview</string>
+    <string name="post_share_scan_hint">Scan to view this thread</string>
+    <string name="post_share_detail_line">Thread %1$s · Page %2$d · #%3$s</string>
+    <string name="post_share_slogan">Share Stage1 posts</string>
+    <string name="post_share_brand_title">%1$s 鹅球</string>
+    <string name="post_share_brand_slogan">更好的鹅球</string>
+    <string name="post_share_brand_slogan_prefix">更好的</string>
+    <string name="post_share_brand_slogan_suffix">球</string>
+    <string name="post_share_qr_content_desc">QR code</string>
     <string name="menu_thread_attachment">Attachment</string>
     <string name="menu_emoticon">Emoticon</string>
     <string name="menu_keyboard">Keyboard</string>

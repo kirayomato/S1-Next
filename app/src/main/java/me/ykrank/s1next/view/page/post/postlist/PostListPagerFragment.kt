@@ -56,9 +56,9 @@ import me.ykrank.s1next.view.page.app.AppPostListActivity
 import me.ykrank.s1next.view.page.post.adapter.PostAdapterDelegate
 import me.ykrank.s1next.view.page.post.adapter.PostListRecyclerViewAdapter
 import me.ykrank.s1next.view.page.post.adapter.render.HybridPostListRecyclerViewAdapter
-import me.ykrank.s1next.view.page.post.share.PostShareCardRenderer
-import me.ykrank.s1next.view.page.post.share.PostSharePreviewActivity
+import me.ykrank.s1next.view.page.post.share.PostSharePreviewDialogFragment
 import me.ykrank.s1next.view.page.post.share.PostShareRequest
+import me.ykrank.s1next.view.page.post.share.PostShareSelectionPayload
 import me.ykrank.s1next.view.page.post.share.PostShareSelectionOwner
 import me.ykrank.s1next.view.page.post.share.PostShareSelectionState
 import java.util.*
@@ -226,6 +226,15 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
                     startPostShareSelection(event.postId)
                 }
             }, { super.onError(it) })
+
+        parentFragmentManager.setFragmentResultListener(
+            PostSharePreviewDialogFragment.RESULT_REQUEST_KEY,
+            viewLifecycleOwner
+        ) { _, result ->
+            if (result.getBoolean(PostSharePreviewDialogFragment.RESULT_SHARED, false)) {
+                cancelPostShareSelection()
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -371,24 +380,14 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
             showSnackbar(R.string.post_share_image_failed)
             return
         }
-        lifecycleScope.launch {
-            try {
-                showSnackbar(R.string.post_share_generating)
-                val uri = PostShareCardRenderer(requireContext().applicationContext).renderToUri(
-                    PostShareRequest(
-                        threadId = threadId,
-                        threadTitle = mThreadInfo?.title,
-                        page = mPageNum,
-                        posts = posts,
-                    )
-                )
-                PostSharePreviewActivity.start(requireContext(), uri)
-                cancelPostShareSelection()
-            } catch (e: Exception) {
-                L.report(e)
-                showSnackbar(R.string.post_share_image_failed)
-            }
-        }
+        PostSharePreviewDialogFragment.newInstance(
+            PostShareRequest(
+                threadId = threadId,
+                threadTitle = mThreadInfo?.title,
+                page = mPageNum,
+                posts = ArrayList(posts),
+            )
+        ).show(parentFragmentManager, PostSharePreviewDialogFragment.TAG)
     }
 
     override fun togglePostShareSelection(postId: Int) {
@@ -436,12 +435,16 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
             if (hybrid != null) {
                 hybrid.notifyPostShareSelectionChanged(changedPostIds)
             } else if (changedPostIds == null) {
-                mRecyclerAdapter.notifyDataSetChanged()
+                mRecyclerAdapter.notifyItemRangeChanged(
+                    0,
+                    mRecyclerAdapter.itemCount,
+                    PostShareSelectionPayload
+                )
             } else {
                 changedPostIds.forEach { postId ->
                     val index = currentPosts.indexOfFirst { it.id == postId }
                     if (index >= 0) {
-                        mRecyclerAdapter.notifyItemChanged(index)
+                        mRecyclerAdapter.notifyItemChanged(index, PostShareSelectionPayload)
                     }
                 }
             }

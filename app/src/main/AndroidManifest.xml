@@ -125,11 +125,6 @@
             android:windowSoftInputMode="stateVisible|adjustResize" />
 
         <activity
-            android:name=".view.page.post.share.PostSharePreviewActivity"
-            android:colorMode="wideColorGamut"
-            android:configChanges="uiMode" />
-
-        <activity
             android:name=".view.page.app.AppPostListActivity"
             android:colorMode="wideColorGamut"
             android:configChanges="uiMode"
