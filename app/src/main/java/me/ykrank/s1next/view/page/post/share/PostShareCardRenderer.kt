@@ -20,6 +20,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
+import androidx.cardview.widget.CardView
 import androidx.core.content.FileProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -52,8 +53,7 @@ class PostShareCardRenderer(private val context: Context) {
     private val renderMapper = PostRenderMapper()
     private val imageBiz = ImageBiz(App.preAppComponent.downloadPreferencesManager)
     private val afternoonBackgroundColor = context.getColor(com.github.ykrank.androidtools.R.color.saraba_background)
-    private val divideLineColor = context.getColor(com.github.ykrank.androidtools.R.color.grey_500)
-    private val postSeparatorColor = context.getColor(com.github.ykrank.androidtools.R.color.black_12p)
+    private val divideLineColor = context.getColor(com.github.ykrank.androidtools.R.color.black_12p)
     private val textPrimaryColor = context.getColor(com.github.ykrank.androidtools.R.color.black_87p)
     private val textSecondaryColor = context.getColor(com.github.ykrank.androidtools.R.color.black_54p)
     private val accentColor = context.getColor(com.github.ykrank.androidtools.R.color.light_blue_A400)
@@ -70,7 +70,7 @@ class PostShareCardRenderer(private val context: Context) {
             }
             outlineProvider = roundRectOutlineProvider(dp(24))
             clipToOutline = true
-            setPadding(dp(14), 0, dp(14), 0)
+            setPadding(dp(8), 0, dp(8), 0)
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
@@ -97,7 +97,7 @@ class PostShareCardRenderer(private val context: Context) {
     private fun contentCard(request: PostShareRequest): View {
         return LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(dp(12), dp(12), dp(12), dp(12))
+            setPadding(dp(6), dp(12), dp(6), dp(12))
             background = rounded(afternoonBackgroundColor, dp(16))
 
             request.threadTitle?.takeIf { it.isNotBlank() }?.let { title ->
@@ -106,18 +106,15 @@ class PostShareCardRenderer(private val context: Context) {
                         maxLines = 3
                     }
                 )
-                addView(divider(), marginParams(top = dp(8), bottom = dp(10)))
+                addView(divider(), marginParams(height = dp(1), top = dp(8), bottom = dp(8)))
             }
 
             request.posts.forEachIndexed { index, post ->
-                if (index > 0) {
-                    addView(postSeparator(), marginParams(top = dp(10), bottom = dp(10), left = dp(4), right = dp(4)))
-                }
-                addView(postSection(post))
+                addView(postCard(post), marginParams(top = if (index == 0) 0 else dp(2)))
             }
 
-            addView(divider(), marginParams(top = dp(10), bottom = dp(10)))
-            addView(footerRow(request))
+            addView(divider(), marginParams(height = dp(1), top = dp(8), bottom = dp(8)))
+            addView(footerRow(request), marginParams(left = dp(16)))
         }
     }
 
@@ -149,6 +146,18 @@ class PostShareCardRenderer(private val context: Context) {
             if (!hasContent) {
                 addView(textView(" ", BODY_TEXT_SP, textPrimaryColor, Typeface.DEFAULT))
             }
+        }
+    }
+
+    private fun postCard(post: Post): View {
+        return CardView(context).apply {
+            radius = dp(10).toFloat()
+            cardElevation = dpFloat(0.5f)
+            maxCardElevation = dpFloat(0.5f)
+            useCompatPadding = true
+            setCardBackgroundColor(COLOR_POST_CARD_BACKGROUND)
+            setContentPadding(dp(8), dp(6), dp(8), dp(6))
+            addView(postSection(post))
         }
     }
 
@@ -408,20 +417,6 @@ class PostShareCardRenderer(private val context: Context) {
     private fun divider(): View {
         return View(context).apply {
             setBackgroundColor(divideLineColor)
-            layoutParams = LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                dp(1)
-            )
-        }
-    }
-
-    private fun postSeparator(): View {
-        return View(context).apply {
-            setBackgroundColor(postSeparatorColor)
-            layoutParams = LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                dp(2)
-            )
         }
     }
 
@@ -520,6 +515,10 @@ class PostShareCardRenderer(private val context: Context) {
         return (value * context.resources.displayMetrics.density).roundToInt()
     }
 
+    private fun dpFloat(value: Float): Float {
+        return value * context.resources.displayMetrics.density
+    }
+
     private inner class ShareHtmlImageGetter : Html.ImageGetter {
         override fun getDrawable(source: String?): Drawable? {
             val emoticonName = parseEmoticonName(source) ?: return null
@@ -578,12 +577,13 @@ class PostShareCardRenderer(private val context: Context) {
         private const val CACHE_DIR = "post_share"
         private const val BODY_TEXT_SP = 13f
         private const val DEFAULT_IMAGE_RATIO = 0.75f
-        private const val BRAND_SECTION_HEIGHT_DP = 60
+        private const val BRAND_SECTION_HEIGHT_DP = 48
         private const val ASSET_EMOTICON_DIR = "image/emoticon"
         private const val ASSET_GOOSE_EMOTICON = "$ASSET_EMOTICON_DIR/goose2017/001.png"
         private const val URL_EMOTICON_MARKER = "image/smiley/"
         private const val COLOR_PAGE_GRADIENT_START = 0xFFDFF8FE.toInt()
         private const val COLOR_PAGE_GRADIENT_END = 0xFFEEE9FF.toInt()
+        private const val COLOR_POST_CARD_BACKGROUND = 0xFFFAFBF0.toInt()
 
     }
 }
