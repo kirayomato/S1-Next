@@ -81,6 +81,7 @@ class HybridPostListRecyclerViewAdapter(
     }
 
     fun notifyProfileChanged(uid: String, profile: Profile) {
+        headerDelegate.setAuthorProfile(uid, profile)
         dataSet.forEachIndexed { index, item ->
             val post = (item as? PostRenderItem)?.post ?: item as? Post ?: return@forEachIndexed
             if (post.authorId == uid) {

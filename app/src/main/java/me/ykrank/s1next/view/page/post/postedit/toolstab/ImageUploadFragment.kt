@@ -94,6 +94,9 @@ class ImageUploadFragment : LibImageUploadFragment() {
         }
         val binding = ViewImageUploadSourceSwitchBinding.inflate(inflater, container, false)
         sourceBinding = binding
+        binding.uploadOptionsBar.onExpandedChanged = {
+            uploadOptionsExpanded = it
+        }
         binding.forumAttachmentSwitch.isChecked = useForumAttachment
         binding.forumAttachmentSwitch.setOnCheckedChangeListener { _, checked ->
             useForumAttachment = checked
@@ -104,9 +107,6 @@ class ImageUploadFragment : LibImageUploadFragment() {
         binding.originalResolutionSwitch.setOnCheckedChangeListener { _, checked ->
             useOriginalResolution = checked
             updateUploadSourceText()
-        }
-        binding.optionsHeader.setOnClickListener {
-            setUploadOptionsExpanded(!uploadOptionsExpanded)
         }
         updateUploadSourceText()
         setUploadOptionsExpanded(uploadOptionsExpanded)
@@ -148,7 +148,7 @@ class ImageUploadFragment : LibImageUploadFragment() {
                 R.string.image_upload_source_external_hint
             }
         )
-        binding.uploadOptionsTitle.text = getString(
+        binding.uploadOptionsBar.title = getString(
             R.string.image_upload_options_summary,
             getString(
                 if (useForumAttachment) {
@@ -170,14 +170,7 @@ class ImageUploadFragment : LibImageUploadFragment() {
     private fun setUploadOptionsExpanded(expanded: Boolean) {
         uploadOptionsExpanded = expanded
         val binding = sourceBinding ?: return
-        binding.uploadOptionsDetail.visibility = if (expanded) View.VISIBLE else View.GONE
-        binding.expandIcon.setImageResource(
-            if (expanded) {
-                R.drawable.ic_expand_less
-            } else {
-                R.drawable.ic_expand_more
-            }
-        )
+        binding.uploadOptionsBar.isExpanded = expanded
     }
 
     private fun syncForumAttachments() {

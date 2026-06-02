@@ -22,10 +22,8 @@ import me.ykrank.s1next.BuildConfig
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.ApiCacheProvider
 import me.ykrank.s1next.data.api.ApiUtil
-import me.ykrank.s1next.data.api.ProfileProvider
 import me.ykrank.s1next.data.api.S1Service
 import me.ykrank.s1next.data.api.model.Post
-import me.ykrank.s1next.data.api.model.Profile
 import me.ykrank.s1next.data.api.model.Rate
 import me.ykrank.s1next.data.api.model.wrapper.ForumGroupsWrapper
 import me.ykrank.s1next.data.api.model.wrapper.PostsWrapper
@@ -41,7 +39,6 @@ import me.ykrank.s1next.data.pref.DownloadPreferencesManager
 class S1ApiCacheProvider(
     private val downloadPerf: DownloadPreferencesManager,
     private val s1Service: S1Service,
-    private val profileProvider: ProfileProvider,
     private val cacheBiz: CacheBiz,
     private val cacheGroupBiz: CacheGroupBiz,
     private val user: User,
@@ -122,7 +119,6 @@ class S1ApiCacheProvider(
         authorId: String?,
         ignoreCache: Boolean,
         onRateUpdate: ((pid: Int, rate: List<Rate>) -> Unit)?,
-        onProfileUpdate: ((String, Profile) -> Unit)?,
     ): Flow<Resource<PostsWrapper>> {
         val isLogged = user.isLogged
         val cacheType = ApiCacheConstants.CacheType.Posts
@@ -213,8 +209,6 @@ class S1ApiCacheProvider(
 
         // 评分缓存过期的回帖，先展示缓存，然后再刷新
         val outdatedRatePostIds = mutableListOf<Int>()
-        // 需要更新的用户信息
-        val needUpdateUidList = mutableListOf<String>()
         var emitCount = 0
         return apiCacheFlow.getFlow()
             .combineTransform(ratePostFlow) { it, ratePostWrapper ->
@@ -274,12 +268,6 @@ class S1ApiCacheProvider(
                             postList.forEach {
                                 if (it.rates?.size != 0) {
                                     loadRatesFromCache(it)
-                                }
-                                val authorId = it.authorId
-                                if (authorId != null) {
-                                    it.profile = profileProvider.getProfileCaches(authorId)
-                                    if (it.profile == null)
-                                        needUpdateUidList.add(authorId)
                                 }
                             }
 
@@ -346,11 +334,6 @@ class S1ApiCacheProvider(
                                 }
                             }
                         }
-                    }
-
-                    // 获取用户信息
-                    if (needUpdateUidList.isNotEmpty()) {
-                        profileProvider.getProfiles(needUpdateUidList, onProfileUpdate)
                     }
                 } else if (it.isSuccess && emitCount == 0) {
                     loadTime.addPoint("posts emit cache ${it.source.name} ${it.data?.data?.postList?.size}")

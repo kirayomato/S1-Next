@@ -463,7 +463,6 @@ class PostShareCardRenderer(private val context: Context) {
     }
 
     private fun postMeta(post: Post): CharSequence {
-        val goose = post.profile?.goose?.takeIf { it.isNotBlank() }.orEmpty()
         val time = if (post.dateTime > 0) {
             DateUtils.getRelativeDateTimeString(
                 context,
@@ -475,7 +474,7 @@ class PostShareCardRenderer(private val context: Context) {
         } else {
             ""
         }
-        return listOf(goose, time).filter { it.isNotBlank() }.joinToString(" · ")
+        return time
     }
 
     private fun assetImage(assetPath: String, targetSize: Int): ImageView {

@@ -33,6 +33,9 @@ class Profile() : Account(), Parcelable {
     var lastPostDate: Long? = null
 
     @JsonIgnore
+    var gooseValue: Int? = null
+
+    @JsonIgnore
     var stats: List<Pair<String, String>> = listOf()
 
     @JsonIgnore
@@ -42,7 +45,7 @@ class Profile() : Account(), Parcelable {
 
     val goose: String?
         get() =
-            stats.firstOrNull { it.first == "战斗力" }?.second
+            gooseValue?.toString() ?: stats.firstOrNull { it.first == "战斗力" }?.second
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -62,6 +65,7 @@ class Profile() : Account(), Parcelable {
         if (lastVisitDate != other.lastVisitDate) return false
         if (lastActiveDate != other.lastActiveDate) return false
         if (lastPostDate != other.lastPostDate) return false
+        if (gooseValue != other.gooseValue) return false
         if (stats != other.stats) return false
         if (manager != other.manager) return false
 
@@ -82,6 +86,7 @@ class Profile() : Account(), Parcelable {
         result = 31 * result + (lastVisitDate?.hashCode() ?: 0)
         result = 31 * result + (lastActiveDate?.hashCode() ?: 0)
         result = 31 * result + (lastPostDate?.hashCode() ?: 0)
+        result = 31 * result + (gooseValue ?: 0)
         result = 31 * result + stats.hashCode()
         result = 31 * result + (manager?.hashCode() ?: 0)
         return result
@@ -102,6 +107,7 @@ class Profile() : Account(), Parcelable {
         this.lastVisitDate = space?.get("lastvisit")?.asLong()
         this.lastActiveDate = space?.get("lastactivity")?.asLong()
         this.lastPostDate = space?.get("lastpost")?.asLong()
+        this.gooseValue = parseGoose(extCredits)
     }
 
     companion object {
@@ -184,11 +190,40 @@ class Profile() : Account(), Parcelable {
                     }
                 }
                 profile.stats = stats
+                profile.gooseValue = stats.firstOrNull { it.first == "战斗力" }?.second?.trim()?.toIntOrNull()
             } catch (e: Exception) {
                 L.report(e)
             }
 
             return profile
+        }
+
+        private fun parseGoose(extCredits: JsonNode?): Int? {
+            if (extCredits == null || extCredits.isNull) {
+                return null
+            }
+            extCredits.get("战斗力")?.asText()?.trim()?.toIntOrNull()?.let {
+                return it
+            }
+            val fields = extCredits.fields()
+            while (fields.hasNext()) {
+                val entry = fields.next()
+                val node = entry.value
+                if (entry.key == "战斗力" ||
+                    node.get("title")?.asText() == "战斗力" ||
+                    node.get("name")?.asText() == "战斗力"
+                ) {
+                    listOf("value", "credits", "credit").forEach { key ->
+                        node.get(key)?.asText()?.trim()?.toIntOrNull()?.let {
+                            return it
+                        }
+                    }
+                    node.asText()?.trim()?.toIntOrNull()?.let {
+                        return it
+                    }
+                }
+            }
+            return null
         }
     }
 }

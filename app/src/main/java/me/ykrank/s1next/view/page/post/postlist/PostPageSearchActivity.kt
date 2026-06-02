@@ -38,6 +38,7 @@ import me.ykrank.s1next.data.cache.api.ApiCacheFlow
 import me.ykrank.s1next.data.cache.biz.CacheBiz
 import me.ykrank.s1next.util.HtmlUtils
 import me.ykrank.s1next.view.activity.BaseActivity
+import me.ykrank.s1next.widget.CollapsibleInfoBar
 import org.jsoup.Jsoup
 import kotlin.math.max
 import kotlin.math.min
@@ -47,6 +48,7 @@ class PostPageSearchActivity : BaseActivity() {
     private lateinit var searchView: SearchView
     private lateinit var recyclerView: RecyclerView
     private lateinit var stateView: TextView
+    private lateinit var scopeBar: CollapsibleInfoBar
     private lateinit var scopeSwitch: SwitchCompat
     private lateinit var scopeTitleView: TextView
     private lateinit var scopeHintView: TextView
@@ -63,6 +65,7 @@ class PostPageSearchActivity : BaseActivity() {
         searchView = findViewById(R.id.search_view)
         recyclerView = findViewById(R.id.search_results)
         stateView = findViewById(R.id.search_state)
+        scopeBar = findViewById(R.id.search_scope_container)
         scopeSwitch = findViewById(R.id.search_scope_switch)
         scopeTitleView = findViewById(R.id.search_scope_title)
         scopeHintView = findViewById(R.id.search_scope_hint)
@@ -144,14 +147,18 @@ class PostPageSearchActivity : BaseActivity() {
     private fun updateScopeText(cachedPageCount: Int?) {
         val currentPayload = payload
         if (scopeSwitch.isChecked) {
-            scopeTitleView.setText(R.string.post_page_search_scope_cached)
+            val title = getString(R.string.post_page_search_scope_cached)
+            scopeBar.title = title
+            scopeTitleView.text = title
             scopeHintView.text = if (cachedPageCount != null) {
                 getString(R.string.post_page_search_scope_cached_hint_loaded, cachedPageCount)
             } else {
                 getString(R.string.post_page_search_scope_cached_hint)
             }
         } else {
-            scopeTitleView.setText(R.string.post_page_search_scope_current)
+            val title = getString(R.string.post_page_search_scope_current)
+            scopeBar.title = title
+            scopeTitleView.text = title
             scopeHintView.text = getString(
                 R.string.post_page_search_scope_current_hint,
                 currentPayload?.currentPageNum ?: 1

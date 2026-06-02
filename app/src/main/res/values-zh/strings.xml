@@ -129,6 +129,11 @@
     <string name="post_action_feedback">反馈</string>
     <string name="post_action_app_feedback">APP反馈</string>
     <string name="post_action_forum_report">论坛举报</string>
+    <string name="post_author_registered_within_week">1周内注册</string>
+    <string name="post_author_registered_within_month">1月内注册</string>
+    <string name="post_author_registered_within_three_months">3月内注册</string>
+    <string name="post_author_registered_within_six_months">6月内注册</string>
+    <string name="post_author_registered_within_year">1年内注册</string>
     <string name="title_post_copy">复制帖子</string>
     <string name="post_copy_text_only">仅文本</string>
     <string name="post_copy_image_placeholder">[图片]</string>

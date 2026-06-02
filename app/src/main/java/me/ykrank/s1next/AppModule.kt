@@ -21,6 +21,7 @@ import me.ykrank.s1next.data.cache.api.S1ApiCacheProvider
 import me.ykrank.s1next.data.cache.biz.CacheBiz
 import me.ykrank.s1next.data.cache.biz.CacheGroupBiz
 import me.ykrank.s1next.data.db.biz.BlackListBiz
+import me.ykrank.s1next.data.db.biz.UserProfileBiz
 import me.ykrank.s1next.data.pref.AppDataPreferencesManager
 import me.ykrank.s1next.data.pref.DownloadPreferencesManager
 import me.ykrank.s1next.data.pref.NetworkPreferencesManager
@@ -156,10 +157,9 @@ class AppModule {
     @AppLife
     fun providerProfileProvider(
         s1Service: S1Service,
-        cacheBiz: CacheBiz,
-        downloadPreferencesManager: DownloadPreferencesManager,
+        userProfileBiz: UserProfileBiz,
     ): ProfileProvider {
-        return S1ProfileProvider(s1Service, cacheBiz, downloadPreferencesManager)
+        return S1ProfileProvider(s1Service, userProfileBiz)
     }
 
     @Provides
@@ -168,7 +168,6 @@ class AppModule {
         context: Context,
         downloadPreferencesManager: DownloadPreferencesManager,
         s1Service: S1Service,
-        profileProvider: ProfileProvider,
         cacheBiz: CacheBiz,
         cacheGroupBiz: CacheGroupBiz,
         user: User,
@@ -178,7 +177,6 @@ class AppModule {
         return S1ApiCacheProvider(
             downloadPreferencesManager,
             s1Service,
-            profileProvider,
             cacheBiz,
             cacheGroupBiz,
             user,

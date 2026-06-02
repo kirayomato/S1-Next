@@ -90,10 +90,6 @@ class Post : PaperParcelable, Cloneable, DiffSameItem, StableIdModel {
     @JsonProperty("_isOp")
     var isOpPost: Boolean = false
 
-    @JsonProperty("_profile")
-    var profile: Profile? = null
-
-
     constructor()
 
     @JsonCreator
@@ -209,7 +205,6 @@ class Post : PaperParcelable, Cloneable, DiffSameItem, StableIdModel {
         if (banned != other.banned) return false
         if (rates != other.rates) return false
         if (isOpPost != other.isOpPost) return false
-        if (profile != other.profile) return false
 
         return true
     }
@@ -232,7 +227,6 @@ class Post : PaperParcelable, Cloneable, DiffSameItem, StableIdModel {
         result = 31 * result + banned.hashCode()
         result = 31 * result + (rates?.hashCode() ?: 0)
         result = 31 * result + isOpPost.hashCode()
-        result = 31 * result + (profile?.hashCode() ?: 0)
         return result
     }
 

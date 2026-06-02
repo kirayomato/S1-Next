@@ -17,6 +17,7 @@ import me.ykrank.s1next.data.db.biz.HistoryBiz
 import me.ykrank.s1next.data.db.biz.LoginUserBiz
 import me.ykrank.s1next.data.db.biz.ReadProgressBiz
 import me.ykrank.s1next.data.db.biz.ThreadBiz
+import me.ykrank.s1next.data.db.biz.UserProfileBiz
 import me.ykrank.s1next.task.AutoSignTask
 import me.ykrank.s1next.view.activity.BaseActivity
 import me.ykrank.s1next.view.activity.ForumActivity
@@ -127,6 +128,7 @@ interface AppComponent {
     val threadBiz: ThreadBiz
     val historyBiz: HistoryBiz
     val loginUserBiz: LoginUserBiz
+    val userProfileBiz: UserProfileBiz
     val cacheBiz: CacheBiz
 
     //endregion

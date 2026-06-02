@@ -15,6 +15,7 @@ import me.ykrank.s1next.data.db.biz.HistoryBiz
 import me.ykrank.s1next.data.db.biz.LoginUserBiz
 import me.ykrank.s1next.data.db.biz.ReadProgressBiz
 import me.ykrank.s1next.data.db.biz.ThreadBiz
+import me.ykrank.s1next.data.db.biz.UserProfileBiz
 import me.ykrank.s1next.widget.encrypt.AndroidStoreEncryption
 import me.ykrank.s1next.widget.encrypt.Encryption
 
@@ -62,6 +63,11 @@ class DbModule {
         return LoginUserBiz(manager, encryption)
     }
 
+    @Provides
+    @AppLife
+    fun provideUserProfileBiz(manager: AppDatabaseManager, objectMapper: ObjectMapper): UserProfileBiz {
+        return UserProfileBiz(manager, objectMapper)
+    }
 
     @Provides
     @AppLife

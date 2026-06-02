@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:id="@+id/collapsible_info_bar_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:foreground="?attr/selectableItemBackground"
+        android:gravity="center_vertical"
+        android:minHeight="32dp"
+        android:orientation="horizontal"
+        android:paddingLeft="@dimen/item_padding"
+        android:paddingRight="@dimen/item_padding_small"
+        android:paddingStart="@dimen/item_padding"
+        android:paddingEnd="@dimen/item_padding_small">
+
+        <TextView
+            android:id="@+id/collapsible_info_bar_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textStyle="bold"
+            tools:text="Forum attachment upload · Limit 2000" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/collapsible_info_bar_expand_icon"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:padding="4dp"
+            app:srcCompat="@drawable/ic_expand_more"
+            app:tint="?android:attr/textColorPrimary" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/collapsible_info_bar_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/item_padding"
+        android:paddingRight="@dimen/item_padding"
+        android:paddingBottom="@dimen/spacing_micro"
+        android:paddingStart="@dimen/item_padding"
+        android:paddingEnd="@dimen/item_padding"
+        android:visibility="gone" />
+
+</merge>

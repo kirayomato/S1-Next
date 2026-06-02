@@ -12,17 +12,15 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
+import kotlinx.coroutines.withContext
 import me.ykrank.s1next.data.api.model.Profile
-import me.ykrank.s1next.data.cache.CacheConstants
-import me.ykrank.s1next.data.cache.biz.CacheBiz
 import me.ykrank.s1next.data.cache.exmodel.BaseCache
-import me.ykrank.s1next.data.pref.DownloadPreferencesManager
+import me.ykrank.s1next.data.db.biz.UserProfileBiz
 import java.util.concurrent.ConcurrentHashMap
 
 class S1ProfileProvider(
     private val s1Service: S1Service,
-    private val cacheBiz: CacheBiz,
-    private val downloadPreferencesManager: DownloadPreferencesManager,
+    private val userProfileBiz: UserProfileBiz,
 ) : ProfileProvider {
 
     private val profileCache = LruCache<String, BaseCache<Profile>>(500)
@@ -33,27 +31,70 @@ class S1ProfileProvider(
     private val _profileUpdateFlow = MutableSharedFlow<Pair<String, Profile>>()
     override val profileUpdateFlow = _profileUpdateFlow.asSharedFlow()
 
-    override fun getProfileCaches(userId: String): Profile? {
-        val cache = profileCache.get(userId)
-        if (cache != null && System.currentTimeMillis() - cache.time < MEMORY_CACHE_PROFILE_MILLS) {
-            return cache.data
+    override suspend fun getProfile(userId: String, forceRefresh: Boolean): Profile? {
+        var cachedProfile: Profile? = null
+        if (!forceRefresh) {
+            val memoryCache = profileCache.get(userId)
+            if (memoryCache != null && !isExpired(memoryCache.time)) {
+                return memoryCache.data
+            }
+            val dbCache = withContext(Dispatchers.IO) {
+                userProfileBiz.getProfile(userId)
+            }
+            if (dbCache != null) {
+                cachedProfile = dbCache.profile
+                profileCache.put(userId, BaseCache(dbCache.updatedAt, dbCache.profile))
+                if (!isExpired(dbCache.updatedAt)) {
+                    return dbCache.profile
+                }
+            }
         }
-        return getProfileDiskCache(userId)?.also {
-            profileCache.put(userId, BaseCache(System.currentTimeMillis(), it))
+
+        return refreshProfile(userId) ?: cachedProfile
+    }
+
+    override fun getProfiles(
+        authorIds: List<String>,
+        onProfileUpdate: ((uid: String, profile: Profile) -> Unit)?
+    ) {
+        authorIds.distinct().forEach { authorId ->
+            scope.launch {
+                val cachedProfile = loadCachedProfile(authorId)
+                if (cachedProfile != null) {
+                    launch(Dispatchers.Main) {
+                        onProfileUpdate?.invoke(authorId, cachedProfile.profile)
+                    }
+                }
+                if (cachedProfile == null || isExpired(cachedProfile.updatedAt)) {
+                    refreshProfile(authorId)?.let { profile ->
+                        launch(Dispatchers.Main) {
+                            onProfileUpdate?.invoke(authorId, profile)
+                        }
+                    }
+                }
+            }
         }
     }
 
-    override suspend fun getProfile(userId: String, forceRefresh: Boolean): Profile? {
-        if (!forceRefresh) {
-            getProfileCaches(userId)?.let { return it }
+    private fun loadCachedProfile(userId: String): UserProfileBiz.CachedProfile? {
+        val memoryCache = profileCache.get(userId)
+        if (memoryCache != null) {
+            return UserProfileBiz.CachedProfile(memoryCache.data, memoryCache.time)
         }
+        return userProfileBiz.getProfile(userId)?.also {
+            profileCache.put(userId, BaseCache(it.updatedAt, it.profile))
+        }
+    }
 
+    private suspend fun refreshProfile(userId: String): Profile? {
         val deferred = activeRequests.computeIfAbsent(userId) { id ->
             L.d("ProfileProvider: No active request for $id. Starting new network call.")
             scope.async {
                 try {
                     requestSemaphore.withPermit {
-                        fetchProfileFromApi(id)
+                        fetchProfileFromApi(id)?.let { profile ->
+                            putProfileCache(id, profile).profile
+                        }
                     }
                 } catch (e: Exception) {
                     L.report(e)
@@ -66,84 +107,41 @@ class S1ProfileProvider(
         }
 
         return try {
-            deferred.await()?.also { profile ->
-                putProfileCache(userId, profile)
-            }
+            deferred.await()
         } catch (e: Exception) {
             L.e("ProfileProvider: Error awaiting profile for id:$userId", e)
             null
         }
     }
 
-    override fun getProfiles(
-        authorIds: List<String>,
-        onProfileUpdate: ((uid: String, profile: Profile) -> Unit)?
-    ) {
-        authorIds.distinct().forEach { authorId ->
-            scope.launch {
-                getProfile(authorId)?.let { profile ->
-                    launch(Dispatchers.Main) {
-                        onProfileUpdate?.invoke(authorId, profile)
-                    }
-                }
-            }
-
-        }
-    }
-
-
     private suspend fun fetchProfileFromApi(uid: String): Profile? {
         try {
             val htmlResponse = s1Service.getProfileWeb(
                 "${Api.BASE_URL}space-uid-${uid}.html", uid
             )
-            val profile = Profile.fromHtml(htmlResponse)
-            saveProfileDiskCache(uid, htmlResponse)
-            return profile
+            return Profile.fromHtml(htmlResponse)
         } catch (e: Exception) {
             L.report(e)
             return null
         }
     }
 
-    private fun putProfileCache(uid: String, profile: Profile) {
-        profileCache.put(uid, BaseCache(System.currentTimeMillis(), profile))
+    private fun putProfileCache(uid: String, profile: Profile): UserProfileBiz.CachedProfile {
+        val cachedProfile = userProfileBiz.saveProfile(uid, profile)
+        profileCache.put(uid, BaseCache(cachedProfile.updatedAt, cachedProfile.profile))
         scope.launch {
-            _profileUpdateFlow.emit(uid to profile)
+            _profileUpdateFlow.emit(uid to cachedProfile.profile)
         }
+        return cachedProfile
     }
 
-    private fun getProfileDiskCache(uid: String): Profile? {
-        val cache = cacheBiz.getTextZipNewest(listOf(CacheConstants.GROUP_PROFILE, uid)) ?: return null
-        if (System.currentTimeMillis() - cache.timestamp > DISK_CACHE_PROFILE_MILLS) {
-            return null
-        }
-        val html = cache.decodeZipString ?: return null
-        return runCatching {
-            Profile.fromHtml(html)
-        }.onFailure {
-            L.report(it)
-        }.getOrNull()
-    }
-
-    private fun saveProfileDiskCache(uid: String, html: String) {
-        cacheBiz.saveZipAsync(
-            profileCacheKey(uid),
-            uid.toIntOrNull(),
-            html,
-            maxSize = downloadPreferencesManager.totalDataCacheSize,
-            groups = listOf(CacheConstants.GROUP_PROFILE, uid)
-        )
-    }
-
-    private fun profileCacheKey(uid: String): String {
-        return "${CacheConstants.GROUP_PROFILE}#$uid"
+    private fun isExpired(updatedAt: Long): Boolean {
+        return System.currentTimeMillis() - updatedAt > DB_CACHE_PROFILE_MILLS
     }
 
     companion object {
         const val TAG = "S1Profile"
         const val MAX_CONCURRENT_PROFILE_REQUESTS = 5
-        const val MEMORY_CACHE_PROFILE_MILLS = 5 * 60 * 1_000L
-        const val DISK_CACHE_PROFILE_MILLS = 24 * 60 * 60 * 1_000L
+        const val DB_CACHE_PROFILE_MILLS = 24 * 60 * 60 * 1_000L
     }
 }

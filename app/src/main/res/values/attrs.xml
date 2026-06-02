@@ -13,4 +13,9 @@
     <attr name="iconPostToolMenuExtension" format="reference" />
 
     <attr name="iconPostToolTintColor" format="color" />
+
+    <declare-styleable name="CollapsibleInfoBar">
+        <attr name="collapsibleInfoBarTitle" format="string|reference" />
+        <attr name="collapsibleInfoBarExpanded" format="boolean" />
+    </declare-styleable>
 </resources>

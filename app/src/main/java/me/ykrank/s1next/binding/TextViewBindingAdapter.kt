@@ -20,6 +20,7 @@ import android.view.TouchDelegate
 import android.view.View
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
+import androidx.core.graphics.ColorUtils
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.github.ykrank.androidtools.util.ResourceUtil
@@ -362,21 +363,98 @@ object TextViewBindingAdapter {
     @JvmStatic
     @BindingAdapter("goose")
     fun setGoose(textView: TextView, goose: String?) {
-        if (goose.isNullOrEmpty()) {
-            textView.setTextColor(textView.textColors)
+        val normalizedGoose = normalizeGoose(goose)
+        val gooseValue = normalizedGoose?.let { GOOSE_VALUE_REGEX.find(it)?.value?.toIntOrNull() }
+        if (gooseValue == null) {
+            if (normalizedGoose?.startsWith("-") == true) {
+                textView.setTextColor(
+                    ResourceUtil.getAttrColorInt(
+                        textView.context,
+                        com.github.ykrank.androidtools.R.attr.textColorError
+                    )
+                )
+            } else {
+                textView.setTextColor(ResourceUtil.getTextColorPrimary(textView.context))
+            }
             return
         }
 
-        when {
-            // 负鹅标红
-            goose.startsWith("-") -> {
-                textView.setTextColor(Color.RED)
-            }
+        if (gooseValue >= 0) {
+            textView.setTextColor(ResourceUtil.getTextColorPrimary(textView.context))
+            return
+        }
+        val color = if (gooseValue < -10) {
+            ResourceUtil.getAttrColorInt(
+                textView.context,
+                com.github.ykrank.androidtools.R.attr.textColorError
+            )
+        } else {
+            ResourceUtil.getAttrColorInt(
+                textView.context,
+                com.github.ykrank.androidtools.R.attr.textColorWarning
+            )
+        }
+        textView.setTextColor(color)
+    }
 
-            // 正鹅默认颜色
-            else -> {
-                textView.setTextColor(ResourceUtil.getTextColorPrimary(textView.context))
-            }
+    private fun normalizeGoose(goose: String?): String? {
+        return goose?.trim()?.replace('−', '-')
+    }
+
+    @JvmStatic
+    @BindingAdapter("registrationAge")
+    fun setRegistrationAge(textView: TextView, regDate: Long?) {
+        val bucket = registrationAgeBucket(regDate)
+        if (bucket == null) {
+            textView.text = null
+            textView.visibility = View.GONE
+            return
+        }
+        textView.visibility = View.VISIBLE
+        textView.setText(bucket.labelRes)
+        textView.setTextColor(registrationAgeColor(textView.context, bucket))
+    }
+
+    private fun registrationAgeBucket(regDate: Long?): RegistrationAgeBucket? {
+        if (regDate == null || regDate <= 0) {
+            return null
+        }
+        val ageSeconds = System.currentTimeMillis() / 1000 - regDate
+        return when {
+            ageSeconds < 0 -> null
+            ageSeconds <= WEEK_SECONDS -> RegistrationAgeBucket.WEEK
+            ageSeconds <= MONTH_SECONDS -> RegistrationAgeBucket.MONTH
+            ageSeconds <= THREE_MONTH_SECONDS -> RegistrationAgeBucket.THREE_MONTHS
+            ageSeconds <= SIX_MONTH_SECONDS -> RegistrationAgeBucket.SIX_MONTHS
+            ageSeconds <= YEAR_SECONDS -> RegistrationAgeBucket.YEAR
+            else -> null
         }
     }
+
+    private fun registrationAgeColor(context: Context, bucket: RegistrationAgeBucket): Int {
+        val primary = ResourceUtil.getAttrColorInt(context, androidx.appcompat.R.attr.colorAccent)
+        val hint = ResourceUtil.getAttrColorInt(
+            context,
+            com.github.ykrank.androidtools.R.attr.textColorHint
+        )
+        return ColorUtils.blendARGB(primary, hint, bucket.hintRatio)
+    }
+
+    private enum class RegistrationAgeBucket(
+        val labelRes: Int,
+        val hintRatio: Float,
+    ) {
+        WEEK(R.string.post_author_registered_within_week, 0f),
+        MONTH(R.string.post_author_registered_within_month, 0.18f),
+        THREE_MONTHS(R.string.post_author_registered_within_three_months, 0.36f),
+        SIX_MONTHS(R.string.post_author_registered_within_six_months, 0.54f),
+        YEAR(R.string.post_author_registered_within_year, 0.72f),
+    }
+
+    private const val WEEK_SECONDS = 7 * 24 * 60 * 60L
+    private const val MONTH_SECONDS = 30 * 24 * 60 * 60L
+    private const val THREE_MONTH_SECONDS = 90 * 24 * 60 * 60L
+    private const val SIX_MONTH_SECONDS = 180 * 24 * 60 * 60L
+    private const val YEAR_SECONDS = 365 * 24 * 60 * 60L
+    private val GOOSE_VALUE_REGEX = Regex("^[+-]?\\d+")
 }

@@ -36,7 +36,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.ykrank.s1next.App
 import me.ykrank.s1next.R
+import me.ykrank.s1next.data.api.ProfileProvider
 import me.ykrank.s1next.data.api.model.Post
+import me.ykrank.s1next.data.api.model.Profile
 import me.ykrank.s1next.data.api.model.Thread
 import me.ykrank.s1next.data.api.model.collection.Posts
 import me.ykrank.s1next.data.api.model.wrapper.PostsWrapper
@@ -53,7 +55,6 @@ import me.ykrank.s1next.view.fragment.BaseRecyclerViewFragment
 import me.ykrank.s1next.view.internal.LoadingViewModelBindingDelegateQuickSidebarImpl
 import me.ykrank.s1next.view.internal.PagerScrollState
 import me.ykrank.s1next.view.page.app.AppPostListActivity
-import me.ykrank.s1next.view.page.post.adapter.PostAdapterDelegate
 import me.ykrank.s1next.view.page.post.adapter.PostListRecyclerViewAdapter
 import me.ykrank.s1next.view.page.post.adapter.render.HybridPostListRecyclerViewAdapter
 import me.ykrank.s1next.view.page.post.share.PostSharePreviewDialogFragment
@@ -82,6 +83,9 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
 
     @Inject
     internal lateinit var objectMapper: ObjectMapper
+
+    @Inject
+    internal lateinit var profileProvider: ProfileProvider
 
     private var mThreadId: String? = null
     private var mPageNum: Int = 0
@@ -561,22 +565,6 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
                         }
                     }
                 }
-            },
-            { uid, profile ->
-                currentPosts.forEachIndexed { index, post ->
-                    if (post.authorId == uid) {
-                        post.profile = profile
-                        val hybrid = mRecyclerAdapter as? HybridPostListRecyclerViewAdapter
-                        if (hybrid != null) {
-                            hybrid.notifyProfileChanged(uid, profile)
-                        } else {
-                            val payload = Bundle().apply {
-                                putString(PostAdapterDelegate.KEY_GOOSE_UPDATE, profile.goose)
-                            }
-                            mRecyclerAdapter.notifyItemChanged(index, payload)
-                        }
-                    }
-                }
             }
         )
     }
@@ -629,6 +617,7 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
             val postListInfo = posts?.postListInfo as Thread
             currentPosts = postList
             mThreadInfo = postListInfo
+            loadAuthorProfiles(postList)
             val submitCallback: () -> Unit = {
                 if (blacklistChanged) {
                     blacklistChanged = false
@@ -689,6 +678,28 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
                 mPagerCallback?.setupThreadAttachment(it)
             }
         }
+    }
+
+    private fun loadAuthorProfiles(posts: List<Post>) {
+        val authorIds = posts.mapNotNull { it.authorId }.distinct()
+        if (authorIds.isEmpty()) {
+            return
+        }
+        profileProvider.getProfiles(authorIds) { uid, profile ->
+            if (!isAdded || !this::mRecyclerAdapter.isInitialized) {
+                return@getProfiles
+            }
+            notifyAuthorProfileChanged(uid, profile)
+        }
+    }
+
+    private fun notifyAuthorProfileChanged(uid: String, profile: Profile) {
+        val hybrid = mRecyclerAdapter as? HybridPostListRecyclerViewAdapter
+        if (hybrid != null) {
+            hybrid.notifyProfileChanged(uid, profile)
+            return
+        }
+        (mRecyclerAdapter as? PostListRecyclerViewAdapter)?.notifyProfileChanged(uid, profile)
     }
 
     override fun onError(throwable: Throwable) {

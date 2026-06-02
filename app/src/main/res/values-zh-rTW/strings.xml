@@ -230,6 +230,11 @@
     <string name="post_action_feedback">反饋</string>
     <string name="post_action_app_feedback">APP反饋</string>
     <string name="post_action_forum_report">論壇舉報</string>
+    <string name="post_author_registered_within_week">1週內註冊</string>
+    <string name="post_author_registered_within_month">1月內註冊</string>
+    <string name="post_author_registered_within_three_months">3月內註冊</string>
+    <string name="post_author_registered_within_six_months">6月內註冊</string>
+    <string name="post_author_registered_within_year">1年內註冊</string>
     <string name="title_post_copy">複製帖子</string>
     <string name="post_copy_text_only">僅文本</string>
     <string name="post_copy_image_placeholder">[圖片]</string>

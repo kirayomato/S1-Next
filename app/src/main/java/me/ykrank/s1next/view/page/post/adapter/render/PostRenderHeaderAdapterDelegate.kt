@@ -10,7 +10,9 @@ import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewHolder
 import com.github.ykrank.androidtools.widget.EventBus
 import me.ykrank.s1next.App
 import me.ykrank.s1next.R
+import me.ykrank.s1next.binding.TextViewBindingAdapter
 import me.ykrank.s1next.data.User
+import me.ykrank.s1next.data.api.model.Profile
 import me.ykrank.s1next.data.api.model.Thread
 import me.ykrank.s1next.data.pref.GeneralPreferencesManager
 import me.ykrank.s1next.databinding.ItemPostRenderHeaderBinding
@@ -36,6 +38,7 @@ class PostRenderHeaderAdapterDelegate(
 
     private var threadInfo: Thread? = null
     private var pageNum: Int = 1
+    private val authorProfiles = mutableMapOf<String, Profile>()
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
         val binding = DataBindingUtil.inflate<ItemPostRenderHeaderBinding>(
@@ -58,14 +61,30 @@ class PostRenderHeaderAdapterDelegate(
             bindShareSelection(holder.binding, t.post)
             return
         }
+        if (payloads.any { it is Profile }) {
+            val profile = t.post.authorId?.let { authorProfiles[it] }
+            holder.binding.postViewModel?.authorProfile?.set(profile)
+            holder.binding.executePendingBindings()
+            bindAuthorProfile(holder.binding, profile)
+            return
+        }
         holder.binding.quickSidebarEnable = generalPreferencesManager.isQuickSideBarEnable
         holder.binding.postViewModel?.let {
             it.thread.set(threadInfo)
             it.pageNum.set(pageNum)
             it.post.set(t.post)
+            it.authorProfile.set(t.post.authorId?.let { authorProfiles[it] })
         }
         holder.binding.executePendingBindings()
+        bindAuthorProfile(holder.binding, t.post.authorId?.let { authorProfiles[it] })
         bindShareSelection(holder.binding, t.post)
+    }
+
+    private fun bindAuthorProfile(binding: ItemPostRenderHeaderBinding, profile: Profile?) {
+        val goose = profile?.goose
+        binding.goose.text = goose
+        TextViewBindingAdapter.setGoose(binding.goose, goose)
+        TextViewBindingAdapter.setRegistrationAge(binding.registrationAge, profile?.regDate)
     }
 
     private fun bindShareSelection(binding: ItemPostRenderHeaderBinding, post: me.ykrank.s1next.data.api.model.Post) {
@@ -80,8 +99,8 @@ class PostRenderHeaderAdapterDelegate(
             binding.avatar,
             binding.authorName,
             binding.goose,
+            binding.registrationAge,
             binding.originalPosterTag,
-            binding.tvOnlySeeHim,
             binding.tvDatetime,
             binding.tvFloor
         )
@@ -99,13 +118,11 @@ class PostRenderHeaderAdapterDelegate(
             binding.threadTitle.setOnClickListener(null)
             binding.authorName.setOnClickListener(null)
             binding.goose.setOnClickListener(null)
+            binding.registrationAge.setOnClickListener(null)
             binding.originalPosterTag.setOnClickListener(null)
             binding.tvDatetime.setOnClickListener(null)
             binding.avatar.setOnClickListener {
                 binding.postViewModel?.onAvatarClick(it)
-            }
-            binding.tvOnlySeeHim.setOnClickListener {
-                binding.postViewModel?.onOnlySeeHimClick(it)
             }
             binding.postShareScrim.setOnClickListener(null)
             binding.postShareScrim.isClickable = false
@@ -125,5 +142,9 @@ class PostRenderHeaderAdapterDelegate(
     fun setThreadInfo(threadInfo: Thread, pageNum: Int) {
         this.threadInfo = threadInfo
         this.pageNum = pageNum
+    }
+
+    fun setAuthorProfile(uid: String, profile: Profile) {
+        authorProfiles[uid] = profile
     }
 }

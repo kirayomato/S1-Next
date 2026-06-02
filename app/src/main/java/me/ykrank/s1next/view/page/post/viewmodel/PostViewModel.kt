@@ -15,6 +15,7 @@ import me.ykrank.s1next.R
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.data.api.model.Post
+import me.ykrank.s1next.data.api.model.Profile
 import me.ykrank.s1next.data.api.model.Thread
 import me.ykrank.s1next.data.api.model.Vote
 import me.ykrank.s1next.view.activity.UserHomeActivity
@@ -26,7 +27,6 @@ import me.ykrank.s1next.view.event.ReportEvent
 import me.ykrank.s1next.view.event.VotePostEvent
 import me.ykrank.s1next.view.internal.BlacklistMenuAction
 import me.ykrank.s1next.view.page.app.AppPostListActivity
-import me.ykrank.s1next.view.page.post.postlist.PostListActivity
 import me.ykrank.s1next.view.page.post.render.PostRenderActions
 
 class PostViewModel(
@@ -36,6 +36,7 @@ class PostViewModel(
 ) {
 
     val post = ObservableField<Post>()
+    val authorProfile = ObservableField<Profile>()
     val thread = ObservableField<Thread>()
     val vote = ObservableField<Vote>()
     val floor = ObservableField<CharSequence>()
@@ -175,14 +176,6 @@ class PostViewModel(
         val t = thread.get()
         if (p != null && t?.id != null) {
             AppPostListActivity.start(v.context, t.id!!, p.getPage(), p.id.toString())
-        }
-    }
-
-    fun onOnlySeeHimClick(v: View) {
-        val aId = post.get()?.authorId
-        val t = thread.get()
-        if (aId != null && t != null) {
-            PostListActivity.start(v.context, t, aId)
         }
     }
 

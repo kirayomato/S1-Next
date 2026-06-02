@@ -1,7 +1,6 @@
 package me.ykrank.s1next.view.page.post.adapter
 
 import android.content.Context
-import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
@@ -21,6 +20,7 @@ import me.ykrank.s1next.binding.TextViewBindingAdapter
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.ApiCacheProvider
 import me.ykrank.s1next.data.api.model.Post
+import me.ykrank.s1next.data.api.model.Profile
 import me.ykrank.s1next.data.api.model.Thread
 import me.ykrank.s1next.data.api.model.Vote
 import me.ykrank.s1next.data.pref.GeneralPreferencesManager
@@ -57,6 +57,7 @@ class PostAdapterDelegate(
     private var threadInfo: Thread? = null
     private var voteInfo: Vote? = null
     private var pageNum: Int = 1
+    private val authorProfiles = mutableMapOf<String, Profile>()
 
     init {
         App.appComponent.inject(this)
@@ -110,17 +111,15 @@ class PostAdapterDelegate(
             bindShareSelection(viewHolder.binding, post)
             return
         }
-        val bundle = payloads[0] as? Bundle
-        if (bundle == null) {
-            super.onBindViewHolder(items, position, holder, payloads)
+        if (payloads.any { it is Profile }) {
+            val post = items[position] as? Post ?: return
+            val profile = post.authorId?.let { authorProfiles[it] }
+            viewHolder.binding.postViewModel?.authorProfile?.set(profile)
+            viewHolder.binding.executePendingBindings()
+            bindAuthorProfile(viewHolder.binding, profile)
             return
         }
-        if (bundle.containsKey("KEY_GOOSE_UPDATE")) {
-            val newGoose = bundle.getString(KEY_GOOSE_UPDATE)
-            // 只更新 goose 对应的 TextView
-            viewHolder.binding.goose.text = newGoose
-            TextViewBindingAdapter.setGoose(viewHolder.binding.goose, newGoose)
-        }
+        super.onBindViewHolder(items, position, holder, payloads)
     }
 
     override fun onBindViewHolderData(
@@ -142,6 +141,7 @@ class PostAdapterDelegate(
             it.thread.set(threadInfo)
             it.pageNum.set(pageNum)
             it.post.set(post)
+            it.authorProfile.set(post.authorId?.let { authorProfiles[it] })
 
             if ("1" == post.number) {
                 it.vote.set(voteInfo)
@@ -219,7 +219,15 @@ class PostAdapterDelegate(
         }
 
         binding.executePendingBindings()
+        bindAuthorProfile(binding, post.authorId?.let { authorProfiles[it] })
         bindShareSelection(binding, post)
+    }
+
+    private fun bindAuthorProfile(binding: ItemPostBinding, profile: Profile?) {
+        val goose = profile?.goose
+        binding.goose.text = goose
+        TextViewBindingAdapter.setGoose(binding.goose, goose)
+        TextViewBindingAdapter.setRegistrationAge(binding.registrationAge, profile?.regDate)
     }
 
     private fun bindShareSelection(binding: ItemPostBinding, post: Post) {
@@ -234,8 +242,8 @@ class PostAdapterDelegate(
             binding.avatar,
             binding.authorName,
             binding.goose,
+            binding.registrationAge,
             binding.originalPosterTag,
-            binding.tvOnlySeeHim,
             binding.tvDatetime,
             binding.tvFloor
         )
@@ -253,13 +261,11 @@ class PostAdapterDelegate(
             binding.threadTitle.setOnClickListener(null)
             binding.authorName.setOnClickListener(null)
             binding.goose.setOnClickListener(null)
+            binding.registrationAge.setOnClickListener(null)
             binding.originalPosterTag.setOnClickListener(null)
             binding.tvDatetime.setOnClickListener(null)
             binding.avatar.setOnClickListener {
                 binding.postViewModel?.onAvatarClick(it)
-            }
-            binding.tvOnlySeeHim.setOnClickListener {
-                binding.postViewModel?.onOnlySeeHimClick(it)
             }
             binding.postShareScrim.setOnClickListener(null)
             binding.postShareScrim.isClickable = false
@@ -298,8 +304,8 @@ class PostAdapterDelegate(
         this.voteInfo = voteInfo
     }
 
-    companion object {
-        const val KEY_GOOSE_UPDATE = "KEY_GOOSE_UPDATE"
+    fun setAuthorProfile(uid: String, profile: Profile) {
+        authorProfiles[uid] = profile
     }
 
 }

@@ -3,147 +3,97 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
+    <me.ykrank.s1next.widget.CollapsibleInfoBar
+        android:id="@+id/upload_options_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/cardViewBackground"
-        android:orientation="vertical">
+        app:collapsibleInfoBarExpanded="false">
 
         <LinearLayout
-            android:id="@+id/options_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:foreground="?attr/selectableItemBackground"
             android:gravity="center_vertical"
-            android:minHeight="32dp"
-            android:orientation="horizontal"
-            android:paddingLeft="@dimen/item_padding"
-            android:paddingRight="@dimen/item_padding_small"
-            android:paddingStart="@dimen/item_padding"
-            android:paddingEnd="@dimen/item_padding_small">
+            android:minHeight="44dp"
+            android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/upload_options_title"
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:ellipsize="end"
-                android:includeFontPadding="false"
-                android:maxLines="1"
-                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textStyle="bold"
-                tools:text="论坛附件上传 · 限制大图" />
+                android:orientation="vertical">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/expand_icon"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:padding="4dp"
-                app:tint="?android:attr/textColorPrimary"
-                app:srcCompat="@drawable/ic_expand_more" />
+                <TextView
+                    android:id="@+id/upload_source_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:includeFontPadding="false"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:textColor="?android:attr/textColorPrimary"
+                    tools:text="论坛附件上传" />
+
+                <TextView
+                    android:id="@+id/upload_source_hint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_mill"
+                    android:includeFontPadding="false"
+                    android:maxLines="2"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:textColor="?android:attr/textColorSecondary"
+                    tools:text="插入为论坛附件，随网页提交消费" />
+
+            </LinearLayout>
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/forum_attachment_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/item_padding_small"
+                android:layout_marginStart="@dimen/item_padding_small" />
 
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/upload_options_detail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingLeft="@dimen/item_padding"
-            android:paddingRight="@dimen/item_padding"
-            android:paddingBottom="@dimen/spacing_micro"
-            android:paddingStart="@dimen/item_padding"
-            android:paddingEnd="@dimen/item_padding"
-            android:visibility="gone">
+            android:gravity="center_vertical"
+            android:minHeight="44dp"
+            android:orientation="horizontal">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:minHeight="44dp"
-                android:orientation="horizontal">
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-                <LinearLayout
-                    android:layout_width="0dp"
+                <TextView
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:includeFontPadding="false"
+                    android:text="@string/image_upload_original_resolution"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:textColor="?android:attr/textColorPrimary" />
 
-                    <TextView
-                        android:id="@+id/upload_source_title"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:includeFontPadding="false"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                        android:textColor="?android:attr/textColorPrimary"
-                        tools:text="论坛附件上传" />
-
-                    <TextView
-                        android:id="@+id/upload_source_hint"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/spacing_mill"
-                        android:includeFontPadding="false"
-                        android:maxLines="2"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                        android:textColor="?android:attr/textColorSecondary"
-                        tools:text="插入为论坛附件，随网页提交消费" />
-
-                </LinearLayout>
-
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/forum_attachment_switch"
-                    android:layout_width="wrap_content"
+                <TextView
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/item_padding_small"
-                    android:layout_marginStart="@dimen/item_padding_small" />
+                    android:layout_marginTop="@dimen/spacing_mill"
+                    android:includeFontPadding="false"
+                    android:maxLines="2"
+                    android:text="@string/image_upload_original_resolution_hint"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:textColor="?android:attr/textColorSecondary" />
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/original_resolution_switch"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:minHeight="44dp"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:includeFontPadding="false"
-                        android:text="@string/image_upload_original_resolution"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                        android:textColor="?android:attr/textColorPrimary" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/spacing_mill"
-                        android:includeFontPadding="false"
-                        android:maxLines="2"
-                        android:text="@string/image_upload_original_resolution_hint"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                        android:textColor="?android:attr/textColorSecondary" />
-
-                </LinearLayout>
-
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/original_resolution_switch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/item_padding_small"
-                    android:layout_marginStart="@dimen/item_padding_small" />
-
-            </LinearLayout>
+                android:layout_marginLeft="@dimen/item_padding_small"
+                android:layout_marginStart="@dimen/item_padding_small" />
 
         </LinearLayout>
 
-    </LinearLayout>
+    </me.ykrank.s1next.widget.CollapsibleInfoBar>
 </layout>

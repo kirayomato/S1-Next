@@ -13,6 +13,7 @@ import me.ykrank.s1next.data.db.dbmodel.DbThread
 import me.ykrank.s1next.data.db.dbmodel.History
 import me.ykrank.s1next.data.db.dbmodel.LoginUser
 import me.ykrank.s1next.data.db.dbmodel.ReadProgress
+import me.ykrank.s1next.data.db.dbmodel.UserProfile
 import java.io.File
 import java.io.IOException
 
@@ -45,6 +46,7 @@ class AppDatabaseBackupMerger(
                     mergeHistories(sourceDb, targetDb)
                     mergeReadProgress(sourceDb, targetDb)
                     mergeLoginUsers(sourceDb, targetDb)
+                    mergeUserProfiles(sourceDb, targetDb)
                 }
             }
             BackupDelegate.SUCCESS
@@ -222,6 +224,59 @@ class AppDatabaseBackupMerger(
         }
     }
 
+    private fun mergeUserProfiles(sourceDb: SQLiteDatabase, targetDb: AppDatabase) {
+        queryTable(
+            sourceDb,
+            "UserProfile",
+            arrayOf(
+                "Uid",
+                "Username",
+                "HomeUsername",
+                "SignHtml",
+                "Friends",
+                "Replies",
+                "Threads",
+                "GroupTitle",
+                "OnlineHour",
+                "RegDate",
+                "LastVisitDate",
+                "LastActiveDate",
+                "LastPostDate",
+                "Goose",
+                "StatsJson",
+                "ManagerJson",
+                "UpdatedAt",
+                "LastRequestAt"
+            )
+        ) { cursor ->
+            val uid = cursor.getStringOrNull("Uid") ?: return@queryTable
+            val item = UserProfile(
+                uid = uid,
+                username = cursor.getStringOrNull("Username"),
+                homeUsername = cursor.getStringOrNull("HomeUsername"),
+                signHtml = cursor.getStringOrNull("SignHtml"),
+                friends = cursor.getIntOrNull("Friends"),
+                replies = cursor.getIntOrNull("Replies"),
+                threads = cursor.getIntOrNull("Threads"),
+                groupTitle = cursor.getStringOrNull("GroupTitle"),
+                onlineHour = cursor.getIntOrNull("OnlineHour"),
+                regDate = cursor.getLongOrNull("RegDate"),
+                lastVisitDate = cursor.getLongOrNull("LastVisitDate"),
+                lastActiveDate = cursor.getLongOrNull("LastActiveDate"),
+                lastPostDate = cursor.getLongOrNull("LastPostDate"),
+                goose = cursor.getIntOrNull("Goose"),
+                statsJson = cursor.getStringOrNull("StatsJson"),
+                managerJson = cursor.getStringOrNull("ManagerJson"),
+                updatedAt = cursor.getLong("UpdatedAt"),
+                lastRequestAt = cursor.getLong("LastRequestAt"),
+            )
+            val oldItem = targetDb.userProfile().getByUid(item.uid)
+            if (oldItem == null || item.updatedAt >= oldItem.updatedAt) {
+                targetDb.userProfile().insert(item)
+            }
+        }
+    }
+
     private fun queryTable(
         sourceDb: SQLiteDatabase,
         table: String,
@@ -248,8 +303,18 @@ class AppDatabaseBackupMerger(
         return getInt(getColumnIndexOrThrow(columnName))
     }
 
+    private fun Cursor.getIntOrNull(columnName: String): Int? {
+        val index = getColumnIndexOrThrow(columnName)
+        return if (isNull(index)) null else getInt(index)
+    }
+
     private fun Cursor.getLong(columnName: String): Long {
         return getLong(getColumnIndexOrThrow(columnName))
+    }
+
+    private fun Cursor.getLongOrNull(columnName: String): Long? {
+        val index = getColumnIndexOrThrow(columnName)
+        return if (isNull(index)) null else getLong(index)
     }
 
     companion object {

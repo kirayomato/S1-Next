@@ -20,6 +20,7 @@ import me.ykrank.s1next.view.event.EnterPostShareSelectionEvent
 import me.ykrank.s1next.view.event.QuoteEvent
 import me.ykrank.s1next.view.event.RateEvent
 import me.ykrank.s1next.view.event.ReportEvent
+import me.ykrank.s1next.view.page.post.postlist.PostListActivity
 
 object PostRenderActions {
 
@@ -92,6 +93,14 @@ object PostRenderActions {
                 sharePost(anchor, thread, pageNum, post)
             }
         )
+        val authorId = post.authorId
+        if (thread != null && !authorId.isNullOrBlank()) {
+            listItems.add(
+                PostActionMenuPopup.Item(R.string.only_see_him, R.drawable.ic_search_24dp) {
+                    PostListActivity.start(anchor.context, thread, authorId)
+                }
+            )
+        }
         listItems.add(
             PostActionMenuPopup.Item(R.string.post_action_app_feedback, R.drawable.ic_feedback_24dp) {
                 feedbackPost(anchor, fragment, thread, pageNum, post)
