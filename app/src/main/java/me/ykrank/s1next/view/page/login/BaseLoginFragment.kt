@@ -18,22 +18,20 @@ import com.github.ykrank.androidtools.util.ViewUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.ykrank.s1next.App.Companion.appComponent
+import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.data.db.biz.LoginUserBiz
 import me.ykrank.s1next.databinding.FragmentAppLoginBinding
 import me.ykrank.s1next.util.IntentUtil
 import me.ykrank.s1next.view.fragment.BaseFragment
-import javax.inject.Inject
 
 /**
  * A Fragment offers login via username and password.
  */
 abstract class BaseLoginFragment : BaseFragment() {
 
-    @Inject
-    lateinit var mLoginUserBiz: LoginUserBiz
+    private val mLoginUserBiz: LoginUserBiz by lazy { App.appComponent.loginUserBiz }
 
     private var mUsernameView: EditText? = null
     private var mPasswordView: EditText? = null
@@ -44,7 +42,6 @@ abstract class BaseLoginFragment : BaseFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        appComponent.inject(this)
         val binding = FragmentAppLoginBinding.inflate(inflater, container, false)
         this.binding = binding
         mUsernameView = binding.username

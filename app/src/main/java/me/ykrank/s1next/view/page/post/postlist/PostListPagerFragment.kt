@@ -1,6 +1,5 @@
 package me.ykrank.s1next.view.page.post.postlist
 
-import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.os.Bundle
@@ -28,6 +27,7 @@ import com.github.ykrank.androidtools.util.ResourceUtil
 import com.github.ykrank.androidtools.util.RxJavaUtil
 import com.github.ykrank.androidtools.widget.recycleview.StartSnapLinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
@@ -63,7 +63,6 @@ import me.ykrank.s1next.view.page.post.share.PostShareSelectionPayload
 import me.ykrank.s1next.view.page.post.share.PostShareSelectionOwner
 import me.ykrank.s1next.view.page.post.share.PostShareSelectionState
 import java.util.*
-import javax.inject.Inject
 
 /**
  * A Fragment representing one of the pages of posts.
@@ -71,21 +70,20 @@ import javax.inject.Inject
  *
  * Activity or Fragment containing this must implement [PagerCallback].
  */
+@AndroidEntryPoint
 class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
     OnQuickSideBarTouchListener,
     PostShareSelectionOwner {
 
-    @Inject
-    internal lateinit var mGeneralPreferencesManager: GeneralPreferencesManager
+    private val mGeneralPreferencesManager: GeneralPreferencesManager =
+        App.preAppComponent.generalPreferencesManager
 
-    @Inject
-    internal lateinit var mReadPreferencesManager: ReadPreferencesManager
+    private val mReadPreferencesManager: ReadPreferencesManager =
+        App.preAppComponent.readProgressPreferencesManager
 
-    @Inject
-    internal lateinit var objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper = App.preAppComponent.jsonMapper
 
-    @Inject
-    internal lateinit var profileProvider: ProfileProvider
+    private val profileProvider: ProfileProvider by lazy { App.appComponent.profileProvider }
 
     private var mThreadId: String? = null
     private var mPageNum: Int = 0
@@ -148,11 +146,6 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
 
     val pageNum: Int
         get() = mPageNum
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        App.appComponent.inject(this)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

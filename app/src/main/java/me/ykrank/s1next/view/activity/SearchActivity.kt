@@ -50,7 +50,6 @@ import me.ykrank.s1next.view.dialog.LoginPromptDialogFragment
 import me.ykrank.s1next.view.transition.CircularReveal
 import me.ykrank.s1next.view.transition.TransitionCompatCreator
 import me.ykrank.s1next.widget.track.event.SearchTrackEvent
-import javax.inject.Inject
 
 /**
  * Created by ykrank on 2016/9/28 0028.
@@ -59,11 +58,9 @@ import javax.inject.Inject
  */
 class SearchActivity : BaseActivity() {
 
-    @Inject
-    lateinit var mUserValidator: UserValidator
+    private val mUserValidator: UserValidator by lazy { App.appComponent.userValidator }
 
-    @Inject
-    lateinit var s1Service: S1Service
+    private val s1Service: S1Service by lazy { App.appComponent.s1Service }
 
     private lateinit var binding: ActivitySearchBinding
 
@@ -78,7 +75,6 @@ class SearchActivity : BaseActivity() {
     private val autoTransitionCompat by lazy { TransitionCompatCreator.getAutoTransition() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        App.appComponent.inject(this)
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_search)
 

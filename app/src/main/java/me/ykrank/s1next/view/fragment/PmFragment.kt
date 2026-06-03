@@ -6,23 +6,20 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import com.github.ykrank.androidtools.util.MathUtil
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
-import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.model.wrapper.PmsWrapper
 import me.ykrank.s1next.view.activity.NewPmActivity
 import me.ykrank.s1next.view.adapter.BaseRecyclerViewAdapter
 import me.ykrank.s1next.view.adapter.PmRecyclerViewAdapter
-import javax.inject.Inject
 
 /**
  * Created by ykrank on 2016/11/12 0012.
  */
 
+@AndroidEntryPoint
 class PmFragment : BaseLoadMoreRecycleViewFragment<PmsWrapper>() {
-    @Inject
-    internal lateinit var user: User
     private lateinit var mRecyclerAdapter: PmRecyclerViewAdapter
     private var toUid: String? = null
     private var toUsername: String? = null
@@ -39,7 +36,6 @@ class PmFragment : BaseLoadMoreRecycleViewFragment<PmsWrapper>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        App.appComponent.inject(this)
 
         if (toUid.isNullOrEmpty() || toUsername.isNullOrEmpty()) {
             showSnackbar(R.string.message_api_error)
@@ -74,7 +70,7 @@ class PmFragment : BaseLoadMoreRecycleViewFragment<PmsWrapper>() {
 
     override fun getPageSourceObservable(pageNum: Int): Single<PmsWrapper> {
         return mS1Service.getPmList(toUid, pageNum)
-                .map { pmsWrapper -> pmsWrapper.setMsgToUsername(user, toUsername) }
+                .map { pmsWrapper -> pmsWrapper.setMsgToUsername(mUser, toUsername) }
     }
 
     override fun onNext(data: PmsWrapper) {

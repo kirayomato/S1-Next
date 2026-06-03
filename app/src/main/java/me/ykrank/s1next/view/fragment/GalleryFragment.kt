@@ -25,6 +25,7 @@ import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.isNetwork
 import com.github.ykrank.androidtools.widget.track.DataTrackAgent
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -51,6 +52,7 @@ import javax.inject.Inject
 /**
  * Created by ykrank on 2017/6/16.
  */
+@AndroidEntryPoint
 class GalleryFragment : Fragment() {
     private var mImageUrl: Uri? = null
     private var mImageThumbUrl: Uri? = null
@@ -84,7 +86,6 @@ class GalleryFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        App.appComponent.inject(this)
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
 

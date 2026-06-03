@@ -7,6 +7,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.ykrank.androidtools.data.CacheParam
 import com.github.ykrank.androidtools.data.Resource
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -19,7 +20,6 @@ import me.ykrank.s1next.view.event.PostDisableStickyChangeEvent
 import me.ykrank.s1next.view.event.ThreadTypeChangeEvent
 import me.ykrank.s1next.view.fragment.ThreadListPagerFragment.PagerCallback
 import me.ykrank.s1next.view.fragment.ThreadListPagerFragment.SubForumsCallback
-import javax.inject.Inject
 
 /**
  * A Fragment representing one of the pages of threads.
@@ -28,10 +28,11 @@ import javax.inject.Inject
  * Activity or Fragment containing this must implement
  * [PagerCallback] and [SubForumsCallback].
  */
+@AndroidEntryPoint
 class ThreadListPagerFragment : BaseRecyclerViewFragment<ThreadsWrapper>() {
 
-    @Inject
-    internal lateinit var mGeneralPreferencesManager: GeneralPreferencesManager
+    private val mGeneralPreferencesManager: GeneralPreferencesManager =
+        App.preAppComponent.generalPreferencesManager
 
     private var mForumId: String? = null
     private var mTypeId: String? = null
@@ -50,7 +51,6 @@ class ThreadListPagerFragment : BaseRecyclerViewFragment<ThreadsWrapper>() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        App.appComponent.inject(this)
         super.onCreate(savedInstanceState)
 
         mPagerCallback = parentFragment as PagerCallback

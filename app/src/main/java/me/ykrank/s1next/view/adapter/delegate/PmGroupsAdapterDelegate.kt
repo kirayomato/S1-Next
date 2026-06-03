@@ -11,19 +11,11 @@ import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.model.PmGroup
 import me.ykrank.s1next.databinding.ItemPmGroupBinding
 import me.ykrank.s1next.viewmodel.PmGroupViewModel
-import javax.inject.Inject
 
 class PmGroupsAdapterDelegate(context: Context) : BaseAdapterDelegate<PmGroup, SimpleRecycleViewHolder<ItemPmGroupBinding>>(context, PmGroup::class.java) {
 
-    @Inject
-    lateinit var mEventBus: EventBus
-
-    @Inject
-    lateinit var mUser: User
-
-    init {
-        App.appComponent.inject(this)
-    }
+    private val mEventBus: EventBus = App.preAppComponent.eventBus
+    private val mUser: User by lazy { App.appComponent.user }
 
     public override fun onCreateViewHolder(parent: ViewGroup): androidx.recyclerview.widget.RecyclerView.ViewHolder {
         val binding = DataBindingUtil.inflate<ItemPmGroupBinding>(mLayoutInflater,

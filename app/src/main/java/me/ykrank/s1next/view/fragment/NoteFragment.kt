@@ -12,8 +12,8 @@ import com.github.ykrank.androidtools.ui.internal.LoadingViewModelBindingDelegat
 import com.github.ykrank.androidtools.ui.vm.LoadingViewModel
 import com.github.ykrank.androidtools.util.MathUtil
 import com.github.ykrank.androidtools.widget.EventBus
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
-import me.ykrank.s1next.App
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.data.api.model.collection.Notes
 import me.ykrank.s1next.data.api.model.wrapper.BaseDataWrapper
@@ -28,6 +28,7 @@ import javax.inject.Inject
  * Created by ykrank on 2017/1/5.
  */
 
+@AndroidEntryPoint
 class NoteFragment : BaseLoadMoreRecycleViewFragment<BaseDataWrapper<Notes>>() {
     private lateinit var mRecyclerAdapter: NoteRecyclerViewAdapter
 
@@ -41,7 +42,6 @@ class NoteFragment : BaseLoadMoreRecycleViewFragment<BaseDataWrapper<Notes>>() {
         get() = mRecyclerAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        App.appComponent.inject(this)
         super.onViewCreated(view, savedInstanceState)
         leavePageMsg("NoteFragment")
 

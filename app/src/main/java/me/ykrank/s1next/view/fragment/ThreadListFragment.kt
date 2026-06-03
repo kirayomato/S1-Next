@@ -15,7 +15,6 @@ import me.ykrank.s1next.data.api.model.Forum
 import me.ykrank.s1next.data.pref.GeneralPreferencesManager
 import me.ykrank.s1next.util.IntentUtil
 import me.ykrank.s1next.view.event.PostDisableStickyChangeEvent
-import javax.inject.Inject
 
 /**
  * A Fragment includes [android.support.v4.view.ViewPager]
@@ -27,14 +26,12 @@ class ThreadListFragment : BaseViewPagerFragment(), ThreadListPagerFragment.Page
     private var mTypeId: String = "0"
     private lateinit var mForumId: String
 
-    @Inject
-    internal lateinit var mEventBus: EventBus
-    @Inject
-    internal lateinit var mGeneralPreferencesManager: GeneralPreferencesManager
+    private val mEventBus: EventBus = App.preAppComponent.eventBus
+    private val mGeneralPreferencesManager: GeneralPreferencesManager =
+        App.preAppComponent.generalPreferencesManager
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        App.appComponent.inject(this)
 
         val forum:Forum = arguments!!.getParcelable(ARG_FORUM)!!
         mForumName = forum.name

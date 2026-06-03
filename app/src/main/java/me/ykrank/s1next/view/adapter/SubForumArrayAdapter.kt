@@ -7,17 +7,15 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.annotation.LayoutRes
-import me.ykrank.s1next.App.Companion.appComponent
+import me.ykrank.s1next.App
 import me.ykrank.s1next.binding.TextViewBindingAdapter
 import me.ykrank.s1next.data.api.model.Forum
 import me.ykrank.s1next.data.pref.ThemeManager
-import javax.inject.Inject
 
 class SubForumArrayAdapter(activity: Activity, @LayoutRes resource: Int, objects: List<Forum>) :
     ArrayAdapter<Forum?>(activity, resource, objects) {
 
-    @Inject
-    lateinit var themeManager: ThemeManager
+    private val themeManager: ThemeManager = App.preAppComponent.themeManager
     private val mLayoutInflater: LayoutInflater
 
     @LayoutRes
@@ -25,7 +23,6 @@ class SubForumArrayAdapter(activity: Activity, @LayoutRes resource: Int, objects
     private val mGentleAccentColor: Int
 
     init {
-        appComponent.inject(this)
         mLayoutInflater = activity.layoutInflater
         mResource = resource
         mGentleAccentColor = themeManager.gentleAccentColor

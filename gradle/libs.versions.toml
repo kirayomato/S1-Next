@@ -9,7 +9,7 @@ constraintlayout = "2.1.4"
 bugly_crashreport = "4.1.9.3"
 bugly_crashreport_upgrade = "1.6.1"
 bugly_nativecrashreport = "3.9.2"
-dagger = "2.51.1"
+dagger = "2.57.1"
 flipper = "0.271.0"
 glide = "4.16.0"
 guava = "33.2.0-android"
@@ -77,8 +77,8 @@ flipper-network-plugin = { module = "com.facebook.flipper:flipper-network-plugin
 flipper-leakcanary-plugin = { module = "com.facebook.flipper:flipper-leakcanary2-plugin", version.ref = "flipper" }
 flipper-noop = { module = "com.facebook.flipper:flipper-noop", version.ref = "flipper" }
 glide-ksp = { module = "com.github.bumptech.glide:ksp", version.ref = "glide" }
-dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
-dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "dagger" }
+hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "dagger" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 glide-okhttp3-integration = { module = "com.github.bumptech.glide:okhttp3-integration", version.ref = "okhttp3Integration" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
@@ -123,3 +123,4 @@ androidLibrary = { id = "com.android.library", version.ref = "agp" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 gradleVersionsPlugin = { id = "com.github.ben-manes.versions", version.ref = "gradleVersionsPlugin" }
 androidKsp = { id = "com.google.devtools.ksp", version.ref = "kotlinKsp" }
+hiltAndroid = { id = "com.google.dagger.hilt.android", version.ref = "dagger" }

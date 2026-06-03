@@ -26,16 +26,13 @@ import me.ykrank.s1next.view.adapter.SimpleSpinnerAdapter
 import me.ykrank.s1next.view.dialog.requestdialog.NewThreadRequestDialogFragment
 import me.ykrank.s1next.view.event.RequestDialogSuccessEvent
 import me.ykrank.s1next.widget.uploadimg.ForumAttachmentUploadTarget
-import javax.inject.Inject
 
 /**
  * A Fragment shows [EditText] to let the user edit thread.
  */
 class NewThreadFragment : BasePostEditFragment() {
-    @Inject
-    internal lateinit var mS1Service: S1Service
-    @Inject
-    internal lateinit var objectMapper: ObjectMapper
+    private val mS1Service: S1Service by lazy { App.appComponent.s1Service }
+    private val objectMapper: ObjectMapper = App.preAppComponent.jsonMapper
     private var mCacheKey: String? = null
     private var mForumId: Int = 0
 
@@ -73,7 +70,6 @@ class NewThreadFragment : BasePostEditFragment() {
         mCacheKey = String.format(CACHE_KEY_PREFIX, mForumId)
         leavePageMsg("NewThreadFragment##mForumId:" + mForumId)
 
-        App.appComponent.inject(this)
         init()
     }
 

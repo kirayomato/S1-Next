@@ -19,7 +19,6 @@ import me.ykrank.s1next.data.api.S1Service
 import me.ykrank.s1next.data.api.model.PostEditor
 import me.ykrank.s1next.databinding.ViewImageUploadSourceSwitchBinding
 import me.ykrank.s1next.view.event.PostAddImageEvent
-import me.ykrank.s1next.widget.net.Image
 import me.ykrank.s1next.widget.uploadimg.FORUM_ATTACHMENT_REMOTE_PREFIX
 import me.ykrank.s1next.widget.uploadimg.ForumAttachmentUploadManager
 import me.ykrank.s1next.widget.uploadimg.ForumAttachmentUploadTarget
@@ -28,22 +27,16 @@ import me.ykrank.s1next.widget.uploadimg.RIPImageUploadManager
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
-import javax.inject.Inject
 
 class ImageUploadFragment : LibImageUploadFragment() {
 
-    @Inject
-    internal lateinit var mEventBus: EventBus
+    private val mEventBus: EventBus = App.preAppComponent.eventBus
 
-    @Inject
-    internal lateinit var mUser: User
+    private val mUser: User by lazy { App.appComponent.user }
 
-    @Inject
-    internal lateinit var mS1Service: S1Service
+    private val mS1Service: S1Service by lazy { App.appComponent.s1Service }
 
-    @Inject
-    @Image
-    internal lateinit var mOkHttpClient: OkHttpClient
+    private val mOkHttpClient: OkHttpClient by lazy { App.appComponent.imageOkHttpClient }
 
     private var useForumAttachment = true
     private var useOriginalResolution = false
@@ -54,7 +47,6 @@ class ImageUploadFragment : LibImageUploadFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        App.appComponent.inject(this)
     }
 
     override val imageClickListener: ((View, ModelImageUpload) -> Unit)? =

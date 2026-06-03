@@ -17,6 +17,7 @@ import com.github.ykrank.androidtools.util.LooperUtil
 import com.github.ykrank.androidtools.util.MathUtil
 import com.github.ykrank.androidtools.util.RxJavaUtil
 import com.github.ykrank.androidtools.widget.recycleview.StartSnapLinearLayoutManager
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
@@ -49,7 +50,6 @@ import me.ykrank.s1next.view.fragment.BaseRecyclerViewFragment
 import me.ykrank.s1next.view.internal.LoadingViewModelBindingDelegateQuickSidebarImpl
 import me.ykrank.s1next.view.page.app.AppPostListPagerFragment.PagerCallback
 import me.ykrank.s1next.view.page.login.AppLoginDialogFragment
-import javax.inject.Inject
 
 /**
  * A Fragment representing one of the pages of posts.
@@ -57,20 +57,18 @@ import javax.inject.Inject
  *
  * Activity or Fragment containing this must implement [PagerCallback].
  */
+@AndroidEntryPoint
 class AppPostListPagerFragment : BaseRecyclerViewFragment<AppPostsWrapper>(),
     OnQuickSideBarTouchListener {
 
-    @Inject
-    internal lateinit var mGeneralPreferencesManager: GeneralPreferencesManager
+    private val mGeneralPreferencesManager: GeneralPreferencesManager =
+        App.preAppComponent.generalPreferencesManager
 
-    @Inject
-    internal lateinit var objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper = App.preAppComponent.jsonMapper
 
-    @Inject
-    internal lateinit var appService: AppService
+    private val appService: AppService by lazy { App.appComponent.appService }
 
-    @Inject
-    internal lateinit var loginUserBiz: LoginUserBiz
+    private val loginUserBiz: LoginUserBiz by lazy { App.appComponent.loginUserBiz }
 
     private var mThreadId: String? = null
     private var mPageNum: Int = 0
@@ -99,7 +97,6 @@ class AppPostListPagerFragment : BaseRecyclerViewFragment<AppPostsWrapper>(),
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        App.appComponent.inject(this)
         super.onViewCreated(view, savedInstanceState)
 
         mRecyclerAdapter =

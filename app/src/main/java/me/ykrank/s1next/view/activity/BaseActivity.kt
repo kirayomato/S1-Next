@@ -22,6 +22,7 @@ import com.github.ykrank.androidtools.widget.track.DataTrackAgent
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.common.base.Optional
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import me.ykrank.s1next.App
@@ -40,35 +41,37 @@ import me.ykrank.s1next.view.internal.CoordinatorLayoutAnchorDelegateImpl
 import me.ykrank.s1next.view.internal.DrawerLayoutDelegateConcrete
 import me.ykrank.s1next.view.internal.RequestCode
 import me.ykrank.s1next.view.internal.ToolbarDelegate
-import javax.inject.Inject
 
 /**
  * A base Activity which includes the Toolbar
  * and navigation drawer amongst others.
  * Also changes theme depends on settings.
  */
+@AndroidEntryPoint
 abstract class BaseActivity : LibBaseActivity() {
 
-    @Inject
-    internal lateinit var mEventBus: EventBus
+    @JvmField
+    protected val mEventBus: EventBus = App.preAppComponent.eventBus
 
-    @Inject
-    internal lateinit var mUser: User
+    protected val mUser: User by lazy { App.appComponent.user }
 
-    @Inject
-    lateinit var mGeneralPreferencesManager: GeneralPreferencesManager
+    @JvmField
+    protected val mGeneralPreferencesManager: GeneralPreferencesManager =
+        App.preAppComponent.generalPreferencesManager
 
-    @Inject
-    internal lateinit var mDownloadPreferencesManager: DownloadPreferencesManager
+    @JvmField
+    protected val mDownloadPreferencesManager: DownloadPreferencesManager =
+        App.preAppComponent.downloadPreferencesManager
 
-    @Inject
-    internal lateinit var mDataPreferencesManager: DataPreferencesManager
+    @JvmField
+    protected val mDataPreferencesManager: DataPreferencesManager =
+        App.preAppComponent.dataPreferencesManager
 
-    @Inject
-    internal lateinit var mThemeManager: ThemeManager
+    @JvmField
+    protected val mThemeManager: ThemeManager = App.preAppComponent.themeManager
 
-    @Inject
-    internal lateinit var trackAgent: DataTrackAgent
+    @JvmField
+    protected val trackAgent: DataTrackAgent = App.preAppComponent.dataTrackAgent
 
     private var mToolbarDelegate: ToolbarDelegate? = null
     private var drawerLayoutDelegate: DrawerLayoutDelegateConcrete? = null
@@ -86,7 +89,6 @@ abstract class BaseActivity : LibBaseActivity() {
         }
 
     override fun attachBaseContext(newBase: Context?) {
-        App.appComponent.inject(this)
         super.attachBaseContext(ResourceUtil.setScaledDensity(newBase, mGeneralPreferencesManager.fontScale))
     }
 

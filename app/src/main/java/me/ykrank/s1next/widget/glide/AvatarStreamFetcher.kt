@@ -13,7 +13,6 @@ import okhttp3.*
 import okhttp3.internal.cache.CacheStrategy
 import java.io.IOException
 import java.io.InputStream
-import javax.inject.Inject
 
 /**
  * Fetches an [java.io.InputStream] from [AvatarUrl] using the OkHttp library.
@@ -31,17 +30,13 @@ class AvatarStreamFetcher(
     @Volatile
     private var call: Call? = null
 
-    @Inject
-    internal lateinit var mDownloadPreferencesManager: DownloadPreferencesManager
-    @Inject
-    internal lateinit var avatarFailUrlsCache: AvatarFailUrlsCache
+    private val mDownloadPreferencesManager: DownloadPreferencesManager =
+        App.preAppComponent.downloadPreferencesManager
+    private val avatarFailUrlsCache: AvatarFailUrlsCache =
+        App.appComponent.avatarFailUrlsCache
 
     private val imageBiz by lazy {
         ImageBiz(mDownloadPreferencesManager)
-    }
-
-    init {
-        App.appComponent.inject(this)
     }
 
     override fun loadData(priority: Priority, callback: DataFetcher.DataCallback<in InputStream>) {

@@ -4,7 +4,8 @@ import android.content.Context
 import com.fasterxml.jackson.databind.ObjectMapper
 import dagger.Module
 import dagger.Provides
-import me.ykrank.s1next.AppLife
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import me.ykrank.s1next.data.cache.CacheDatabaseManager
 import me.ykrank.s1next.data.cache.CacheDatabaseManagerImpl
 import me.ykrank.s1next.data.cache.biz.CacheBiz
@@ -18,65 +19,67 @@ import me.ykrank.s1next.data.db.biz.ThreadBiz
 import me.ykrank.s1next.data.db.biz.UserProfileBiz
 import me.ykrank.s1next.widget.encrypt.AndroidStoreEncryption
 import me.ykrank.s1next.widget.encrypt.Encryption
+import javax.inject.Singleton
 
 @Module
+@InstallIn(SingletonComponent::class)
 class DbModule {
     @Provides
-    @AppLife
+    @Singleton
     fun provideAppDatabaseManager(context: Context): AppDatabaseManager {
         return AppDatabaseManagerImpl(context)
     }
 
     @Provides
-    @AppLife
+    @Singleton
     fun provideBlackListBiz(manager: AppDatabaseManager): BlackListBiz {
         return BlackListBiz(manager)
     }
 
     @Provides
-    @AppLife
+    @Singleton
     fun provideBlackWordBiz(manager: AppDatabaseManager): BlackWordBiz {
         return BlackWordBiz(manager)
     }
 
     @Provides
-    @AppLife
+    @Singleton
     fun provideReadProgressDbWrapper(manager: AppDatabaseManager): ReadProgressBiz {
         return ReadProgressBiz(manager)
     }
 
     @Provides
-    @AppLife
+    @Singleton
     fun provideThreadBiz(manager: AppDatabaseManager): ThreadBiz {
         return ThreadBiz(manager)
     }
 
     @Provides
-    @AppLife
+    @Singleton
     fun provideHistoryBiz(manager: AppDatabaseManager): HistoryBiz {
         return HistoryBiz(manager)
     }
 
     @Provides
-    @AppLife
+    @Singleton
     fun provideLoginUserBiz(manager: AppDatabaseManager, encryption: Encryption): LoginUserBiz {
         return LoginUserBiz(manager, encryption)
     }
 
     @Provides
-    @AppLife
+    @Singleton
     fun provideUserProfileBiz(manager: AppDatabaseManager, objectMapper: ObjectMapper): UserProfileBiz {
         return UserProfileBiz(manager, objectMapper)
     }
 
     @Provides
-    @AppLife
+    @Singleton
     fun provideDbEncryption(): Encryption {
         return AndroidStoreEncryption("s1next_db")
     }
 
     @Provides
-    @AppLife
+    @Singleton
     fun provideCacheDatabaseManager(
         context: Context,
         appManager: AppDatabaseManager
@@ -85,13 +88,13 @@ class DbModule {
     }
 
     @Provides
-    @AppLife
+    @Singleton
     fun provideCacheBiz(manager: CacheDatabaseManager, objectMapper: ObjectMapper): CacheBiz {
         return CacheBiz(manager, objectMapper)
     }
 
     @Provides
-    @AppLife
+    @Singleton
     fun provideCacheGroupBiz(manager: CacheDatabaseManager): CacheGroupBiz {
         return CacheGroupBiz(manager)
     }

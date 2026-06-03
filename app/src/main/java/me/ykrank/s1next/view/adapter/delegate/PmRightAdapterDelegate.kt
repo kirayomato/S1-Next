@@ -12,16 +12,10 @@ import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.model.Pm
 import me.ykrank.s1next.databinding.ItemPmRightBinding
 import me.ykrank.s1next.viewmodel.PmViewModel
-import javax.inject.Inject
 
 class PmRightAdapterDelegate(context: Context, private val lifecycleOwner: LifecycleOwner) : BaseAdapterDelegate<Pm, SimpleRecycleViewHolder<ItemPmRightBinding>>(context, Pm::class.java) {
 
-    @Inject
-    internal lateinit var user: User
-
-    init {
-        App.appComponent.inject(this)
-    }
+    private val user: User by lazy { App.appComponent.user }
 
     override fun isForViewType(items: MutableList<Any>, position: Int): Boolean {
         val item = items[position]

@@ -24,7 +24,6 @@ import me.ykrank.s1next.view.fragment.ForumFragment
 import me.ykrank.s1next.view.internal.ToolbarDropDownInterface
 import me.ykrank.s1next.view.page.post.postlist.PostListActivity
 import me.ykrank.s1next.viewmodel.DropDownItemListViewModel
-import javax.inject.Inject
 
 /**
  * An Activity shows the forum groups.
@@ -34,8 +33,8 @@ import javax.inject.Inject
  */
 class ForumActivity : BaseActivity(), ToolbarDropDownInterface.Callback, AdapterView.OnItemSelectedListener {
 
-    @Inject
-    internal lateinit var mReadPrefManager: ReadPreferencesManager
+    private val mReadPrefManager: ReadPreferencesManager =
+        App.preAppComponent.readProgressPreferencesManager
 
     private var mToolbarSpinnerBinding: ToolbarSpinnerBinding? = null
 
@@ -50,7 +49,6 @@ class ForumActivity : BaseActivity(), ToolbarDropDownInterface.Callback, Adapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        App.appComponent.inject(this)
 
         setContentView(R.layout.activity_base)
 

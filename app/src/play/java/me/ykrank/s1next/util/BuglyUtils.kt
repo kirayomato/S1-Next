@@ -1,9 +1,12 @@
 package me.ykrank.s1next.util
 
 import android.content.Context
-import com.github.ykrank.androidtools.util.RxJavaUtil
 import com.tencent.bugly.crashreport.CrashReport
 import com.tencent.bugly.crashreport.CrashReport.UserStrategy
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import me.ykrank.s1next.BuildConfig
 import me.ykrank.s1next.util.AppDeviceUtil.getAppFullVersionName
 
@@ -14,9 +17,10 @@ object BuglyUtils {
     val isPlay: Boolean
         get() = true
 
+    @OptIn(DelicateCoroutinesApi::class)
     fun init(context: Context) {
         val appContext = context.applicationContext
-        RxJavaUtil.workInRxIoThread {
+        GlobalScope.launch(Dispatchers.IO) {
             val userStrategy = UserStrategy(appContext)
             userStrategy.setAppVersion(getAppFullVersionName())
             CrashReport.initCrashReport(

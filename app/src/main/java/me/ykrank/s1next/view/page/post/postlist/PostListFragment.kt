@@ -63,7 +63,6 @@ import me.ykrank.s1next.view.page.edit.EditPostActivity
 import me.ykrank.s1next.view.page.post.prefetch.ThreadPrefetchDialogFragment
 import me.ykrank.s1next.widget.track.event.ViewThreadTrackEvent
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 
 /**
@@ -73,20 +72,18 @@ import javax.inject.Inject
 class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCallback,
     View.OnClickListener {
 
-    @Inject
-    internal lateinit var mEventBus: EventBus
+    private val mEventBus: EventBus = App.preAppComponent.eventBus
 
-    @Inject
-    internal lateinit var mGeneralPreferencesManager: GeneralPreferencesManager
+    private val mGeneralPreferencesManager: GeneralPreferencesManager =
+        App.preAppComponent.generalPreferencesManager
 
-    @Inject
-    internal lateinit var mReadPrefManager: ReadPreferencesManager
+    private val mReadPrefManager: ReadPreferencesManager =
+        App.preAppComponent.readProgressPreferencesManager
 
-    @Inject
-    internal lateinit var mDownloadPrefManager: DownloadPreferencesManager
+    private val mDownloadPrefManager: DownloadPreferencesManager =
+        App.preAppComponent.downloadPreferencesManager
 
-    @Inject
-    internal lateinit var historyBiz: HistoryBiz
+    private val historyBiz: HistoryBiz by lazy { App.appComponent.historyBiz }
 
     private lateinit var mThreadId: String
     private var mThreadTitle: String? = null
@@ -120,7 +117,6 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupToolbarPageJump()
-        App.appComponent.inject(this)
 
         val bundle = requireArguments()
         val type = bundle.getInt(ARG_TYPE)

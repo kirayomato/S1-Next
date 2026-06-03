@@ -11,7 +11,6 @@ import androidx.annotation.CallSuper
 import com.github.ykrank.androidtools.ui.LibBaseLoadMoreRecycleViewFragment
 import com.github.ykrank.androidtools.ui.internal.LoadingViewModelBindingDelegate
 import io.reactivex.Single
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.ApiCacheProvider
@@ -25,6 +24,7 @@ import me.ykrank.s1next.databinding.FragmentBaseBinding
 import me.ykrank.s1next.databinding.FragmentBaseCardViewContainerBinding
 import me.ykrank.s1next.view.internal.LoadingViewModelBindingDelegateBaseCardViewContainerImpl
 import me.ykrank.s1next.view.internal.LoadingViewModelBindingDelegateBaseImpl
+import javax.inject.Inject
 
 /**
  * Created by ykrank on 2016/11/12 0012.
@@ -32,21 +32,24 @@ import me.ykrank.s1next.view.internal.LoadingViewModelBindingDelegateBaseImpl
 
 abstract class BaseLoadMoreRecycleViewFragment<D> : LibBaseLoadMoreRecycleViewFragment<D>() {
 
+    @Inject
     internal lateinit var mUserValidator: UserValidator
+
+    @Inject
     internal lateinit var mS1Service: S1Service
+
+    @Inject
     internal lateinit var apiCacheProvider: ApiCacheProvider
+
+    @Inject
     internal lateinit var mDownloadPrefManager: DownloadPreferencesManager
+
+    @Inject
     internal lateinit var mUser: User
 
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mUserValidator = App.appComponent.userValidator
-        mS1Service = App.appComponent.s1Service
-        apiCacheProvider = App.appComponent.apiCacheProvider
-        mDownloadPrefManager = App.preAppComponent.downloadPreferencesManager
-        mUser = App.appComponent.user
-
         setHasOptionsMenu(true)
     }
 

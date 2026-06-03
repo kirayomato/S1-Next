@@ -4,8 +4,8 @@ import android.os.Bundle
 import android.view.View
 import com.github.ykrank.androidtools.util.MathUtil
 import com.github.ykrank.androidtools.widget.EventBus
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.model.collection.PmGroups
 import me.ykrank.s1next.data.api.model.wrapper.BaseDataWrapper
@@ -15,6 +15,7 @@ import me.ykrank.s1next.view.event.NoticeRefreshEvent
 import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class PmGroupsFragment : BaseLoadMoreRecycleViewFragment<BaseDataWrapper<PmGroups>>() {
     private lateinit var mRecyclerAdapter: PmGroupsRecyclerViewAdapter
 
@@ -28,7 +29,6 @@ class PmGroupsFragment : BaseLoadMoreRecycleViewFragment<BaseDataWrapper<PmGroup
         get() = true
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        App.appComponent.inject(this)
         super.onViewCreated(view, savedInstanceState)
         leavePageMsg("PmGroupsFragment")
         activity?.setTitle(R.string.pms)

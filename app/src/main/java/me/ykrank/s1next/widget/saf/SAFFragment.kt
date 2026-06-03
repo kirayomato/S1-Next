@@ -13,7 +13,6 @@ import androidx.fragment.app.Fragment
 import com.github.ykrank.androidtools.util.L
 import me.ykrank.s1next.App
 import me.ykrank.s1next.data.pref.DownloadPreferencesManager
-import javax.inject.Inject
 
 
 /**
@@ -22,8 +21,8 @@ import javax.inject.Inject
  */
 class SAFFragment : Fragment() {
 
-    @Inject
-    internal lateinit var mDownloadPreferencesManager: DownloadPreferencesManager
+    private val mDownloadPreferencesManager: DownloadPreferencesManager
+        get() = App.preAppComponent.downloadPreferencesManager
 
     private var getDictionaryCallback: ((DocumentFile) -> Unit)? = null
 
@@ -48,11 +47,6 @@ class SAFFragment : Fragment() {
 
             }
         }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        App.appComponent.inject(this)
-    }
 
     fun getDownloadPath(callback: ((DocumentFile) -> Unit)?, focusResetPath: Boolean = false) {
         getDictionaryCallback = callback

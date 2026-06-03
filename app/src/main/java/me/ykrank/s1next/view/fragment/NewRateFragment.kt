@@ -24,15 +24,13 @@ import me.ykrank.s1next.databinding.ItemRateReasonBinding
 import me.ykrank.s1next.view.adapter.SimpleSpinnerAdapter
 import me.ykrank.s1next.view.dialog.requestdialog.RateRequestDialogFragment
 import me.ykrank.s1next.viewmodel.NewRateViewModel
-import javax.inject.Inject
 
 /**
  * A Fragment shows [EditText] to let the user enter reply.
  */
 class NewRateFragment : BaseFragment() {
 
-    @Inject
-    internal lateinit var s1Service: S1Service
+    private val s1Service: S1Service by lazy { App.appComponent.s1Service }
 
     private var threadId: String? = null
     private var postID: String? = null
@@ -68,7 +66,6 @@ class NewRateFragment : BaseFragment() {
         postID = arguments?.getString(ARG_POST_ID)
         leavePageMsg("NewRateFragment##threadId:$threadId,postID:$postID")
 
-        App.appComponent.inject(this)
         init()
         refreshData()
     }

@@ -1,7 +1,6 @@
 package me.ykrank.s1next.util
 
 import android.content.Context
-import com.github.ykrank.androidtools.util.RxJavaUtil
 import com.tencent.bugly.crashreport.CrashReport
 import com.tencent.bugly.crashreport.CrashReport.UserStrategy
 import kotlinx.coroutines.DelicateCoroutinesApi

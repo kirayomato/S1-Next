@@ -14,28 +14,22 @@ import com.github.ykrank.androidtools.widget.EventBus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.ykrank.s1next.App.Companion.appComponent
+import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.db.biz.BlackListBiz
 import me.ykrank.s1next.databinding.DialogBlacklistRemarkBinding
 import me.ykrank.s1next.view.dialog.BaseDialogFragment
 import me.ykrank.s1next.view.event.BlackListChangeEvent
 import me.ykrank.s1next.widget.track.event.BlackListTrackEvent
-import javax.inject.Inject
 
 /**
  * A dialog lets the user enter blacklist remark.
  */
 class BlackListRemarkDialogFragment : BaseDialogFragment() {
-    @Inject
-    lateinit var eventBus: EventBus
-
-    @Inject
-    lateinit var blackListDb: BlackListBiz
+    private val eventBus: EventBus = App.preAppComponent.eventBus
+    private val blackListDb: BlackListBiz by lazy { App.appComponent.blackListBiz }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        appComponent.inject(this)
-
         val activity: Activity = requireActivity()
         val binding = DataBindingUtil.inflate<DialogBlacklistRemarkBinding>(
             activity.layoutInflater,

@@ -9,20 +9,13 @@ import me.ykrank.s1next.data.api.app.model.AppDataWrapper
 import me.ykrank.s1next.data.api.app.model.AppLoginResult
 import me.ykrank.s1next.view.dialog.ProgressDialogFragment
 import me.ykrank.s1next.view.event.AppLoginEvent
-import javax.inject.Inject
 
 /**
  * A [ProgressDialogFragment] posts a request to login to server.
  */
 class AppLoginDialogFragment : BaseLoginDialogFragment<AppDataWrapper<AppLoginResult>>() {
 
-    @Inject
-    internal lateinit var mAppService: AppService
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        App.appComponent.inject(this)
-        super.onCreate(savedInstanceState)
-    }
+    private val mAppService: AppService by lazy { App.appComponent.appService }
 
     override fun getSourceObservable(): Single<AppDataWrapper<AppLoginResult>> {
         return mAppService.login(username, password, questionId, answer)

@@ -8,7 +8,6 @@ import me.ykrank.s1next.App
 import me.ykrank.s1next.data.pref.DownloadPreferencesManager
 import okhttp3.Call
 import java.io.InputStream
-import javax.inject.Inject
 
 /**
  * Created by ykrank on 2017/3/21.
@@ -16,12 +15,8 @@ import javax.inject.Inject
 
 class AppHttpStreamFetcher(client: Call.Factory, url: GlideUrl) : OkHttpStreamFetcher(client, url) {
 
-    @Inject
-    lateinit var mDownloadPreferencesManager: DownloadPreferencesManager
-
-    init {
-        App.appComponent.inject(this)
-    }
+    private val mDownloadPreferencesManager: DownloadPreferencesManager =
+        App.preAppComponent.downloadPreferencesManager
 
     override fun loadData(priority: Priority, callback: DataFetcher.DataCallback<in InputStream>) {
         if (!mDownloadPreferencesManager.isImagesDownload) {

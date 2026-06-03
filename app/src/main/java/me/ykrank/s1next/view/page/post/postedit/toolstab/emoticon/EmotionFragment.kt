@@ -9,7 +9,6 @@ import me.ykrank.s1next.databinding.FragmentEmotionBinding
 import me.ykrank.s1next.view.fragment.BaseFragment
 import me.ykrank.s1next.view.page.post.postedit.toolstab.emoticon.adapter.EmoticonPagerAdapter
 import me.ykrank.s1next.widget.EmoticonFactory
-import javax.inject.Inject
 
 class EmotionFragment : BaseFragment() {
 
@@ -17,8 +16,7 @@ class EmotionFragment : BaseFragment() {
 
     protected lateinit var mEmoticonKeyboard: View
 
-    @Inject
-    internal lateinit var mEmoticonFactory: EmoticonFactory
+    private val mEmoticonFactory: EmoticonFactory by lazy { App.appComponent.emoticonFactory }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentEmotionBinding.inflate(inflater, container, false)
@@ -27,11 +25,6 @@ class EmotionFragment : BaseFragment() {
 
         setupEmoticonPager()
         return binding.root
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        App.appComponent.inject(this)
     }
 
     private fun setupEmoticonPager() {

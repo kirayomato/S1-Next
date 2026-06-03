@@ -9,7 +9,6 @@ import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewHolder
 import com.github.ykrank.androidtools.widget.EventBus
 import me.ykrank.s1next.App
 import me.ykrank.s1next.R
-import me.ykrank.s1next.data.api.S1Service
 import me.ykrank.s1next.data.api.model.Post
 import me.ykrank.s1next.data.api.model.Thread
 import me.ykrank.s1next.data.api.model.Vote
@@ -19,7 +18,6 @@ import me.ykrank.s1next.view.adapter.delegate.BaseAdapterDelegate
 import me.ykrank.s1next.view.page.post.viewmodel.PostBlackViewModel
 import me.ykrank.s1next.widget.span.FixedSpannableFactory
 import me.ykrank.s1next.widget.span.PostMovementMethod
-import javax.inject.Inject
 
 class PostBlackAdapterDelegate(private val fragment: Fragment, context: Context) :
     BaseAdapterDelegate<Post, SimpleRecycleViewHolder<ItemPostBlackBinding>>(
@@ -27,21 +25,12 @@ class PostBlackAdapterDelegate(private val fragment: Fragment, context: Context)
         Post::class.java
     ) {
 
-    @Inject
-    internal lateinit var mEventBus: EventBus
-
-    @Inject
-    internal lateinit var mS1Service: S1Service
-
-    @Inject
-    internal lateinit var mGeneralPreferencesManager: GeneralPreferencesManager
+    private val mEventBus: EventBus = App.preAppComponent.eventBus
+    private val mGeneralPreferencesManager: GeneralPreferencesManager =
+        App.preAppComponent.generalPreferencesManager
     private var threadInfo: Thread? = null
     private var voteInfo: Vote? = null
     private var pageNum: Int = 1
-
-    init {
-        App.appComponent.inject(this)
-    }
 
     private fun setTextSelectable(binding: ItemPostBlackBinding, selectable: Boolean) {
         binding.authorName.setTextIsSelectable(selectable)

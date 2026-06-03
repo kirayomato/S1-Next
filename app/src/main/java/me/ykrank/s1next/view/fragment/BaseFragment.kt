@@ -8,6 +8,7 @@ import androidx.annotation.CallSuper
 import androidx.lifecycle.lifecycleScope
 import com.github.ykrank.androidtools.ui.LibBaseFragment
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import me.ykrank.s1next.App
 import me.ykrank.s1next.data.User
@@ -16,17 +17,18 @@ import me.ykrank.s1next.util.ErrorUtil
 import me.ykrank.s1next.view.activity.BaseActivity
 import javax.inject.Inject
 
+@AndroidEntryPoint
 abstract class BaseFragment : LibBaseFragment() {
 
     @Inject
     internal lateinit var mUserValidator: UserValidator
+
     @Inject
     internal lateinit var mUser: User
 
     @CallSuper
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        App.appComponent.inject(this)
     }
 
     fun showRetrySnackbar(throwable: Throwable, onClickListener: View.OnClickListener) {

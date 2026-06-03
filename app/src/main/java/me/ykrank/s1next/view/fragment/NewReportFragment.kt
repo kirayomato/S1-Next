@@ -25,15 +25,13 @@ import me.ykrank.s1next.data.api.model.AjaxResult
 import me.ykrank.s1next.data.api.model.ReportPreInfo
 import me.ykrank.s1next.databinding.FragmentNewReportBinding
 import me.ykrank.s1next.view.adapter.SimpleSpinnerAdapter
-import javax.inject.Inject
 
 /**
  * A Fragment shows [EditText] to let the user enter reply.
  */
 class NewReportFragment : BaseFragment() {
 
-    @Inject
-    internal lateinit var s1Service: S1Service
+    private val s1Service: S1Service by lazy { App.appComponent.s1Service }
 
     private var threadId: String? = null
     private var postID: String? = null
@@ -61,7 +59,6 @@ class NewReportFragment : BaseFragment() {
         pageNum = arguments?.getInt(ARG_PAGE_NUM, 1) ?: 1
         leavePageMsg("NewReportFragment##threadId:$threadId,postID:$postID,pageNum:$pageNum")
 
-        App.appComponent.inject(this)
         init()
         refreshData()
     }

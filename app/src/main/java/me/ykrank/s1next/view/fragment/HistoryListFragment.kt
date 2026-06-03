@@ -10,13 +10,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.ykrank.s1next.App.Companion.appComponent
+import me.ykrank.s1next.App
 import me.ykrank.s1next.data.cache.biz.CacheBiz
 import me.ykrank.s1next.data.db.biz.HistoryBiz
 import me.ykrank.s1next.databinding.FragmentBaseBinding
 import me.ykrank.s1next.view.activity.HistoryActivity
 import me.ykrank.s1next.view.adapter.HistoryCursorRecyclerViewAdapter
-import javax.inject.Inject
 
 /**
  * Fragment show post view history list
@@ -24,11 +23,9 @@ import javax.inject.Inject
 class HistoryListFragment : BaseFragment() {
     private var mRecyclerAdapter: HistoryCursorRecyclerViewAdapter? = null
 
-    @Inject
-    lateinit var historyBiz: HistoryBiz
+    private val historyBiz: HistoryBiz by lazy { App.appComponent.historyBiz }
 
-    @Inject
-    lateinit var cacheBiz: CacheBiz
+    private val cacheBiz: CacheBiz by lazy { App.appComponent.cacheBiz }
 
     private lateinit var binding: FragmentBaseBinding
     private var mode: String = HistoryActivity.MODE_HISTORY
@@ -49,7 +46,6 @@ class HistoryListFragment : BaseFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        appComponent.inject(this)
         super.onViewCreated(view, savedInstanceState)
         leavePageMsg("HistoryListFragment")
         val activity: Activity = requireActivity()

@@ -7,8 +7,6 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.github.ykrank.androidtools.widget.EditorDiskCache;
 
-import javax.inject.Inject;
-
 import me.ykrank.s1next.App;
 import me.ykrank.s1next.R;
 
@@ -19,9 +17,6 @@ import me.ykrank.s1next.R;
 public final class DiscardEditPromptDialogFragment extends BaseDialogFragment {
 
     public static final String TAG = DiscardEditPromptDialogFragment.class.getName();
-
-    @Inject
-    EditorDiskCache editorDiskCache;
 
     private static final String ARG_KEY = "key";
     private static final String ARG_CONTENT = "content";
@@ -47,8 +42,7 @@ public final class DiscardEditPromptDialogFragment extends BaseDialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        App.Companion.getAppComponent().inject(this);
-        
+        final EditorDiskCache editorDiskCache = App.Companion.getAppComponent().getEditorDiskCache();
         String msg = getArguments().getString(ARG_MESSAGE);
         if (msg == null) msg = getString(R.string.dialog_message_reply_discard_prompt);
         final String key = getArguments().getString(ARG_KEY);

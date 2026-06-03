@@ -18,7 +18,6 @@ import me.ykrank.s1next.databinding.FragmentWebviewBinding
 import me.ykrank.s1next.view.internal.BackPressDelegate
 import me.ykrank.s1next.viewmodel.WebPageViewModel
 import java.net.CookieManager
-import javax.inject.Inject
 
 /**
  * Local WebView for PC web site and sync OkHttp cookie
@@ -29,13 +28,11 @@ class WebViewFragment : BaseFragment(), BackPressDelegate {
     private var enableJs: Boolean = false
     private var pcAgent: Boolean = false
 
-    @Inject
-    internal lateinit var mCookieManager: CookieManager
+    private val mCookieManager: CookieManager = App.preAppComponent.cookieManager
 
     private lateinit var binding: FragmentWebviewBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        App.appComponent.inject(this)
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_webview, container, false)
         return binding.root
     }

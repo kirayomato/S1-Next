@@ -12,23 +12,18 @@ import com.github.ykrank.androidtools.widget.hostcheck.BaseHostUrl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.ykrank.s1next.App.Companion.appComponent
+import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.data.pref.NetworkPreferencesManager
 import me.ykrank.s1next.widget.hostcheck.AppHostUrl
-import javax.inject.Inject
 
 class NetworkPreferenceFragment : BasePreferenceFragment() {
 
-    @Inject
-    lateinit var mPreferencesManager: NetworkPreferencesManager
-
-    @Inject
-    lateinit var baseHostUrl: AppHostUrl
+    private val mPreferencesManager: NetworkPreferencesManager = App.preAppComponent.networkPreferencesManager
+    private val baseHostUrl: AppHostUrl by lazy { App.appComponent.baseHostUrl }
 
     override fun onCreatePreferences(bundle: Bundle?, s: String?) {
-        appComponent.inject(this)
         addPreferencesFromResource(R.xml.preference_network)
 
         checkForceBaseUrlSummary()

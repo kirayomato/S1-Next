@@ -29,7 +29,6 @@ import me.ykrank.s1next.view.event.ThemeChangeEvent
 import me.ykrank.s1next.view.page.setting.SettingsActivity
 import me.ykrank.s1next.widget.span.HtmlCompat
 import me.ykrank.s1next.widget.span.HtmlCompat.FROM_HTML_MODE_LEGACY
-import javax.inject.Inject
 
 /**
  * An Activity includes general settings that allow users
@@ -38,20 +37,16 @@ import javax.inject.Inject
  */
 class GeneralPreferenceFragment : BasePreferenceFragment(), Preference.OnPreferenceClickListener {
 
-    @Inject
-    internal lateinit var mEventBus: EventBus
+    private val mEventBus: EventBus = App.preAppComponent.eventBus
 
-    @Inject
-    internal lateinit var mGeneralPreferencesManager: GeneralPreferencesManager
+    private val mGeneralPreferencesManager: GeneralPreferencesManager =
+        App.preAppComponent.generalPreferencesManager
 
-    @Inject
-    internal lateinit var mThemeManager: ThemeManager
+    private val mThemeManager: ThemeManager = App.preAppComponent.themeManager
 
-    @Inject
-    internal lateinit var trackAgent: DataTrackAgent
+    private val trackAgent: DataTrackAgent = App.preAppComponent.dataTrackAgent
 
     override fun onCreatePreferences(bundle: Bundle?, s: String?) {
-        App.appComponent.inject(this)
         addPreferencesFromResource(R.xml.preference_general)
 
         findPreference<Preference>(getString(R.string.pref_key_downloads))?.onPreferenceClickListener = this

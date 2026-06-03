@@ -22,7 +22,6 @@ import me.ykrank.s1next.data.cache.biz.CacheBiz
 import me.ykrank.s1next.util.ErrorUtil
 import me.ykrank.s1next.view.activity.HistoryActivity
 import me.ykrank.s1next.view.dialog.BaseLoadProgressDialogFragment
-import javax.inject.Inject
 import kotlin.math.max
 
 
@@ -30,24 +29,19 @@ import kotlin.math.max
  * A dialog lets user load website blacklist.
  */
 class ThreadPrefetchDialogFragment : BaseLoadProgressDialogFragment() {
-    @Inject
-    lateinit var mUser: User
+    private val mUser: User by lazy { App.appComponent.user }
 
-    @Inject
-    lateinit var apiCache: ApiCacheProvider
+    private val apiCache: ApiCacheProvider by lazy { App.appComponent.apiCacheProvider }
 
-    @Inject
-    lateinit var cacheBiz: CacheBiz
+    private val cacheBiz: CacheBiz by lazy { App.appComponent.cacheBiz }
 
-    @Inject
-    lateinit var jsonMapper: ObjectMapper
+    private val jsonMapper: ObjectMapper = App.preAppComponent.jsonMapper
 
     private lateinit var threadId: String
     private var pageStart: Int = 1
     private var backupMode: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        App.appComponent.inject(this)
         super.onCreate(savedInstanceState)
         threadId = requireArguments().getString(ARG_THREAD_ID)!!
         pageStart = requireArguments().getInt(ARG_PAGE_START, 1)

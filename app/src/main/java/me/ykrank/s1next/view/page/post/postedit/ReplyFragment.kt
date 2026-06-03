@@ -14,7 +14,6 @@ import me.ykrank.s1next.util.AppDeviceUtil
 import me.ykrank.s1next.view.dialog.requestdialog.ReplyRequestDialogFragment
 import me.ykrank.s1next.view.event.RequestDialogSuccessEvent
 import me.ykrank.s1next.widget.uploadimg.ForumAttachmentUploadTarget
-import javax.inject.Inject
 
 /**
  * A Fragment shows [EditText] to let the user enter reply.
@@ -31,8 +30,7 @@ class ReplyFragment : BasePostEditFragment() {
     private var parsedForumAttachmentUploadInfo: PostEditor.ForumAttachmentUploadInfo? = null
     private var parsedForumAttachments: List<PostEditor.ForumAttachment> = emptyList()
 
-    @Inject
-    internal lateinit var mS1Service: S1Service
+    private val mS1Service: S1Service by lazy { App.appComponent.s1Service }
 
     override val forumAttachmentUploadTarget: ForumAttachmentUploadTarget?
         get() = mThreadId?.let { ForumAttachmentUploadTarget.Reply(it, mForumId, mPageNum) }
@@ -47,7 +45,6 @@ class ReplyFragment : BasePostEditFragment() {
         get() = parsedForumAttachments
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        App.appComponent.inject(this)
         val bundle = requireArguments()
         mThreadId = bundle.getString(ARG_THREAD_ID)
         mQuotePostId = bundle.getString(ARG_QUOTE_POST_ID)

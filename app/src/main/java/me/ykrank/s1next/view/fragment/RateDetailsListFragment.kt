@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.ykrank.androidtools.extension.dp2px
 import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewAdapter
 import com.github.ykrank.androidtools.ui.vm.LoadingViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.model.Rate
@@ -19,6 +20,7 @@ import me.ykrank.s1next.view.activity.UserHomeActivity
  * Created by ykrank on 2017/1/16.
  */
 
+@AndroidEntryPoint
 class RateDetailsListFragment : BaseRecyclerViewFragment<List<Rate>>() {
 
     private lateinit var rates: List<Rate>

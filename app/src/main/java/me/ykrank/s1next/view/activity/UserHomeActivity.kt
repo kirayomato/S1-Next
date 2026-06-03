@@ -38,7 +38,6 @@ import me.ykrank.s1next.view.internal.BlacklistMenuAction
 import me.ykrank.s1next.widget.glide.AvatarFailUrlsCache
 import me.ykrank.s1next.widget.image.ImageBiz
 import me.ykrank.s1next.widget.track.event.ViewHomeTrackEvent
-import javax.inject.Inject
 
 /**
  * Created by ykrank on 2017/1/8.
@@ -46,8 +45,7 @@ import javax.inject.Inject
 
 class UserHomeActivity : BaseActivity() {
 
-    @Inject
-    internal lateinit var profileProvider: ProfileProvider
+    private val profileProvider: ProfileProvider by lazy { App.appComponent.profileProvider }
 
     private lateinit var binding: ActivityHomeBinding
     private var uid: String? = null
@@ -65,7 +63,6 @@ class UserHomeActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        App.appComponent.inject(this)
 
         uid = intent.getStringExtra(ARG_UID)
         name = intent.getStringExtra(ARG_USERNAME)

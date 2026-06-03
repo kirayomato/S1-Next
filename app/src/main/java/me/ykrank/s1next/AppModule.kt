@@ -6,6 +6,8 @@ import com.github.ykrank.androidtools.widget.EditorDiskCache
 import com.github.ykrank.androidtools.widget.EventBus
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.data.api.ApiCacheProvider
@@ -49,27 +51,29 @@ import retrofit2.converter.jackson.JacksonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.io.File
 import java.util.concurrent.TimeUnit
+import javax.inject.Singleton
 
 /**
  * Provides instances of the objects when we need to inject.
  */
 @Module
+@InstallIn(SingletonComponent::class)
 class AppModule {
     @Provides
-    @AppLife
+    @Singleton
     fun provideBaseHostUrl(networkPreferencesManager: NetworkPreferencesManager): AppHostUrl {
         return AppHostUrl(networkPreferencesManager)
     }
 
     @Provides
-    @AppLife
+    @Singleton
     fun provideHttpDns(context: Context, baseHostUrl: AppHostUrl): Dns {
         return AppDns(context, baseHostUrl)
     }
 
     @Data
     @Provides
-    @AppLife
+    @Singleton
     fun providerDataOkHttpClientBuilder(
         cookieJar: CookieJar,
         baseHostUrl: AppHostUrl,
@@ -89,7 +93,7 @@ class AppModule {
 
     @AppData
     @Provides
-    @AppLife
+    @Singleton
     fun providerAppDataOkHttpClientBuilder(
         cookieJar: CookieJar,
         user: User
@@ -106,7 +110,7 @@ class AppModule {
 
     @Image
     @Provides
-    @AppLife
+    @Singleton
     fun providerImageOkHttpClientBuilder(
         cookieJar: CookieJar,
         baseHostUrl: AppHostUrl,
@@ -127,7 +131,7 @@ class AppModule {
     }
 
     @Provides
-    @AppLife
+    @Singleton
     fun providerRetrofit(@Data okHttpClient: OkHttpClient, mapper: ObjectMapper): S1Service {
         return Retrofit.Builder()
             .client(okHttpClient)
@@ -141,7 +145,7 @@ class AppModule {
     }
 
     @Provides
-    @AppLife
+    @Singleton
     fun providerAppRetrofit(@AppData okHttpClient: OkHttpClient): AppService {
         return Retrofit.Builder()
             .client(okHttpClient)
@@ -154,7 +158,7 @@ class AppModule {
     }
 
     @Provides
-    @AppLife
+    @Singleton
     fun providerProfileProvider(
         s1Service: S1Service,
         userProfileBiz: UserProfileBiz,
@@ -163,7 +167,7 @@ class AppModule {
     }
 
     @Provides
-    @AppLife
+    @Singleton
     fun providerApiCacheProvider(
         context: Context,
         downloadPreferencesManager: DownloadPreferencesManager,
@@ -186,31 +190,31 @@ class AppModule {
     }
 
     @Provides
-    @AppLife
+    @Singleton
     fun providerUser(userViewModel: UserViewModel): User {
         return userViewModel.user
     }
 
     @Provides
-    @AppLife
+    @Singleton
     fun provideAutoSignTask(s1Service: S1Service, user: User): AutoSignTask {
         return AutoSignTask(s1Service, user)
     }
 
     @Provides
-    @AppLife
+    @Singleton
     fun providerUserValidator(user: User, autoSignTask: AutoSignTask): UserValidator {
         return UserValidator(user, autoSignTask)
     }
 
     @Provides
-    @AppLife
+    @Singleton
     fun providerUserViewModel(appDataPreferencesManager: AppDataPreferencesManager): UserViewModel {
         return UserViewModel(appDataPreferencesManager)
     }
 
     @Provides
-    @AppLife
+    @Singleton
     fun provideNoticeCheckTask(
         eventBus: EventBus,
         s1Service: S1Service,
@@ -220,7 +224,7 @@ class AppModule {
     }
 
     @Provides
-    @AppLife
+    @Singleton
     fun provideEditorDiskCache(context: Context): EditorDiskCache {
         return EditorDiskCache(
             context.cacheDir.path
@@ -229,19 +233,19 @@ class AppModule {
     }
 
     @Provides
-    @AppLife
+    @Singleton
     fun provideAvatarUrlsCache(): AvatarFailUrlsCache {
         return AvatarFailUrlsCache()
     }
 
     @Provides
-    @AppLife
+    @Singleton
     fun provideProgressManager(): ProgressManager {
         return ProgressManager()
     }
 
     @Provides
-    @AppLife
+    @Singleton
     fun provideEmoticonFactory(context: Context): EmoticonFactory {
         return EmoticonFactory(context)
     }

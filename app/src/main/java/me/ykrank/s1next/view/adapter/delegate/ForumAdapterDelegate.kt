@@ -11,15 +11,9 @@ import me.ykrank.s1next.data.api.model.Forum
 import me.ykrank.s1next.data.pref.ThemeManager
 import me.ykrank.s1next.databinding.ItemForumBinding
 import me.ykrank.s1next.viewmodel.ForumViewModel
-import javax.inject.Inject
 
 class ForumAdapterDelegate(context: Context) : BaseAdapterDelegate<Forum, SimpleRecycleViewHolder<ItemForumBinding>>(context, Forum::class.java) {
-    @Inject
-    internal lateinit var themeManager: ThemeManager
-
-    init {
-        App.appComponent.inject(this)
-    }
+    private val themeManager: ThemeManager = App.preAppComponent.themeManager
 
     public override fun onCreateViewHolder(parent: ViewGroup): androidx.recyclerview.widget.RecyclerView.ViewHolder {
         val binding = DataBindingUtil.inflate<ItemForumBinding>(mLayoutInflater,

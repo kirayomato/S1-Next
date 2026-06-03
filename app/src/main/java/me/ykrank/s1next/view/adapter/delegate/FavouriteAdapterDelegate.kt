@@ -12,7 +12,6 @@ import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.model.Favourite
 import me.ykrank.s1next.databinding.ItemFavouriteBinding
 import me.ykrank.s1next.viewmodel.FavouriteViewModel
-import javax.inject.Inject
 
 class FavouriteAdapterDelegate(
     context: Context,
@@ -23,12 +22,7 @@ class FavouriteAdapterDelegate(
         Favourite::class.java
     ) {
 
-    @Inject
-    lateinit var mEventBus: EventBus
-
-    init {
-        App.appComponent.inject(this)
-    }
+    private val mEventBus: EventBus = App.preAppComponent.eventBus
 
     public override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
         val binding = DataBindingUtil.inflate<ItemFavouriteBinding>(mLayoutInflater,

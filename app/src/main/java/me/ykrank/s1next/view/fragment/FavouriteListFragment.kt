@@ -19,17 +19,14 @@ import me.ykrank.s1next.data.api.ApiFlatTransformer
 import me.ykrank.s1next.data.api.S1Service
 import me.ykrank.s1next.util.IntentUtil
 import me.ykrank.s1next.view.event.FavoriteRemoveEvent
-import javax.inject.Inject
 
 /**
  * A Fragment includes [android.support.v4.view.ViewPager]
  * to represent each page of favourite lists.
  */
 class FavouriteListFragment : BaseViewPagerFragment() {
-    @Inject
-    internal lateinit var mEventBus: EventBus
-    @Inject
-    internal lateinit var s1Service: S1Service
+    private val mEventBus: EventBus = App.preAppComponent.eventBus
+    private val s1Service: S1Service by lazy { App.appComponent.s1Service }
 
     private var mTitle: CharSequence? = null
 
@@ -38,7 +35,6 @@ class FavouriteListFragment : BaseViewPagerFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        App.appComponent.inject(this)
         super.onViewCreated(view, savedInstanceState)
         leavePageMsg("FavouriteListFragment")
 

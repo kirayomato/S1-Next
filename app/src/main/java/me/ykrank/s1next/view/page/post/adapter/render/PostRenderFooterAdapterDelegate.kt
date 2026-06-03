@@ -41,8 +41,8 @@ class PostRenderFooterAdapterDelegate(
         PostRenderItem.Footer::class.java
     ) {
     private val eventBus: EventBus = App.preAppComponent.eventBus
-    private val user: User = App.appComponent.user
-    private val apiCache: ApiCacheProvider = App.appComponent.apiCacheProvider
+    private val user: User by lazy { App.appComponent.user }
+    private val apiCache: ApiCacheProvider by lazy { App.appComponent.apiCacheProvider }
     private val generalPreferencesManager: GeneralPreferencesManager =
         App.preAppComponent.generalPreferencesManager
 

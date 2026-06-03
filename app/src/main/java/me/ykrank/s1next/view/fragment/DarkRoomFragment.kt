@@ -2,21 +2,18 @@ package me.ykrank.s1next.view.fragment
 
 import android.os.Bundle
 import android.view.View
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
-import me.ykrank.s1next.App
-import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.model.darkroom.DarkRoomWrapper
 import me.ykrank.s1next.view.adapter.BaseRecyclerViewAdapter
 import me.ykrank.s1next.view.adapter.DarkRoomRecyclerViewAdapter
-import javax.inject.Inject
 
 /**
  * Created by ykrank on 2016/11/12 0012.
  */
 
+@AndroidEntryPoint
 class DarkRoomFragment : BaseLoadMoreRecycleViewFragment<DarkRoomWrapper>() {
-    @Inject
-    internal lateinit var user: User
     private lateinit var mRecyclerAdapter: DarkRoomRecyclerViewAdapter
 
     private var lastCid = ""
@@ -26,7 +23,6 @@ class DarkRoomFragment : BaseLoadMoreRecycleViewFragment<DarkRoomWrapper>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        App.appComponent.inject(this)
         leavePageMsg("DarkRoomFragment")
     }
 

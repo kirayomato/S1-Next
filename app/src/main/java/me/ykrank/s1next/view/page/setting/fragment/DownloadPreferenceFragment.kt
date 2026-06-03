@@ -26,7 +26,6 @@ import me.ykrank.s1next.data.pref.DownloadPreferencesManager
 import me.ykrank.s1next.util.AppFileUtil
 import me.ykrank.s1next.view.page.test.ImageCacheViewFragment
 import java.text.DecimalFormat
-import javax.inject.Inject
 
 /**
  * An Activity includes download settings that allow users
@@ -35,14 +34,12 @@ import javax.inject.Inject
  */
 class DownloadPreferenceFragment : BasePreferenceFragment(), Preference.OnPreferenceClickListener {
 
-    @Inject
-    internal lateinit var mDownloadPreferencesManager: DownloadPreferencesManager
+    private val mDownloadPreferencesManager: DownloadPreferencesManager =
+        App.preAppComponent.downloadPreferencesManager
 
-    @Inject
-    internal lateinit var mCacheBiz: CacheBiz
+    private val mCacheBiz: CacheBiz by lazy { App.appComponent.cacheBiz }
 
-    @Inject
-    internal lateinit var mUser: User
+    private val mUser: User by lazy { App.appComponent.user }
 
     private var disposable: Disposable? = null
 
@@ -60,7 +57,6 @@ class DownloadPreferenceFragment : BasePreferenceFragment(), Preference.OnPrefer
     }
 
     override fun onCreatePreferences(bundle: Bundle?, s: String?) {
-        App.appComponent.inject(this)
         addPreferencesFromResource(R.xml.preference_download)
 
         findPreference<Preference>(getString(R.string.pref_key_data_download_path))?.onPreferenceClickListener =

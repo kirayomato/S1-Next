@@ -34,7 +34,6 @@ import me.ykrank.s1next.view.page.post.share.PostShareSelectionPayload
 import me.ykrank.s1next.view.page.post.viewmodel.PostViewModel
 import me.ykrank.s1next.widget.span.FixedSpannableFactory
 import me.ykrank.s1next.widget.span.PostMovementMethod
-import javax.inject.Inject
 
 class PostAdapterDelegate(
     private val fragment: Fragment,
@@ -43,25 +42,15 @@ class PostAdapterDelegate(
 ) :
     BaseAdapterDelegate<Post, SimpleRecycleViewHolder<ItemPostBinding>>(context, Post::class.java) {
 
-    @Inject
-    internal lateinit var mEventBus: EventBus
-
-    @Inject
-    internal lateinit var mUser: User
-
-    @Inject
-    internal lateinit var mApiCache: ApiCacheProvider
-
-    @Inject
-    internal lateinit var mGeneralPreferencesManager: GeneralPreferencesManager
+    private val mEventBus: EventBus = App.preAppComponent.eventBus
+    private val mUser: User by lazy { App.appComponent.user }
+    private val mApiCache: ApiCacheProvider by lazy { App.appComponent.apiCacheProvider }
+    private val mGeneralPreferencesManager: GeneralPreferencesManager =
+        App.preAppComponent.generalPreferencesManager
     private var threadInfo: Thread? = null
     private var voteInfo: Vote? = null
     private var pageNum: Int = 1
     private val authorProfiles = mutableMapOf<String, Profile>()
-
-    init {
-        App.appComponent.inject(this)
-    }
 
     private fun setTextSelectable(binding: ItemPostBinding, selectable: Boolean) {
         binding.authorName.setTextIsSelectable(selectable)

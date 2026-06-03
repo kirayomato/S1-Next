@@ -3,6 +3,7 @@ package me.ykrank.s1next.view.fragment
 import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
 import me.ykrank.s1next.data.api.model.wrapper.HomeReplyWebWrapper
 import me.ykrank.s1next.view.adapter.BaseRecyclerViewAdapter
@@ -12,6 +13,7 @@ import me.ykrank.s1next.view.adapter.HomeReplyRecyclerViewAdapter
  * Created by ykrank on 2017/2/4.
  */
 
+@AndroidEntryPoint
 class UserReplyFragment : BaseLoadMoreRecycleViewFragment<HomeReplyWebWrapper>() {
 
     private var uid: String? = null

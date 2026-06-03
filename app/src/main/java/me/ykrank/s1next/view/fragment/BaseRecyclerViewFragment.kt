@@ -14,7 +14,6 @@ import com.github.ykrank.androidtools.widget.EventBus
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.ApiCacheProvider
@@ -27,6 +26,7 @@ import me.ykrank.s1next.databinding.FragmentBaseBinding
 import me.ykrank.s1next.databinding.FragmentBaseCardViewContainerBinding
 import me.ykrank.s1next.view.internal.LoadingViewModelBindingDelegateBaseCardViewContainerImpl
 import me.ykrank.s1next.view.internal.LoadingViewModelBindingDelegateBaseImpl
+import javax.inject.Inject
 
 /**
  * A base Fragment includes [SwipeRefreshLayout] to refresh when loading data.
@@ -40,21 +40,24 @@ import me.ykrank.s1next.view.internal.LoadingViewModelBindingDelegateBaseImpl
 </D> */
 abstract class BaseRecyclerViewFragment<D> : LibBaseRecyclerViewFragment<D>() {
 
+    @Inject
     internal lateinit var mUserValidator: UserValidator
+
+    @Inject
     internal lateinit var mS1Service: S1Service
+
+    @Inject
     internal lateinit var apiCacheProvider: ApiCacheProvider
+
+    @Inject
     internal lateinit var mUser: User
+
+    @Inject
     internal lateinit var mEventBus: EventBus
 
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mUserValidator = App.appComponent.userValidator
-        mS1Service = App.appComponent.s1Service
-        apiCacheProvider = App.appComponent.apiCacheProvider
-        mUser = App.appComponent.user
-        mEventBus = App.preAppComponent.eventBus
-
         setHasOptionsMenu(true)
     }
 

@@ -42,7 +42,6 @@ import me.ykrank.s1next.view.page.post.postedit.toolstab.emoticon.EmotionFragmen
 import me.ykrank.s1next.widget.uploadimg.FORUM_ATTACHMENT_REMOTE_PREFIX
 import me.ykrank.s1next.widget.uploadimg.ForumAttachmentUploadTarget
 import me.ykrank.s1next.widget.uploadimg.ForumAttachmentUploadTargetProvider
-import javax.inject.Inject
 
 /**
  * Created by ykrank on 2016/7/31 0031.
@@ -58,12 +57,10 @@ abstract class BasePostEditFragment : BaseFragment(),
      * `mMenuSend` is null when configuration changes.
      */
     protected var mMenuSend: MenuItem? = null
-    @Inject
-    internal lateinit var mEventBus: EventBus
-    @Inject
-    internal lateinit var mGeneralPreferencesManager: GeneralPreferencesManager
-    @Inject
-    internal lateinit var editorDiskCache: EditorDiskCache
+    internal val mEventBus: EventBus = App.preAppComponent.eventBus
+    internal val mGeneralPreferencesManager: GeneralPreferencesManager =
+        App.preAppComponent.generalPreferencesManager
+    internal val editorDiskCache: EditorDiskCache by lazy { App.appComponent.editorDiskCache }
     private var mCacheDisposable: Disposable? = null
     private var requestDialogDisposable: Disposable? = null
     /**
@@ -130,7 +127,6 @@ abstract class BasePostEditFragment : BaseFragment(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        App.appComponent.inject(this)
 
         mReplyView.addTextChangedListener(object : TextWatcher {
 

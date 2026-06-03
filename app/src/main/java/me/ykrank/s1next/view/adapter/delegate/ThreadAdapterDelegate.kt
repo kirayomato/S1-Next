@@ -14,7 +14,6 @@ import me.ykrank.s1next.data.pref.ThemeManager
 import me.ykrank.s1next.databinding.ItemThreadBinding
 import me.ykrank.s1next.viewmodel.ThreadViewModel
 import me.ykrank.s1next.viewmodel.UserViewModel
-import javax.inject.Inject
 
 class ThreadAdapterDelegate(
     context: Context,
@@ -23,18 +22,10 @@ class ThreadAdapterDelegate(
 ) :
         BaseAdapterDelegate<Thread, SimpleRecycleViewHolder<ItemThreadBinding>>(context, Thread::class.java) {
 
-    @Inject
-    internal lateinit var mUserViewModel: UserViewModel
-
-    @Inject
-    internal lateinit var mThemeManager: ThemeManager
-
-    @Inject
-    internal lateinit var mReadPreferencesManager: ReadPreferencesManager
-
-    init {
-        App.appComponent.inject(this)
-    }
+    private val mUserViewModel: UserViewModel by lazy { App.appComponent.userViewModel }
+    private val mThemeManager: ThemeManager = App.preAppComponent.themeManager
+    private val mReadPreferencesManager: ReadPreferencesManager =
+        App.preAppComponent.readProgressPreferencesManager
 
     public override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
         val binding = DataBindingUtil.inflate<ItemThreadBinding>(mLayoutInflater, R.layout.item_thread,

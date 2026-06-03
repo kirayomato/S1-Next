@@ -7,14 +7,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.FragmentActivity
 import com.github.ykrank.androidtools.util.WebViewUtils.clearWebViewCookies
 import com.github.ykrank.androidtools.widget.EventBus
-import me.ykrank.s1next.App.Companion.appComponent
-import me.ykrank.s1next.App.Companion.get
+import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.view.event.LoginEvent
 import me.ykrank.s1next.viewmodel.UserViewModel
 import java.net.CookieManager
-import javax.inject.Inject
 
 /**
  * A dialog shows logout prompt.
@@ -22,18 +20,13 @@ import javax.inject.Inject
  */
 class LogoutDialogFragment : BaseDialogFragment() {
 
-    @Inject
-    lateinit var mCookieManager: CookieManager
+    private val mCookieManager: CookieManager = App.preAppComponent.cookieManager
 
+    private val mUser: UserViewModel by lazy { App.appComponent.userViewModel }
 
-    @Inject
-    lateinit var mUser: UserViewModel
-
-    @Inject
-    lateinit var mEventBus: EventBus
+    private val mEventBus: EventBus = App.preAppComponent.eventBus
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        appComponent.inject(this)
         return AlertDialog.Builder(requireContext())
             .setMessage(R.string.dialog_message_log_out)
             .setPositiveButton(R.string.dialog_button_text_log_out) { dialog: DialogInterface?, which: Int -> logout() }
@@ -46,7 +39,7 @@ class LogoutDialogFragment : BaseDialogFragment() {
      */
     private fun logout() {
         mCookieManager.cookieStore.removeAll()
-        clearWebViewCookies(get())
+        clearWebViewCookies(App.get())
         mUser.user.appSecureToken = null
         mUser.user.isLogged = false
         mEventBus.postDefault(LoginEvent())

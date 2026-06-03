@@ -42,7 +42,6 @@ import me.ykrank.s1next.view.dialog.LogoutDialogFragment
 import me.ykrank.s1next.view.dialog.ThemeChangeDialogFragment
 import me.ykrank.s1next.view.page.setting.SettingsActivity
 import me.ykrank.s1next.viewmodel.UserViewModel
-import javax.inject.Inject
 
 /**
  * Implements the concrete UI logic for [DrawerLayoutDelegate].
@@ -55,27 +54,18 @@ class DrawerLayoutDelegateConcrete(
 
     private val mUser: User
 
-    @Inject
-    internal lateinit var mUserViewModel: UserViewModel
-
-    @Inject
-    internal lateinit var trackAgent: DataTrackAgent
-
-    @Inject
-    internal lateinit var mThemeManager: ThemeManager
-
-    @Inject
-    internal lateinit var mDataPreferencesManager: DataPreferencesManager
-
-    @Inject
-    internal lateinit var mAutoSignTask: AutoSignTask
+    private val mUserViewModel: UserViewModel by lazy { App.appComponent.userViewModel }
+    private val trackAgent: DataTrackAgent = App.preAppComponent.dataTrackAgent
+    private val mThemeManager: ThemeManager = App.preAppComponent.themeManager
+    private val mDataPreferencesManager: DataPreferencesManager =
+        App.preAppComponent.dataPreferencesManager
+    private val mAutoSignTask: AutoSignTask by lazy { App.appComponent.autoSignTask }
 
     private lateinit var pmNoticeBinding: ActionViewNoticeCountBinding
     private lateinit var noteNoticeBinding: ActionViewNoticeCountBinding
     private lateinit var binding: NavigationViewHeaderBinding
 
     init {
-        App.appComponent.inject(this)
         mUser = mUserViewModel.user
     }
 

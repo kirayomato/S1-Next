@@ -15,28 +15,19 @@ import me.ykrank.s1next.data.api.runApiCatching
 import me.ykrank.s1next.data.api.toastError
 import me.ykrank.s1next.data.db.biz.BlackListBiz
 import me.ykrank.s1next.data.db.dbmodel.BlackList
-import javax.inject.Inject
 
 
 /**
  * A dialog lets user load website blacklist.
  */
 class LoadBlackListFromWebDialogFragment : BaseLoadProgressDialogFragment() {
-    @Inject
-    lateinit var s1Service: S1Service
+    private val s1Service: S1Service by lazy { App.appComponent.s1Service }
 
-    @Inject
-    lateinit var mUser: User
+    private val mUser: User by lazy { App.appComponent.user }
 
-    @Inject
-    lateinit var blackListBiz: BlackListBiz
+    private val blackListBiz: BlackListBiz by lazy { App.appComponent.blackListBiz }
 
     private var callBack: (() -> Unit)? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        App.appComponent.inject(this)
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

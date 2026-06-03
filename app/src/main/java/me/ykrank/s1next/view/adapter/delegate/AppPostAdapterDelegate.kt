@@ -13,11 +13,9 @@ import me.ykrank.s1next.R
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.app.model.AppPost
 import me.ykrank.s1next.data.api.app.model.AppThread
-import me.ykrank.s1next.data.pref.GeneralPreferencesManager
 import me.ykrank.s1next.databinding.ItemAppPostBinding
 import me.ykrank.s1next.viewmodel.AppPostViewModel
 import me.ykrank.s1next.widget.span.PostMovementMethod
-import javax.inject.Inject
 
 class AppPostAdapterDelegate(
     activity: Activity,
@@ -28,18 +26,10 @@ class AppPostAdapterDelegate(
     AppPost::class.java
 ) {
 
-    @Inject
-    internal lateinit var mEventBus: EventBus
-    @Inject
-    internal lateinit var mUser: User
-    @Inject
-    internal lateinit var mGeneralPreferencesManager: GeneralPreferencesManager
+    private val mEventBus: EventBus = App.preAppComponent.eventBus
+    private val mUser: User by lazy { App.appComponent.user }
 
     private var threadInfo: AppThread? = null
-
-    init {
-        App.appComponent.inject(this)
-    }
 
     private fun setTextSelectable(binding: ItemAppPostBinding, selectable: Boolean) {
         binding.authorName.setTextIsSelectable(selectable)

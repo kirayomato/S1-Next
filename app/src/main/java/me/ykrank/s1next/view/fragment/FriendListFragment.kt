@@ -3,6 +3,7 @@ package me.ykrank.s1next.view.fragment
 import android.os.Bundle
 import android.view.View
 import com.github.ykrank.androidtools.ui.vm.LoadingViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
 import me.ykrank.s1next.data.api.model.collection.Friends
 import me.ykrank.s1next.data.api.model.wrapper.BaseDataWrapper
@@ -12,6 +13,7 @@ import me.ykrank.s1next.view.adapter.FriendRecyclerViewAdapter
  * Created by ykrank on 2017/1/16.
  */
 
+@AndroidEntryPoint
 class FriendListFragment : BaseRecyclerViewFragment<BaseDataWrapper<Friends>>() {
 
     private var uid: String? = null

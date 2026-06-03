@@ -10,9 +10,9 @@ import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.github.ykrank.androidtools.data.CacheParam
 import com.github.ykrank.androidtools.data.Resource
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.data.api.model.collection.ForumGroups
@@ -26,6 +26,7 @@ import me.ykrank.s1next.view.internal.ToolbarDropDownInterface
 /**
  * A Fragment represents forum list.
  */
+@AndroidEntryPoint
 class ForumFragment : BaseRecyclerViewFragment<ForumGroupsWrapper>(),
     ToolbarDropDownInterface.OnItemSelectedListener {
     private lateinit var mRecyclerAdapter: ForumRecyclerViewAdapter
@@ -36,7 +37,6 @@ class ForumFragment : BaseRecyclerViewFragment<ForumGroupsWrapper>(),
     private var inForceRefresh = false
 
     override fun onAttach(context: Context) {
-        App.appComponent.inject(this)
         super.onAttach(context)
 
         mToolbarCallback = context as ToolbarDropDownInterface.Callback?

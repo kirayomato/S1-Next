@@ -1,7 +1,6 @@
 package me.ykrank.s1next.view.fragment
 
 import android.app.Activity
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -24,15 +23,13 @@ import me.ykrank.s1next.view.dialog.requestdialog.EditPostRequestDialogFragment
 import me.ykrank.s1next.view.event.RequestDialogSuccessEvent
 import me.ykrank.s1next.view.page.post.postedit.BasePostEditFragment
 import me.ykrank.s1next.widget.uploadimg.ForumAttachmentUploadTarget
-import javax.inject.Inject
 
 /**
  * A Fragment shows [EditText] to let the user enter reply.
  */
 class EditPostFragment : BasePostEditFragment() {
 
-    @Inject
-    internal lateinit var mS1Service: S1Service
+    private val mS1Service: S1Service by lazy { App.appComponent.s1Service }
 
     private lateinit var mThread: Thread
     private lateinit var mPost: Post
@@ -64,11 +61,6 @@ class EditPostFragment : BasePostEditFragment() {
 
     override val forumAttachments: List<PostEditor.ForumAttachment>
         get() = parsedForumAttachments
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        App.appComponent.inject(this)
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentEditPostBinding.inflate(inflater, container, false)

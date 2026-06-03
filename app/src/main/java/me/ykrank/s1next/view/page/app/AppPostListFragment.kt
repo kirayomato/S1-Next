@@ -32,7 +32,6 @@ import me.ykrank.s1next.view.event.*
 import me.ykrank.s1next.view.fragment.BaseViewPagerFragment
 import me.ykrank.s1next.view.internal.PagerScrollState
 import me.ykrank.s1next.view.page.edit.EditPostActivity
-import javax.inject.Inject
 
 
 /**
@@ -41,14 +40,13 @@ import javax.inject.Inject
  */
 class AppPostListFragment : BaseViewPagerFragment(), AppPostListPagerFragment.PagerCallback, View.OnClickListener {
 
-    @Inject
-    internal lateinit var mEventBus: EventBus
+    private val mEventBus: EventBus = App.preAppComponent.eventBus
 
-    @Inject
-    internal lateinit var mGeneralPreferencesManager: GeneralPreferencesManager
+    private val mGeneralPreferencesManager: GeneralPreferencesManager =
+        App.preAppComponent.generalPreferencesManager
 
-    @Inject
-    internal lateinit var mDownloadPrefManager: DownloadPreferencesManager
+    private val mDownloadPrefManager: DownloadPreferencesManager =
+        App.preAppComponent.downloadPreferencesManager
 
     private lateinit var mThreadId: String
     private var mThreadTitle: String? = null
@@ -59,7 +57,6 @@ class AppPostListFragment : BaseViewPagerFragment(), AppPostListPagerFragment.Pa
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        App.appComponent.inject(this)
 
         val bundle = requireArguments()
         val type = bundle.getInt(ARG_TYPE)

@@ -23,24 +23,20 @@ import me.ykrank.s1next.widget.hostcheck.AppHostUrl
 import java.net.URI
 import java.util.Arrays
 import java.util.regex.Pattern
-import javax.inject.Inject
 
 /**
  * A Fragment to login in WebView.
  */
 class WebLoginFragment : BaseFragment() {
 
-    @Inject
-    internal lateinit var cookieManger: java.net.CookieManager
-    @Inject
-    internal lateinit var baseHostUrl: AppHostUrl
+    private val cookieManger: java.net.CookieManager = App.preAppComponent.cookieManager
+    private val baseHostUrl: AppHostUrl by lazy { App.appComponent.baseHostUrl }
 
     private lateinit var mFragmentHelpBinding: FragmentWebviewBinding
     private var webView: WebView? = null
     private lateinit var mProgressBar: ProgressBar
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        App.appComponent.inject(this)
         mFragmentHelpBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_webview, container,
                 false)
         webView = mFragmentHelpBinding.webView

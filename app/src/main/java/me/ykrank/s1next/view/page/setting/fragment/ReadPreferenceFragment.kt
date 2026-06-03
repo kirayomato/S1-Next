@@ -3,10 +3,7 @@ package me.ykrank.s1next.view.page.setting.fragment
 import android.content.SharedPreferences
 import android.os.Bundle
 import com.github.ykrank.androidtools.extension.toast
-import me.ykrank.s1next.App.Companion.appComponent
 import me.ykrank.s1next.R
-import me.ykrank.s1next.data.pref.ReadPreferencesManager
-import javax.inject.Inject
 
 /**
  * An Activity includes download settings that allow users
@@ -14,11 +11,8 @@ import javax.inject.Inject
  * size and avatars/images download strategy.
  */
 class ReadPreferenceFragment : BasePreferenceFragment() {
-    @Inject
-    internal lateinit var mReadPreferencesManager: ReadPreferencesManager
 
     override fun onCreatePreferences(bundle: Bundle?, s: String?) {
-        appComponent.inject(this)
         addPreferencesFromResource(R.xml.preference_read)
     }
 

@@ -31,15 +31,13 @@ import me.ykrank.s1next.view.fragment.ThreadListFragment
 import me.ykrank.s1next.view.fragment.ThreadListPagerFragment
 import me.ykrank.s1next.widget.track.event.RandomImageTrackEvent
 import me.ykrank.s1next.widget.track.event.ViewForumTrackEvent
-import javax.inject.Inject
 
 /**
  * An Activity shows the thread lists.
  */
 class ThreadListActivity : BaseActivity(), ThreadListPagerFragment.SubForumsCallback, WifiBroadcastReceiver.NeedMonitorWifi {
 
-    @Inject
-    internal lateinit var mS1Service: S1Service
+    private val mS1Service: S1Service by lazy { App.appComponent.s1Service }
 
     private var mListPopupWindow: ListPopupWindow? = null
     private var mSubForumArrayAdapter: SubForumArrayAdapter? = null
@@ -51,11 +49,6 @@ class ThreadListActivity : BaseActivity(), ThreadListPagerFragment.SubForumsCall
     private var threadTypes: ArrayList<ThreadType>? = null
 
     private var fragment: ThreadListFragment? = null
-
-    override fun attachBaseContext(newBase: Context?) {
-        super.attachBaseContext(newBase)
-        App.appComponent.inject(this)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

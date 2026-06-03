@@ -19,17 +19,18 @@ import com.github.ykrank.androidtools.util.ProcessUtil
 import com.github.ykrank.androidtools.util.ResourceUtil
 import com.github.ykrank.androidtools.widget.net.WifiActivityLifecycleCallbacks
 import com.github.ykrank.androidtools.widget.track.DataTrackAgent
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.android.HiltAndroidApp
 import io.reactivex.plugins.RxJavaPlugins
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import me.ykrank.s1next.data.db.DbModule
 import me.ykrank.s1next.data.pref.GeneralPreferencesManager
-import me.ykrank.s1next.data.pref.PrefModule
 import me.ykrank.s1next.util.BuglyUtils
 import me.ykrank.s1next.util.ErrorUtil
 import me.ykrank.s1next.widget.AppActivityLifecycleCallbacks
 
 
+@HiltAndroidApp
 class App : MultiDexApplication() {
 
     init {
@@ -53,10 +54,7 @@ class App : MultiDexApplication() {
         get() = mAppActivityLifecycleCallbacks.isAppVisible
 
     override fun attachBaseContext(base: Context) {
-        mPreAppComponent = DaggerPreAppComponent.builder()
-            .preAppModule(PreAppModule(this))
-            .prefModule(PrefModule(base))
-            .build()
+        mPreAppComponent = PreAppGraph(this, base)
         mGeneralPreferencesManager = mPreAppComponent.generalPreferencesManager
         super.attachBaseContext(ResourceUtil.setScaledDensity(base, mGeneralPreferencesManager.fontScale))
     }
@@ -96,12 +94,7 @@ class App : MultiDexApplication() {
         L.init(this)
         BuglyUtils.init(this)
 
-        mAppComponent = DaggerAppComponent.builder()
-            .preAppComponent(mPreAppComponent)
-            .buildTypeModule(BuildTypeModule(this))
-            .appModule(AppModule())
-            .dbModule(DbModule())
-            .build()
+        mAppComponent = EntryPointAccessors.fromApplication(this, AppComponent::class.java)
 
         mAppActivityLifecycleCallbacks = AppActivityLifecycleCallbacks(mAppComponent.noticeCheckTask)
         registerActivityLifecycleCallbacks(mAppActivityLifecycleCallbacks)

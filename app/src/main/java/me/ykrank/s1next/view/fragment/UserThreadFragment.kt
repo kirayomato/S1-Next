@@ -2,6 +2,7 @@ package me.ykrank.s1next.view.fragment
 
 import android.os.Bundle
 import android.view.View
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
 import me.ykrank.s1next.data.api.model.HomeThread
 import me.ykrank.s1next.data.api.model.wrapper.HomeThreadWebWrapper
@@ -12,6 +13,7 @@ import me.ykrank.s1next.view.adapter.HomeThreadRecyclerViewAdapter
  * Created by ykrank on 2017/2/4.
  */
 
+@AndroidEntryPoint
 class UserThreadFragment : BaseLoadMoreRecycleViewFragment<HomeThreadWebWrapper>() {
 
     private var uid: String? = null

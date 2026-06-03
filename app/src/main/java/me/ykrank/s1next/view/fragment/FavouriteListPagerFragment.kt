@@ -5,6 +5,7 @@ import android.view.View
 import com.github.ykrank.androidtools.ui.internal.PagerCallback
 import com.github.ykrank.androidtools.ui.vm.LoadingViewModel
 import com.github.ykrank.androidtools.util.MathUtil
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
 import me.ykrank.s1next.data.api.model.collection.Favourites
 import me.ykrank.s1next.data.api.model.wrapper.BaseResultWrapper
@@ -16,6 +17,7 @@ import me.ykrank.s1next.view.adapter.FavouriteRecyclerViewAdapter
  *
  * Activity or Fragment containing this must implement [PagerCallback].
  */
+@AndroidEntryPoint
 class FavouriteListPagerFragment : BaseRecyclerViewFragment<BaseResultWrapper<Favourites>>() {
 
     private var mPageNum: Int = 0

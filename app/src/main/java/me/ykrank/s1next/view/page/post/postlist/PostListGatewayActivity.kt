@@ -12,7 +12,6 @@ import me.ykrank.s1next.data.api.model.link.ThreadLink
 import me.ykrank.s1next.data.pref.ThemeManager
 import me.ykrank.s1next.view.dialog.QuotePostPageParserDialogFragment
 import me.ykrank.s1next.view.dialog.ThreadLinkInvalidPromptDialogFragment
-import javax.inject.Inject
 
 /**
  * An Activity to detect whether the thread link (URI) from Intent is valid.
@@ -23,13 +22,9 @@ import javax.inject.Inject
  */
 class PostListGatewayActivity : FragmentActivity() {
 
-    @Inject
-    lateinit var mThemeManager: ThemeManager
-
     override fun onCreate(savedInstanceState: Bundle?) {
         // default theme for this Activity is light theme
-        App.appComponent.inject(this)
-        if (mThemeManager.isDarkTheme) {
+        if (App.preAppComponent.themeManager.isDarkTheme) {
             setTheme(ThemeManager.TRANSLUCENT_THEME_DARK)
         }
 

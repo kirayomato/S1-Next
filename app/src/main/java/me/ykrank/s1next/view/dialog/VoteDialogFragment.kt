@@ -25,21 +25,17 @@ import me.ykrank.s1next.databinding.ItemVoteBinding
 import me.ykrank.s1next.databinding.LayoutVoteBinding
 import me.ykrank.s1next.viewmodel.ItemVoteViewModel
 import me.ykrank.s1next.viewmodel.VoteViewModel
-import javax.inject.Inject
 
 
 /**
  * A dialog lets the user vote thread.
  */
 class VoteDialogFragment : BaseDialogFragment(), VoteViewModel.VoteVmAction {
-    @Inject
-    lateinit var appService: AppService
+    private val appService: AppService by lazy { App.appComponent.appService }
 
-    @Inject
-    lateinit var s1Service: S1Service
+    private val s1Service: S1Service by lazy { App.appComponent.s1Service }
 
-    @Inject
-    lateinit var mUser: User
+    private val mUser: User by lazy { App.appComponent.user }
 
     private lateinit var tid: String
     private lateinit var mVote: Vote
@@ -49,7 +45,6 @@ class VoteDialogFragment : BaseDialogFragment(), VoteViewModel.VoteVmAction {
     private lateinit var data: List<ItemVoteViewModel>
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        App.appComponent.inject(this)
         super.onCreate(savedInstanceState)
         tid = requireArguments().getString(ARG_THREAD_ID)!!
         mVote = requireArguments().getParcelable(ARG_VOTE)!!

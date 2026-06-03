@@ -25,7 +25,6 @@ import me.ykrank.s1next.data.db.dbmodel.ReadProgress
 import me.ykrank.s1next.data.pref.ReadPreferencesManager
 import me.ykrank.s1next.view.activity.BaseActivity
 import me.ykrank.s1next.view.activity.ForumActivity
-import javax.inject.Inject
 
 /**
  * An Activity which includes [android.support.v4.view.ViewPager]
@@ -33,8 +32,8 @@ import javax.inject.Inject
  */
 class PostListActivity : BaseActivity(), WifiBroadcastReceiver.NeedMonitorWifi {
 
-    @Inject
-    lateinit var mReadPreferences: ReadPreferencesManager
+    private val mReadPreferences: ReadPreferencesManager =
+        App.preAppComponent.readProgressPreferencesManager
 
 
     var fragment: PostListFragment? = null
@@ -43,7 +42,6 @@ class PostListActivity : BaseActivity(), WifiBroadcastReceiver.NeedMonitorWifi {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        App.appComponent.inject(this)
         setContentView(R.layout.activity_base_long_title)
 
         disableDrawerIndicator()

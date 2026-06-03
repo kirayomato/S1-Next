@@ -32,7 +32,7 @@ class PostRenderHeaderAdapterDelegate(
         PostRenderItem.Header::class.java
     ) {
     private val eventBus: EventBus = App.preAppComponent.eventBus
-    private val user: User = App.appComponent.user
+    private val user: User by lazy { App.appComponent.user }
     private val generalPreferencesManager: GeneralPreferencesManager =
         App.preAppComponent.generalPreferencesManager
 
