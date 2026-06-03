@@ -12,15 +12,13 @@ import android.widget.EditText
 import androidx.databinding.DataBindingUtil
 import com.github.ykrank.androidautodispose.AndroidRxDispose
 import com.github.ykrank.androidlifecycle.event.FragmentEvent
-import com.github.ykrank.androidtools.ui.adapter.simple.BindViewHolderCallback
-import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewAdapter
 import com.github.ykrank.androidtools.util.RxJavaUtil
 import dagger.hilt.android.AndroidEntryPoint
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.S1Service
 import me.ykrank.s1next.data.api.model.RatePreInfo
 import me.ykrank.s1next.databinding.FragmentNewRateBinding
-import me.ykrank.s1next.databinding.ItemRateReasonBinding
+import me.ykrank.s1next.view.adapter.RateReasonAdapter
 import me.ykrank.s1next.view.adapter.SimpleSpinnerAdapter
 import me.ykrank.s1next.view.dialog.requestdialog.RateRequestDialogFragment
 import me.ykrank.s1next.viewmodel.NewRateViewModel
@@ -40,8 +38,7 @@ class NewRateFragment : BaseFragment() {
     private var ratePreInfo: RatePreInfo? = null
 
     private lateinit var binding: FragmentNewRateBinding
-    private lateinit var reasonAdapter: SimpleRecycleViewAdapter
-    private lateinit var bindViewHolderCallback: BindViewHolderCallback
+    private lateinit var reasonAdapter: RateReasonAdapter
 
     private val score: String
         get() = binding.spinner.selectedItem as String
@@ -89,13 +86,10 @@ class NewRateFragment : BaseFragment() {
     }
 
     private fun init() {
-        bindViewHolderCallback = BindViewHolderCallback { position, bind ->
-            val itemBinding = bind as ItemRateReasonBinding
-            itemBinding.root.setOnClickListener { v -> binding.etReason.setText(itemBinding.model) }
-        }
-
         binding.recycleView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
-        reasonAdapter = SimpleRecycleViewAdapter(context!!, R.layout.item_rate_reason, false, bindViewHolderCallback, null)
+        reasonAdapter = RateReasonAdapter(context!!) { reason ->
+            binding.etReason.setText(reason)
+        }
         binding.recycleView.adapter = reasonAdapter
     }
 
