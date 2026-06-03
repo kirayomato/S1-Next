@@ -1,13 +1,16 @@
 package me.ykrank.s1next.view.page.post.adapter
 
 import android.content.Context
+import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewHolder
 import com.github.ykrank.androidtools.widget.EventBus
 import me.ykrank.s1next.R
+import me.ykrank.s1next.binding.ImageViewBindingAdapter
+import me.ykrank.s1next.binding.TextViewBindingAdapter
+import me.ykrank.s1next.binding.ViewBindingAdapter
 import me.ykrank.s1next.data.api.model.Post
 import me.ykrank.s1next.data.api.model.Thread
 import me.ykrank.s1next.data.api.model.Vote
@@ -24,7 +27,7 @@ class PostBlackAdapterDelegate(
     private val mEventBus: EventBus,
     private val mGeneralPreferencesManager: GeneralPreferencesManager
 ) :
-    BaseAdapterDelegate<Post, SimpleRecycleViewHolder<ItemPostBlackBinding>>(
+    BaseAdapterDelegate<Post, PostBlackViewHolder>(
         context,
         Post::class.java
     ) {
@@ -46,47 +49,59 @@ class PostBlackAdapterDelegate(
     }
 
     public override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
-        val binding = DataBindingUtil.inflate<ItemPostBlackBinding>(
-            mLayoutInflater,
-            R.layout.item_post_black, parent, false
+        val binding = ItemPostBlackBinding.inflate(mLayoutInflater, parent, false)
+        val viewModel = PostBlackViewModel(fragment.viewLifecycleOwner, mEventBus)
+        binding.avatar.setOnClickListener(viewModel::onAvatarClick)
+        binding.avatar.setOnLongClickListener(viewModel::onAvatarLongClick)
+        binding.tvFloor.setOnClickListener(viewModel::onFloorClick)
+        TextViewBindingAdapter.increaseClickingArea(
+            binding.tvFloor,
+            binding.tvFloor.resources.getDimension(
+                com.github.ykrank.androidtools.R.dimen.minimum_touch_target_size
+            )
         )
-        binding.postViewModel = PostBlackViewModel(fragment.viewLifecycleOwner, mEventBus)
 
         binding.tvReply.setSpannableFactory(FixedSpannableFactory())
 
         setTextSelectable(binding, false)
 
-        return SimpleRecycleViewHolder(binding)
+        return PostBlackViewHolder(binding, viewModel)
     }
 
     override fun onBindViewHolderData(
         post: Post,
         position: Int,
-        holder: SimpleRecycleViewHolder<ItemPostBlackBinding>,
+        holder: PostBlackViewHolder,
         payloads: List<Any>
     ) {
         val binding = holder.binding
 
-        binding.quickSidebarEnable = mGeneralPreferencesManager.isQuickSideBarEnable
+        ViewBindingAdapter.setMarginEnd(
+            binding.contentContainer,
+            if (mGeneralPreferencesManager.isQuickSideBarEnable) {
+                binding.root.resources.getDimension(com.github.ykrank.androidtools.R.dimen.spacing_normal)
+            } else {
+                0f
+            }
+        )
 
         val selectable = false
         if (selectable != binding.tvReply.isTextSelectable) {
             setTextSelectable(binding, selectable)
         }
 
-        binding.postViewModel?.let {
-            it.thread.set(threadInfo)
-            it.pageNum.set(pageNum)
-            it.post.set(post)
-
-            if ("1" == post.number) {
-                it.vote.set(voteInfo)
-            } else {
-                it.vote.set(null)
-            }
-        }
-
-        binding.executePendingBindings()
+        holder.viewModel.thread.set(threadInfo)
+        holder.viewModel.pageNum.set(pageNum)
+        holder.viewModel.post.set(post)
+        holder.viewModel.vote.set(if ("1" == post.number) voteInfo else null)
+        binding.threadTitle.text = threadInfo?.title
+        binding.threadTitle.visibility =
+            if (pageNum == 1 && post.isFirst && threadInfo?.title != null) View.VISIBLE else View.GONE
+        ImageViewBindingAdapter.loadAvatar(binding.avatar, null, post.authorId)
+        binding.authorName.text = post.authorName
+        binding.originalPosterTag.visibility = if (post.isOpPost) View.VISIBLE else View.GONE
+        binding.tvFloor.text = holder.viewModel.floor.get()
+        TextViewBindingAdapter.setReply(binding.tvReply, null, null, fragment.viewLifecycleOwner, post)
     }
 
     // Bug workaround for losing text selection ability, see:
@@ -112,3 +127,8 @@ class PostBlackAdapterDelegate(
     }
 
 }
+
+class PostBlackViewHolder(
+    binding: ItemPostBlackBinding,
+    val viewModel: PostBlackViewModel
+) : SimpleRecycleViewHolder<ItemPostBlackBinding>(binding)
