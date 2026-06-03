@@ -44,6 +44,7 @@ class VoteDialogFragment : BaseDialogFragment(), VoteViewModel.VoteVmAction {
     private lateinit var mVote: Vote
     private lateinit var binding: LayoutVoteBinding
     private lateinit var adapter: VoteOptionsAdapter
+    private lateinit var model: VoteViewModel
 
     private lateinit var data: List<ItemVoteViewModel>
 
@@ -58,13 +59,13 @@ class VoteDialogFragment : BaseDialogFragment(), VoteViewModel.VoteVmAction {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = LayoutVoteBinding.inflate(inflater, container, false)
 
-        val model = VoteViewModel(mVote, this)
-        binding.model = model
+        model = VoteViewModel(mVote, this)
+        binding.bindVote(model)
 
         binding.recycleView.adapter = adapter
         binding.recycleView.layoutManager = LinearLayoutManager(requireContext())
         mVote.voteOptions?.let {
-            data = it.values.map { ItemVoteViewModel(binding.model!!, it) }
+            data = it.values.map { ItemVoteViewModel(model, it) }
             adapter.swapDataSet(data)
         }
 
@@ -108,7 +109,8 @@ class VoteDialogFragment : BaseDialogFragment(), VoteViewModel.VoteVmAction {
                     appVoteResult.toastError(activity) {
                         val appVote = this.data
                         voteOptionsResult.toastError(activity) {
-                            binding.model?.appVote?.set(appVote)
+                            model.appVote.set(appVote)
+                            binding.bindVote(model)
                             data?.let {
                                 this@VoteDialogFragment.data.forEachIndexed { index, vm ->
                                     vm.option.mergeWithAppVoteOption(
@@ -122,6 +124,16 @@ class VoteDialogFragment : BaseDialogFragment(), VoteViewModel.VoteVmAction {
                     }
                 }
         }
+    }
+
+    private fun LayoutVoteBinding.bindVote(model: VoteViewModel) {
+        val appVote = model.appVote.get()
+        tvVoteIntro.text = model.getVoteSummary(appVote)
+        btnViewAllVoter.isEnabled = appVote?.isOvert == true
+        btnViewAllVoter.setOnClickListener(model.clickViewAllVoter(appVote))
+        btnVote.isEnabled = model.isVoteable(appVote)
+        btnVote.setText(if (appVote?.isVoted == true) R.string.voted else R.string.vote)
+        btnVote.setOnClickListener(model.clickVote())
     }
 
     private fun refreshSelectedItem(position: Int) {
