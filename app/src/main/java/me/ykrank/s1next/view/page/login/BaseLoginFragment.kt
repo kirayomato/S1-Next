@@ -10,6 +10,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
@@ -48,6 +49,16 @@ abstract class BaseLoginFragment : BaseFragment() {
         mUsernameView = binding.username
         mPasswordView = binding.password
         mLoginButton = binding.login
+        binding.updateAnswerVisibility()
+        binding.questionSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                binding.updateAnswerVisibility()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                binding.updateAnswerVisibility()
+            }
+        }
 
         initView()
         return binding.root
@@ -155,6 +166,10 @@ abstract class BaseLoginFragment : BaseFragment() {
         questionId: Int?,
         answer: String?
     )
+
+    private fun FragmentAppLoginBinding.updateAnswerVisibility() {
+        answer.visibility = if (questionSpinner.selectedItemPosition <= 0) View.GONE else View.VISIBLE
+    }
 
     companion object {
         @JvmField

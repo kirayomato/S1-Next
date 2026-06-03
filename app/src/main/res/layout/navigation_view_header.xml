@@ -1,90 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.percentlayout.widget.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="me.ykrank.s1next.view.internal.DrawerLayoutDelegateConcrete">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-    <data>
-
-        <import type="android.view.View" />
-
-        <variable
-            name="userViewModel"
-            type="me.ykrank.s1next.viewmodel.UserViewModel" />
-    </data>
-
-    <androidx.percentlayout.widget.PercentRelativeLayout
+    <ImageView
+        android:id="@+id/drawer_header_background"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/drawer_top_background_content_desc"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_drawer_header_background"
+        app:layout_aspectRatio="@fraction/drawer_header_aspect_ratio"
+        app:layout_widthPercent="100%" />
 
-        <ImageView
-            android:id="@+id/drawer_header_background"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/drawer_top_background_content_desc"
-            android:scaleType="centerCrop"
-            app:imageDrawable="@{@drawable/ic_drawer_header_background}"
-            app:layout_aspectRatio="@fraction/drawer_header_aspect_ratio"
-            app:layout_widthPercent="100%" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/shape_scrim"
+        app:layout_aspectRatio="@fraction/drawer_header_aspect_ratio"
+        app:layout_widthPercent="100%" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/shape_scrim"
-            app:layout_aspectRatio="@fraction/drawer_header_aspect_ratio"
-            app:layout_widthPercent="100%" />
+    <ImageView
+        android:id="@+id/drawer_user_avatar"
+        android:layout_width="@dimen/drawer_avatar_size"
+        android:layout_height="@dimen/drawer_avatar_size"
+        android:layout_marginStart="@dimen/item_padding"
+        android:layout_marginLeft="@dimen/item_padding"
+        android:layout_marginTop="@dimen/drawer_avatar_margin_top"
+        android:contentDescription="@string/drawer_avatar_content_desc" />
 
-        <ImageView
-            android:id="@+id/drawer_user_avatar"
-            android:layout_width="@dimen/drawer_avatar_size"
-            android:layout_height="@dimen/drawer_avatar_size"
-            android:layout_marginLeft="@dimen/item_padding"
-            android:layout_marginStart="@dimen/item_padding"
-            android:layout_marginTop="@dimen/drawer_avatar_margin_top"
-            android:contentDescription="@string/drawer_avatar_content_desc"
-            app:user="@{userViewModel.user}" />
+    <TextView
+        android:id="@+id/drawer_user_name"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/drawer_subtitle_height"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="@dimen/list_view_padding"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:lines="1"
+        android:paddingStart="@dimen/item_padding"
+        android:paddingLeft="@dimen/item_padding"
+        android:paddingTop="@dimen/list_view_padding"
+        android:paddingRight="@dimen/item_padding"
+        android:paddingBottom="@dimen/list_view_padding"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:textColor="?attr/drawerTextColor" />
 
-        <TextView
-            android:id="@+id/drawer_user_name"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/drawer_subtitle_height"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="@dimen/list_view_padding"
-            android:ellipsize="end"
-            android:gravity="center_vertical"
-            android:lines="1"
-            android:paddingBottom="@dimen/list_view_padding"
-            android:paddingLeft="@dimen/item_padding"
-            android:paddingRight="@dimen/item_padding"
-            android:paddingStart="@dimen/item_padding"
-            android:paddingTop="@dimen/list_view_padding"
-            android:text="@{userViewModel.user.logged ? userViewModel.user.name : @string/action_login}"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-            android:textColor="?attr/drawerTextColor"
-            tools:text="@string/action_login" />
-
-        <TextView
-            android:id="@+id/drawer_auto_sign"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/drawer_subtitle_height"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginBottom="@dimen/list_view_padding"
-            android:ellipsize="end"
-            android:gravity="center_vertical"
-            android:lines="1"
-            android:paddingBottom="@dimen/list_view_padding"
-            android:paddingLeft="@dimen/item_padding"
-            android:paddingRight="@dimen/item_padding"
-            android:paddingStart="@dimen/item_padding"
-            android:paddingTop="@dimen/list_view_padding"
-            android:text="@{userViewModel.signed ? @string/already_checked_in:@string/action_check_in}"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-            android:textColor="?attr/drawerTextColor"
-            android:visibility="@{userViewModel.user.logged ? View.VISIBLE:View.GONE}" />
-
-    </androidx.percentlayout.widget.PercentRelativeLayout>
-
-</layout>
+    <TextView
+        android:id="@+id/drawer_auto_sign"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/drawer_subtitle_height"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="@dimen/list_view_padding"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:lines="1"
+        android:paddingStart="@dimen/item_padding"
+        android:paddingLeft="@dimen/item_padding"
+        android:paddingTop="@dimen/list_view_padding"
+        android:paddingRight="@dimen/item_padding"
+        android:paddingBottom="@dimen/list_view_padding"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:textColor="?attr/drawerTextColor" />
+</androidx.percentlayout.widget.PercentRelativeLayout>

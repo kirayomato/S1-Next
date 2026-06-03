@@ -9,7 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
 import android.widget.Toast
-import androidx.databinding.DataBindingUtil
+import androidx.databinding.Observable
 import androidx.drawerlayout.widget.DrawerLayout
 import com.github.ykrank.androidautodispose.AndroidRxDispose
 import com.github.ykrank.androidlifecycle.event.ActivityEvent
@@ -22,6 +22,7 @@ import com.github.ykrank.androidtools.widget.track.DataTrackAgent
 import com.github.ykrank.androidtools.widget.track.event.ThemeChangeTrackEvent
 import com.google.android.material.navigation.NavigationView
 import me.ykrank.s1next.R
+import me.ykrank.s1next.binding.ImageViewBindingAdapter
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.pref.DataPreferencesManager
 import me.ykrank.s1next.data.pref.ThemeManager
@@ -63,6 +64,7 @@ class DrawerLayoutDelegateConcrete(
     private lateinit var pmNoticeBinding: ActionViewNoticeCountBinding
     private lateinit var noteNoticeBinding: ActionViewNoticeCountBinding
     private lateinit var binding: NavigationViewHeaderBinding
+    private var userHeaderCallback: Observable.OnPropertyChangedCallback? = null
 
     override fun setupNavDrawerItem(drawerLayout: DrawerLayout, navigationView: NavigationView) {
         setupNavDrawerHeader(drawerLayout, navigationView)
@@ -75,8 +77,15 @@ class DrawerLayoutDelegateConcrete(
 
     @SuppressLint("RestrictedApi")
     private fun setupNavDrawerHeader(drawerLayout: DrawerLayout, navigationView: NavigationView) {
-        binding = DataBindingUtil.bind(navigationView.getHeaderView(0))!!
-        binding.userViewModel = mUserViewModel
+        binding = NavigationViewHeaderBinding.bind(navigationView.getHeaderView(0))
+        binding.bindUserHeader()
+        val callback = object : Observable.OnPropertyChangedCallback() {
+            override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
+                binding.bindUserHeader()
+            }
+        }
+        userHeaderCallback = callback
+        mUserViewModel.addOnPropertyChangedCallback(callback)
 
         // let status bar display over drawer if API >= 21
         // let DrawerLayout draw the insets area for the status bar
@@ -141,7 +150,17 @@ class DrawerLayoutDelegateConcrete(
 
     override fun onDestroy() {
         super.onDestroy()
-        binding.userViewModel = null
+        userHeaderCallback?.let(mUserViewModel::removeOnPropertyChangedCallback)
+        userHeaderCallback = null
+    }
+
+    private fun NavigationViewHeaderBinding.bindUserHeader() {
+        ImageViewBindingAdapter.loadUserAvatar(drawerUserAvatar, mUser)
+        drawerUserName.text = if (mUser.isLogged) mUser.name else drawerUserName.context.getString(R.string.action_login)
+        drawerAutoSign.visibility = if (mUser.isLogged) View.VISIBLE else View.GONE
+        drawerAutoSign.text = drawerAutoSign.context.getString(
+            if (mUserViewModel.isSigned) R.string.already_checked_in else R.string.action_check_in
+        )
     }
 
     /**
