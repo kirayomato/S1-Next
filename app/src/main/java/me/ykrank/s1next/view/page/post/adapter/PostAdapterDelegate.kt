@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -181,7 +180,7 @@ class PostAdapterDelegate(
                                 if (uid != null && uname != null) {
                                     //个人主页
                                     UserHomeActivity.start(
-                                        it.context as FragmentActivity,
+                                        it.context,
                                         uid,
                                         uname,
                                         it
@@ -226,7 +225,6 @@ class PostAdapterDelegate(
         val headerViews = listOf(
             binding.root,
             binding.threadTitle,
-            binding.avatar,
             binding.authorName,
             binding.goose,
             binding.registrationAge,
@@ -238,7 +236,7 @@ class PostAdapterDelegate(
             val toggleSelection = View.OnClickListener {
                 postShareSelectionOwner?.togglePostShareSelection(post.id)
             }
-            headerViews.forEach {
+            (headerViews + binding.avatar).forEach {
                 it.setOnClickListener(toggleSelection)
                 it.setOnLongClickListener(null)
             }
@@ -253,6 +251,9 @@ class PostAdapterDelegate(
             binding.tvDatetime.setOnClickListener(null)
             binding.avatar.setOnClickListener {
                 binding.postViewModel?.onAvatarClick(it)
+            }
+            binding.avatar.setOnLongClickListener {
+                binding.postViewModel?.onAvatarLongClick(it) == true
             }
             binding.postShareScrim.setOnClickListener(null)
             binding.postShareScrim.isClickable = false

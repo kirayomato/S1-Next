@@ -1,6 +1,7 @@
 package me.ykrank.s1next.view.activity
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
@@ -286,6 +287,15 @@ class UserHomeActivity : BaseActivity() {
         private const val ARG_TRANSITION = "transition"
 
         fun start(
+            context: Context,
+            uid: String,
+            userName: String?
+        ) {
+            val activity = resolveFragmentActivity(context, uid, userName) ?: return
+            start(activity, uid, userName)
+        }
+
+        fun start(
             activity: FragmentActivity,
             uid: String,
             userName: String?
@@ -306,6 +316,16 @@ class UserHomeActivity : BaseActivity() {
             intent.putExtra(ARG_UID, uid)
             intent.putExtra(ARG_USERNAME, userName)
             activity.startActivity(intent)
+        }
+
+        fun start(
+            context: Context,
+            uid: String,
+            userName: String?,
+            avatarView: View
+        ) {
+            val activity = resolveFragmentActivity(context, uid, userName) ?: return
+            start(activity, uid, userName, avatarView)
         }
 
         fun start(
@@ -348,6 +368,26 @@ class UserHomeActivity : BaseActivity() {
                 baseContext, avatarView, baseContext.getString(R.string.transition_avatar)
             )
             ActivityCompat.startActivity(baseContext, intent, options.toBundle())
+        }
+
+        private fun resolveFragmentActivity(
+            context: Context,
+            uid: String,
+            userName: String?
+        ): FragmentActivity? {
+            val baseContext = ContextUtils.getBaseContext(context)
+            if (baseContext is FragmentActivity) {
+                return baseContext
+            }
+            L.leaveMsg("uid:$uid")
+            L.leaveMsg("userName:$userName")
+            L.report(
+                IllegalStateException(
+                    "UserHomeActivity start error: context not instance of FragmentActivity: " +
+                        "${context.javaClass.name} -> ${baseContext.javaClass.name}"
+                )
+            )
+            return null
         }
     }
 }

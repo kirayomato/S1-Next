@@ -1,7 +1,6 @@
 package me.ykrank.s1next.viewmodel
 
 import androidx.databinding.ObservableField
-import androidx.fragment.app.FragmentActivity
 import android.view.View
 
 import me.ykrank.s1next.data.api.model.darkroom.DarkRoom
@@ -17,7 +16,7 @@ class DarkRoomViewModel {
         val name = darkRoom.get()?.username
 
         if (uid != null) {
-            UserHomeActivity.start(v.context as FragmentActivity, uid, name, v)
+            UserHomeActivity.start(v.context, uid, name, v)
         }
     }
 }

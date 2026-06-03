@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -177,7 +176,7 @@ class PostRenderFooterAdapterDelegate(
                     bind.avatar.setOnClickListener {
                         if (uid != null && uname != null) {
                             UserHomeActivity.start(
-                                it.context as FragmentActivity,
+                                it.context,
                                 uid,
                                 uname,
                                 it

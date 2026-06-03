@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.view.View
-import androidx.fragment.app.FragmentActivity
 import me.ykrank.s1next.data.api.model.link.ThreadLink
 import me.ykrank.s1next.data.api.model.link.UserLink
 import me.ykrank.s1next.util.IntentUtil
@@ -77,7 +76,7 @@ open class SarabaSpan : URLSpanClick {
             }
             val userLink = UserLink.parse(url)
             if (userLink != null) {
-                UserHomeActivity.start(context as FragmentActivity, userLink.uid, null)
+                UserHomeActivity.start(context, userLink.uid, null)
                 return
             }
 
@@ -96,7 +95,7 @@ open class SarabaSpan : URLSpanClick {
                 return
             }
             if (userLink != null) {
-                UserHomeActivity.start(context as FragmentActivity, userLink.uid, null)
+                UserHomeActivity.start(context, userLink.uid, null)
                 return
             }
 

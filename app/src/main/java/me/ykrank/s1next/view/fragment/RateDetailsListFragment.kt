@@ -3,7 +3,6 @@ package me.ykrank.s1next.view.fragment
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.ykrank.androidtools.extension.dp2px
@@ -55,7 +54,7 @@ class RateDetailsListFragment : BaseRecyclerViewFragment<List<Rate>>() {
                         if (uid != null && uname != null) {
                             //个人主页
                             UserHomeActivity.start(
-                                it.context as FragmentActivity,
+                                it.context,
                                 uid,
                                 uname,
                                 it

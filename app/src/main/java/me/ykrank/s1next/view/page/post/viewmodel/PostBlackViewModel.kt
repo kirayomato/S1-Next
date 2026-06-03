@@ -6,7 +6,6 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.databinding.Observable
 import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
 import com.github.ykrank.androidtools.util.ContextUtils
 import com.github.ykrank.androidtools.util.L
@@ -47,7 +46,7 @@ class PostBlackViewModel(val lifecycleOwner: LifecycleOwner, private val eventBu
             if (authorId != null && authorName != null) {
                 //个人主页
                 UserHomeActivity.start(
-                    v.context as FragmentActivity,
+                    v.context,
                     authorId,
                     authorName,
                     v

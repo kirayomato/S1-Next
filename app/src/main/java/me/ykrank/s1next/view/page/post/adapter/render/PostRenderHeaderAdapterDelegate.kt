@@ -93,7 +93,6 @@ class PostRenderHeaderAdapterDelegate(
         val headerViews = listOf(
             binding.root,
             binding.threadTitle,
-            binding.avatar,
             binding.authorName,
             binding.goose,
             binding.registrationAge,
@@ -105,7 +104,7 @@ class PostRenderHeaderAdapterDelegate(
             val toggleSelection = View.OnClickListener {
                 postShareSelectionOwner?.togglePostShareSelection(post.id)
             }
-            headerViews.forEach {
+            (headerViews + binding.avatar).forEach {
                 it.setOnClickListener(toggleSelection)
                 it.setOnLongClickListener(null)
             }
@@ -120,6 +119,9 @@ class PostRenderHeaderAdapterDelegate(
             binding.tvDatetime.setOnClickListener(null)
             binding.avatar.setOnClickListener {
                 binding.postViewModel?.onAvatarClick(it)
+            }
+            binding.avatar.setOnLongClickListener {
+                binding.postViewModel?.onAvatarLongClick(it) == true
             }
             binding.postShareScrim.setOnClickListener(null)
             binding.postShareScrim.isClickable = false

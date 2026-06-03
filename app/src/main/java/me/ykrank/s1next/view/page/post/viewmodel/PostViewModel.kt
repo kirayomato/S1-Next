@@ -6,7 +6,6 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.databinding.Observable
 import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
 import com.github.ykrank.androidtools.util.ContextUtils
 import com.github.ykrank.androidtools.util.L
@@ -63,7 +62,7 @@ class PostViewModel(
             val authorName = it.authorName
             if (authorId != null && authorName != null) {
                 //个人主页
-                UserHomeActivity.start(v.context as FragmentActivity, authorId, authorName, v)
+                UserHomeActivity.start(v.context, authorId, authorName, v)
             }
         }
     }
