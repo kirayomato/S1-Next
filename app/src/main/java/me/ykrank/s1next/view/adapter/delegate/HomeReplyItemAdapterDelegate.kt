@@ -1,29 +1,37 @@
 package me.ykrank.s1next.view.adapter.delegate
 
 import android.content.Context
-import androidx.recyclerview.widget.RecyclerView
+import android.net.Uri
 import android.view.ViewGroup
-import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewHolder
+import androidx.recyclerview.widget.RecyclerView
 
 import me.ykrank.s1next.data.api.model.HomeReply
 import me.ykrank.s1next.databinding.ItemHomeReplyItemBinding
-import me.ykrank.s1next.viewmodel.HomeReplyItemViewModel
+import me.ykrank.s1next.view.page.post.postlist.PostListGatewayActivity
 
 /**
  * Created by ykrank on 2017/2/4.
  */
 
-class HomeReplyItemAdapterDelegate(context: Context) : BaseAdapterDelegate<HomeReply, SimpleRecycleViewHolder<ItemHomeReplyItemBinding>>(context, HomeReply::class.java) {
+class HomeReplyItemAdapterDelegate(context: Context) : BaseAdapterDelegate<HomeReply, HomeReplyItemAdapterDelegate.ViewHolder>(context, HomeReply::class.java) {
 
-    override fun onBindViewHolderData(t: HomeReply, position: Int, holder: SimpleRecycleViewHolder<ItemHomeReplyItemBinding>, payloads: List<Any>) {
-        val binding = holder.binding
-        binding.model?.reply?.set(t)
+    override fun onBindViewHolderData(t: HomeReply, position: Int, holder: ViewHolder, payloads: List<Any>) {
+        holder.bind(t)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup): androidx.recyclerview.widget.RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
         val binding = ItemHomeReplyItemBinding.inflate(mLayoutInflater, parent, false)
-        binding.model = HomeReplyItemViewModel()
-        return SimpleRecycleViewHolder<ItemHomeReplyItemBinding>(binding)
+        return ViewHolder(binding)
     }
 
+    class ViewHolder(private val binding: ItemHomeReplyItemBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(reply: HomeReply) {
+            binding.reply.text = reply.reply
+            binding.root.setOnClickListener {
+                reply.url?.let { url ->
+                    PostListGatewayActivity.start(it.context, Uri.parse(url))
+                }
+            }
+        }
+    }
 }

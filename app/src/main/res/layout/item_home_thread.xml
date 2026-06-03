@@ -1,85 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    style="?attr/materialCardViewStyle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/card_view_vertical_margin"
+    android:layout_marginBottom="@dimen/card_view_vertical_margin"
+    app:cardCornerRadius="0dp">
 
-    <data>
-
-        <variable
-            name="model"
-            type="me.ykrank.s1next.viewmodel.HomeThreadViewModel" />
-    </data>
-
-    <androidx.cardview.widget.CardView
-        style="?attr/materialCardViewStyle"
+    <LinearLayout
+        android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/card_view_vertical_margin"
-        android:layout_marginTop="@dimen/card_view_vertical_margin"
-        app:cardCornerRadius="0dp">
+        android:orientation="vertical"
+        android:padding="@dimen/item_padding_small">
+
+        <TextView
+            android:id="@+id/thread_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            tools:text="ABCDEFGHI [外野]" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/item_padding_small"
-            android:onClick="@{model::onClick}"
-            android:orientation="vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <TextView
-                android:layout_width="match_parent"
+                android:id="@+id/view_count"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                app:homeThread="@{model.thread}"
-                tools:text="ABCDEFGHI [外野]" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                tools:text="查看 100" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/reply_count"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text='@{@string/view+" "+model.thread.view}'
-                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                    tools:text="查看 100" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/spacing_large"
-                    android:layout_marginStart="@dimen/spacing_large"
-                    android:text='@{@string/reply+" "+model.thread.reply}'
-                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                    tools:text="回复 100" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@{@string/last_replier(model.thread.lastReplier)}"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                    tools:text="最后回复 ykrank" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/spacing_micro"
-                    android:layout_marginStart="@dimen/spacing_micro"
-                    android:text="@{model.thread.lastReplyDate}"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                    tools:text="2017-02-03 18:43" />
-
-
-            </LinearLayout>
+                android:layout_marginStart="@dimen/spacing_large"
+                android:layout_marginLeft="@dimen/spacing_large"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                tools:text="回复 100" />
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
-</layout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/last_replier"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                tools:text="最后回复 ykrank" />
+
+            <TextView
+                android:id="@+id/last_reply_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_micro"
+                android:layout_marginLeft="@dimen/spacing_micro"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                tools:text="2017-02-03 18:43" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
