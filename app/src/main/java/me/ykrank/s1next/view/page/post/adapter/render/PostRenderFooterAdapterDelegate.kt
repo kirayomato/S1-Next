@@ -3,7 +3,6 @@ package me.ykrank.s1next.view.page.post.adapter.render
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,8 +12,10 @@ import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.widget.EventBus
 import kotlinx.coroutines.launch
 import me.ykrank.s1next.R
+import me.ykrank.s1next.binding.ViewBindingAdapter
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.ApiCacheProvider
+import me.ykrank.s1next.data.api.model.Post
 import me.ykrank.s1next.data.api.model.Thread
 import me.ykrank.s1next.data.api.model.Vote
 import me.ykrank.s1next.data.pref.GeneralPreferencesManager
@@ -36,7 +37,7 @@ class PostRenderFooterAdapterDelegate(
     private val apiCache: ApiCacheProvider,
     private val generalPreferencesManager: GeneralPreferencesManager
 ) :
-    BaseAdapterDelegate<PostRenderItem.Footer, SimpleRecycleViewHolder<ItemPostRenderFooterBinding>>(
+    BaseAdapterDelegate<PostRenderItem.Footer, PostRenderFooterViewHolder>(
         context,
         PostRenderItem.Footer::class.java
     ) {
@@ -45,39 +46,41 @@ class PostRenderFooterAdapterDelegate(
     private var pageNum: Int = 1
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
-        val binding = DataBindingUtil.inflate<ItemPostRenderFooterBinding>(
-            mLayoutInflater,
-            R.layout.item_post_render_footer,
-            parent,
-            false
-        )
-        binding.postViewModel = PostViewModel(fragment.viewLifecycleOwner, eventBus, user)
-        return SimpleRecycleViewHolder(binding)
+        val binding = ItemPostRenderFooterBinding.inflate(mLayoutInflater, parent, false)
+        val viewModel = PostViewModel(fragment.viewLifecycleOwner, eventBus, user)
+        binding.tvShowTrade.setOnClickListener(viewModel::onExtraHtmlClick)
+        binding.tvShowVote.setOnClickListener(viewModel::onVoteClick)
+        binding.tvCastMagic.setOnClickListener(viewModel::onAppPostClick)
+        return PostRenderFooterViewHolder(binding, viewModel)
     }
 
     override fun onBindViewHolderData(
         t: PostRenderItem.Footer,
         position: Int,
-        holder: SimpleRecycleViewHolder<ItemPostRenderFooterBinding>,
+        holder: PostRenderFooterViewHolder,
         payloads: List<Any>
     ) {
         val binding = holder.binding
         val post = t.post
         if (payloads.contains(PostShareSelectionPayload)) {
-            bindShareSelection(binding, post)
+            bindShareSelection(binding, holder.viewModel, post)
             return
         }
-        binding.quickSidebarEnable = generalPreferencesManager.isQuickSideBarEnable
-        binding.postViewModel?.let {
-            it.thread.set(threadInfo)
-            it.pageNum.set(pageNum)
-            it.post.set(post)
-            if ("1" == post.number) {
-                it.vote.set(voteInfo)
+        ViewBindingAdapter.setMarginEnd(
+            binding.contentContainer,
+            if (generalPreferencesManager.isQuickSideBarEnable) {
+                binding.root.resources.getDimension(com.github.ykrank.androidtools.R.dimen.spacing_normal)
             } else {
-                it.vote.set(null)
+                0f
             }
-        }
+        )
+        holder.viewModel.thread.set(threadInfo)
+        holder.viewModel.pageNum.set(pageNum)
+        holder.viewModel.post.set(post)
+        holder.viewModel.vote.set(if ("1" == post.number) voteInfo else null)
+        binding.tvShowTrade.visibility = if (post.isTrade) View.VISIBLE else View.GONE
+        binding.tvShowVote.visibility = if (holder.viewModel.vote.get() != null) View.VISIBLE else View.GONE
+        binding.tvCastMagic.visibility = if (post.banned) View.VISIBLE else View.GONE
 
         val rates = post.rates
         if (rates != null) {
@@ -106,16 +109,19 @@ class PostRenderFooterAdapterDelegate(
             binding.recycleViewRates.visibility = View.GONE
         }
 
-        binding.executePendingBindings()
-        bindShareSelection(binding, post)
+        bindShareSelection(binding, holder.viewModel, post)
     }
 
-    private fun bindShareSelection(binding: ItemPostRenderFooterBinding, post: me.ykrank.s1next.data.api.model.Post) {
+    private fun bindShareSelection(
+        binding: ItemPostRenderFooterBinding,
+        viewModel: PostViewModel,
+        post: Post
+    ) {
         val state = postShareSelectionOwner?.postShareSelectionState
         val shareSelectionEnabled = state?.enabled == true
-        binding.postShareSelectionEnabled = shareSelectionEnabled
-        binding.postShareSelected = state?.selectedPostIds?.contains(post.id) == true
-        binding.executePendingBindings()
+        val shareSelected = state?.selectedPostIds?.contains(post.id) == true
+        binding.postShareScrim.visibility =
+            if (shareSelectionEnabled && shareSelected) View.VISIBLE else View.GONE
         if (shareSelectionEnabled) {
             val toggleSelection = View.OnClickListener {
                 postShareSelectionOwner?.togglePostShareSelection(post.id)
@@ -132,13 +138,13 @@ class PostRenderFooterAdapterDelegate(
             binding.postShareScrim.setOnClickListener(null)
             binding.postShareScrim.isClickable = false
             binding.tvShowTrade.setOnClickListener {
-                binding.postViewModel?.onExtraHtmlClick(it)
+                viewModel.onExtraHtmlClick(it)
             }
             binding.tvShowVote.setOnClickListener {
-                binding.postViewModel?.onVoteClick(it)
+                viewModel.onVoteClick(it)
             }
             binding.tvCastMagic.setOnClickListener {
-                binding.postViewModel?.onAppPostClick(it)
+                viewModel.onAppPostClick(it)
             }
             binding.tvRateViewAll.setOnClickListener {
                 post.rates?.let { rates ->
@@ -185,3 +191,8 @@ class PostRenderFooterAdapterDelegate(
         this.voteInfo = voteInfo
     }
 }
+
+class PostRenderFooterViewHolder(
+    binding: ItemPostRenderFooterBinding,
+    val viewModel: PostViewModel
+) : SimpleRecycleViewHolder<ItemPostRenderFooterBinding>(binding)
