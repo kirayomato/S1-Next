@@ -82,11 +82,11 @@ class PostViewModel(
                             if (menuitem.title == v.context.getString(R.string.menu_blacklist_remove)) {
                                 BlacklistMenuAction.removeBlacklist(lifecycleOwner, eventBus, authorIdInt, authorName)
                             } else {
-                                val context = ContextUtils.getBaseContext(v.context)
-                                if (context is androidx.fragment.app.FragmentActivity) {
-                                    BlacklistMenuAction.addBlacklist(context, authorIdInt, authorName)
+                                val activity = ContextUtils.findFragmentActivity(v.context)
+                                if (activity != null) {
+                                    BlacklistMenuAction.addBlacklist(activity, authorIdInt, authorName)
                                 } else {
-                                    L.report(IllegalStateException("抹布时头像Context不为FragmentActivity$context"))
+                                    L.report(IllegalStateException("抹布时头像Context不为FragmentActivity${v.context}"))
                                 }
                             }
                         }

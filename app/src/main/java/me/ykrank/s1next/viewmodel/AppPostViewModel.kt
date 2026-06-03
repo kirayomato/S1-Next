@@ -70,14 +70,14 @@ class AppPostViewModel(
                             lifecycleOwner, eventBus, postData?.authorId ?: 0, postData?.author
                         )
                     } else {
-                        val context = ContextUtils.getBaseContext(v.context)
-                        if (context is androidx.fragment.app.FragmentActivity) {
+                        val activity = ContextUtils.findFragmentActivity(v.context)
+                        if (activity != null) {
                             BlacklistMenuAction.addBlacklist(
-                                context,
+                                activity,
                                 postData?.authorId ?: 0, postData?.author
                             )
                         } else {
-                            L.report(IllegalStateException("抹布时头像Context不为FragmentActivity$context"))
+                            L.report(IllegalStateException("抹布时头像Context不为FragmentActivity${v.context}"))
                         }
                     }
                     return@setOnMenuItemClickListener true
