@@ -5,19 +5,21 @@ import android.view.View.OnLongClickListener
 import androidx.databinding.ObservableField
 import androidx.lifecycle.LifecycleOwner
 import me.ykrank.s1next.data.api.model.Thread
+import me.ykrank.s1next.data.db.biz.ReadProgressBiz
 import me.ykrank.s1next.data.pref.ReadPreferencesManager
 import me.ykrank.s1next.view.page.post.postlist.PostListActivity.Companion.bindClickStartForView
 import me.ykrank.s1next.view.page.post.postlist.PostListActivity.Companion.start
 
 class ThreadViewModel(
     private val lifecycleOwner: LifecycleOwner,
-    private val readPreferencesManager: ReadPreferencesManager
+    private val readPreferencesManager: ReadPreferencesManager,
+    private val readProgressBiz: ReadProgressBiz
 ) {
     val thread = ObservableField<Thread>()
     fun onBind(): Function1<View, Any> {
         return { v: View ->
             bindClickStartForView(
-                v, lifecycleOwner, readPreferencesManager
+                v, lifecycleOwner, readPreferencesManager, readProgressBiz
             ) {
                 thread.get()
             }

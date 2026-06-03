@@ -11,8 +11,7 @@ import me.ykrank.s1next.data.api.model.Account
 import me.ykrank.s1next.data.api.model.Post
 import me.ykrank.s1next.data.api.model.Thread
 import me.ykrank.s1next.data.api.model.Vote
-import me.ykrank.s1next.data.db.biz.BlackListBiz
-import me.ykrank.s1next.data.db.biz.BlackWordBiz
+import me.ykrank.s1next.data.db.biz.bizDependencies
 import me.ykrank.s1next.data.db.dbmodel.BlackList
 import me.ykrank.s1next.data.db.dbmodel.BlackWord
 import paperparcel.PaperParcel
@@ -169,7 +168,7 @@ class Posts @JsonCreator constructor(
         fun filterPostList(oPosts: List<Post>?): List<Post> {
             val posts = ArrayList<Post>()
             if (oPosts != null) {
-                val blackWords = BlackWordBiz.instance.getAllNotNormalBlackWord()
+                val blackWords = bizDependencies().blackWordBiz.getAllNotNormalBlackWord()
                 for (post in oPosts) {
                     val fPost = filterPost(post, false, blackWords)
                     if (fPost != null) {
@@ -192,7 +191,8 @@ class Posts @JsonCreator constructor(
         @WorkerThread
         fun filterPost(post: Post, clone: Boolean = false, blackWords: List<BlackWord>? = null): Post? {
             var newPost: Post = post
-            val blackListWrapper = BlackListBiz.getInstance()
+            val dependencies = bizDependencies()
+            val blackListWrapper = dependencies.blackListBiz
             val blackList = blackListWrapper.getMergedBlackList(post.authorId?.toIntOrNull()
                     ?: -1, post.authorName, enableCache = true)
             if (blackList == null || blackList.post == BlackList.NORMAL) {
@@ -218,7 +218,7 @@ class Posts @JsonCreator constructor(
             val reply = newPost.reply
             if (reply != null && newPost.hide == Post.HIDE_NO) {
                 val mBlackWords = blackWords
-                        ?: BlackWordBiz.instance.getAllNotNormalBlackWord()
+                        ?: dependencies.blackWordBiz.getAllNotNormalBlackWord()
                 mBlackWords.forEach {
                     val word = it.word
                     if (!word.isNullOrEmpty() && it.stat != BlackWord.NORMAL) {

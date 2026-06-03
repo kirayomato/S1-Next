@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.ykrank.s1next.data.cache.biz.CacheBiz
 import me.ykrank.s1next.data.db.biz.HistoryBiz
+import me.ykrank.s1next.data.db.biz.ReadProgressBiz
 import me.ykrank.s1next.data.pref.ReadPreferencesManager
 import me.ykrank.s1next.databinding.FragmentBaseBinding
 import me.ykrank.s1next.view.activity.HistoryActivity
@@ -34,6 +35,9 @@ class HistoryListFragment : BaseFragment() {
 
     @Inject
     internal lateinit var readPreferencesManager: ReadPreferencesManager
+
+    @Inject
+    internal lateinit var readProgressBiz: ReadProgressBiz
 
     private lateinit var binding: FragmentBaseBinding
     private var mode: String = HistoryActivity.MODE_HISTORY
@@ -58,7 +62,13 @@ class HistoryListFragment : BaseFragment() {
         leavePageMsg("HistoryListFragment")
         val activity: Activity = requireActivity()
         binding.recyclerView.setLayoutManager(LinearLayoutManager(activity))
-        mRecyclerAdapter = HistoryCursorRecyclerViewAdapter(activity, viewLifecycleOwner, readPreferencesManager)
+        mRecyclerAdapter = HistoryCursorRecyclerViewAdapter(
+            activity,
+            viewLifecycleOwner,
+            readPreferencesManager,
+            readProgressBiz,
+            historyBiz
+        )
         binding.recyclerView.setAdapter(mRecyclerAdapter)
     }
 

@@ -173,6 +173,7 @@ class PostListActivity : BaseActivity(), WifiBroadcastReceiver.NeedMonitorWifi {
             view: View,
             lifecycleOwner: LifecycleOwner,
             preferencesManager: ReadPreferencesManager,
+            readProgressBiz: ReadProgressBiz,
             threadProvider: () -> Thread?
         ) {
             OnceClickUtil.setClickLister(view, {
@@ -180,7 +181,7 @@ class PostListActivity : BaseActivity(), WifiBroadcastReceiver.NeedMonitorWifi {
                     lifecycleOwner.lifecycleScope.launch {
                         val thread = threadProvider()
                         val readProgress = withContext(Dispatchers.IO) {
-                            ReadProgressBiz.instance.getWithThreadId(
+                            readProgressBiz.getWithThreadId(
                                 thread?.id?.toInt() ?: 0
                             )
                         }

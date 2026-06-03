@@ -11,8 +11,7 @@ import me.ykrank.s1next.data.api.model.Account
 import me.ykrank.s1next.data.api.model.Forum
 import me.ykrank.s1next.data.api.model.Thread
 import me.ykrank.s1next.data.api.model.ThreadType
-import me.ykrank.s1next.data.db.biz.BlackListBiz
-import me.ykrank.s1next.data.db.biz.ThreadBiz
+import me.ykrank.s1next.data.db.biz.bizDependencies
 import me.ykrank.s1next.data.db.dbmodel.BlackList
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -85,8 +84,8 @@ class Threads @JsonCreator constructor(
         fun getFilterThread(oThread: Thread, copyed: Boolean = false): Thread? {
             LooperUtil.enforceOnWorkThread()
             var nThread: Thread = oThread
-            val blackListWrapper = BlackListBiz.getInstance()
-            when (blackListWrapper.getForumFlag(oThread.authorId, oThread.author, enableCache = true)) {
+            val dependencies = bizDependencies()
+            when (dependencies.blackListBiz.getForumFlag(oThread.authorId, oThread.author, enableCache = true)) {
                 BlackList.DEL_FORUM -> return null
                 BlackList.HIDE_FORUM -> if (!oThread.isHide) {
                     if (copyed) {
@@ -108,7 +107,7 @@ class Threads @JsonCreator constructor(
                 }
             }
 
-            val dbThread = ThreadBiz.instance.getWithThreadId(nThread.id?.toInt()
+            val dbThread = dependencies.threadBiz.getWithThreadId(nThread.id?.toInt()
                     ?: 0)
             if (dbThread != null) {
                 nThread.lastReplyCount = dbThread.lastCountWhenView

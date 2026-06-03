@@ -2,6 +2,7 @@ package me.ykrank.s1next.view.adapter
 
 import android.app.Activity
 import androidx.lifecycle.LifecycleOwner
+import me.ykrank.s1next.data.db.biz.ReadProgressBiz
 import me.ykrank.s1next.data.pref.ReadPreferencesManager
 import me.ykrank.s1next.data.pref.ThemeManager
 import me.ykrank.s1next.view.adapter.delegate.ThreadAdapterDelegate
@@ -13,7 +14,8 @@ class ThreadRecyclerViewAdapter(
     forumId: String?,
     userViewModel: UserViewModel,
     themeManager: ThemeManager,
-    readPreferencesManager: ReadPreferencesManager
+    readPreferencesManager: ReadPreferencesManager,
+    readProgressBiz: ReadProgressBiz
 ) : BaseRecyclerViewAdapter(
     activity
 ) {
@@ -25,7 +27,8 @@ class ThreadRecyclerViewAdapter(
                 forumId,
                 userViewModel,
                 themeManager,
-                readPreferencesManager
+                readPreferencesManager,
+                readProgressBiz
             )
         )
     }

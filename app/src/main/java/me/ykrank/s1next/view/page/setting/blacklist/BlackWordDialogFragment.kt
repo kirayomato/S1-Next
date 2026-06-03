@@ -14,6 +14,7 @@ import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.lifecycleScope
 import com.github.ykrank.androidtools.util.ResourceUtil
 import com.github.ykrank.androidtools.util.ViewUtil
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -24,11 +25,16 @@ import me.ykrank.s1next.databinding.DialogBlackWordBinding
 import me.ykrank.s1next.view.dialog.BaseDialogFragment
 import me.ykrank.s1next.view.internal.RequestCode
 import me.ykrank.s1next.viewmodel.BlackWordViewModel
+import javax.inject.Inject
 
 /**
  * A dialog lets the user add or edit blacklist.
  */
+@AndroidEntryPoint
 class BlackWordDialogFragment : BaseDialogFragment() {
+
+    @Inject
+    internal lateinit var blackWordBiz: BlackWordBiz
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val activity = requireActivity()
@@ -59,8 +65,8 @@ class BlackWordDialogFragment : BaseDialogFragment() {
         if (mBlackWord == null) {
             model.loading.set(true)
             lifecycleScope.launch {
-                val count = withContext(Dispatchers.IO){
-                    BlackWordBiz.instance.count()
+                val count = withContext(Dispatchers.IO) {
+                    blackWordBiz.count()
                 }
                 model.loading.set(false)
                 if (count >= 10) {
@@ -120,8 +126,8 @@ class BlackWordDialogFragment : BaseDialogFragment() {
 
             btnVerify.setOnClickListener {
                 lifecycleScope.launch {
-                    val wordBlackWord = withContext(Dispatchers.IO){
-                        BlackWordBiz.instance.getBlackWord(etWord.text.toString())
+                    val wordBlackWord = withContext(Dispatchers.IO) {
+                        blackWordBiz.getBlackWord(etWord.text.toString())
                     }
                     if (wordBlackWord == null || (mBlackWord != null && wordBlackWord.id == mBlackWord.id)) {
                         positionButton.isEnabled = true

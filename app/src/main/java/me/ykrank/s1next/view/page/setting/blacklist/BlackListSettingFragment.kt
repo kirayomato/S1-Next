@@ -13,6 +13,7 @@ import android.widget.ListView
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.github.ykrank.androidtools.util.L
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -25,8 +26,13 @@ import me.ykrank.s1next.view.dialog.LoadBlackListFromWebDialogFragment
 import me.ykrank.s1next.view.dialog.LoginPromptDialogFragment
 import me.ykrank.s1next.view.fragment.BaseFragment
 import me.ykrank.s1next.view.page.setting.SettingsActivity
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class BlackListSettingFragment : BaseFragment(), DialogInterface.OnDismissListener {
+
+    @Inject
+    internal lateinit var blackListBiz: BlackListBiz
 
     private lateinit var mListView: ListView
     private lateinit var mListViewAdapter: BlackListCursorListViewAdapter
@@ -85,7 +91,7 @@ class BlackListSettingFragment : BaseFragment(), DialogInterface.OnDismissListen
                     }
                     lifecycleScope.launch {
                         withContext(Dispatchers.IO) {
-                            BlackListBiz.getInstance().delBlackLists(blackLists)
+                            blackListBiz.delBlackLists(blackLists)
                         }
                         load()
                     }
@@ -133,7 +139,7 @@ class BlackListSettingFragment : BaseFragment(), DialogInterface.OnDismissListen
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mListViewAdapter = BlackListCursorListViewAdapter(requireActivity())
+        mListViewAdapter = BlackListCursorListViewAdapter(requireActivity(), blackListBiz)
         mListView.adapter = mListViewAdapter
         mListView.choiceMode = AbsListView.CHOICE_MODE_MULTIPLE_MODAL
         mListView.setMultiChoiceModeListener(mActionModeCallback)
@@ -197,7 +203,7 @@ class BlackListSettingFragment : BaseFragment(), DialogInterface.OnDismissListen
     private fun load() {
         lifecycleScope.launch(L.report) {
             withContext(Dispatchers.IO) {
-                BlackListBiz.getInstance().blackListCursor
+                blackListBiz.blackListCursor
             }.apply {
                 mListViewAdapter.changeCursor(this)
             }
@@ -219,7 +225,7 @@ class BlackListSettingFragment : BaseFragment(), DialogInterface.OnDismissListen
             if (it.size > 0) {
                 lifecycleScope.launch {
                     withContext(Dispatchers.IO) {
-                        BlackListBiz.getInstance().saveBlackList(it)
+                        blackListBiz.saveBlackList(it)
                     }
                     load()
                 }

@@ -9,6 +9,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
 import me.ykrank.s1next.data.api.model.collection.Favourites
 import me.ykrank.s1next.data.api.model.wrapper.BaseResultWrapper
+import me.ykrank.s1next.data.db.biz.ReadProgressBiz
 import me.ykrank.s1next.data.pref.ReadPreferencesManager
 import me.ykrank.s1next.view.adapter.FavouriteRecyclerViewAdapter
 import javax.inject.Inject
@@ -29,6 +30,9 @@ class FavouriteListPagerFragment : BaseRecyclerViewFragment<BaseResultWrapper<Fa
     @Inject
     internal lateinit var readPreferencesManager: ReadPreferencesManager
 
+    @Inject
+    internal lateinit var readProgressBiz: ReadProgressBiz
+
     private var mPagerCallback: PagerCallback? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,7 +52,8 @@ class FavouriteListPagerFragment : BaseRecyclerViewFragment<BaseResultWrapper<Fa
             requireActivity(),
             viewLifecycleOwner,
             mEventBus,
-            readPreferencesManager
+            readPreferencesManager,
+            readProgressBiz
         )
         recyclerView.adapter = mRecyclerAdapter
     }

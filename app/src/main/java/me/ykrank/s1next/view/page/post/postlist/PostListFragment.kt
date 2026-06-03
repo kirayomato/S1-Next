@@ -89,6 +89,12 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
     @Inject
     internal lateinit var historyBiz: HistoryBiz
 
+    @Inject
+    internal lateinit var readProgressBiz: ReadProgressBiz
+
+    @Inject
+    internal lateinit var threadBiz: ThreadBiz
+
     private lateinit var mThreadId: String
     private var mThreadTitle: String? = null
     private var mForumId: Int? = null
@@ -208,7 +214,7 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
                 .collectLatest {
                     withContext(Dispatchers.IO) {
                         val dbThread = DbThread(Integer.valueOf(mThreadId), it)
-                        ThreadBiz.instance.saveThread(dbThread)
+                        threadBiz.saveThread(dbThread)
                     }
                 }
         }
@@ -289,7 +295,7 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
 
         //Auto save read progress
         if (mReadPrefManager.isSaveAuto) {
-            tempReadProgress?.let { PostListPagerFragment.saveReadProgressBack(it) }
+            tempReadProgress?.let { readProgressBiz.saveReadProgressAsync(it) }
         }
         super.onDestroy()
     }
@@ -709,8 +715,7 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
     internal fun loadReadProgress() {
         lifecycleScope.launch(L.report) {
             val progress = withContext(Dispatchers.IO) {
-                val dbWrapper = ReadProgressBiz.instance
-                dbWrapper.getWithThreadId(mThreadId.toInt())
+                readProgressBiz.getWithThreadId(mThreadId.toInt())
             }
             if (progress != null) {
                 scrollState.state = PagerScrollState.BEFORE_SCROLL_PAGE

@@ -51,6 +51,9 @@ class UserHomeActivity : BaseActivity() {
     @Inject
     internal lateinit var profileProvider: ProfileProvider
 
+    @Inject
+    internal lateinit var blackListBiz: BlackListBiz
+
     private lateinit var binding: ActivityHomeBinding
     private var uid: String? = null
     private var name: String? = null
@@ -91,15 +94,14 @@ class UserHomeActivity : BaseActivity() {
         lifecycleScope.launch {
             mEventBus.getClsFlow<BlackListChangeEvent>()
                 .collect { blackListEvent ->
-                    val dbWrapper = BlackListBiz.getInstance()
                     lifecycleScope.launch(Dispatchers.IO) {
                         if (blackListEvent.isAdd) {
-                            dbWrapper.saveDefaultBlackList(
+                            blackListBiz.saveDefaultBlackList(
                                 blackListEvent.authorPostId, blackListEvent.authorPostName,
                                 blackListEvent.remark
                             )
                         } else {
-                            dbWrapper.delDefaultBlackList(
+                            blackListBiz.delDefaultBlackList(
                                 blackListEvent.authorPostId,
                                 blackListEvent.authorPostName
                             )
@@ -258,11 +260,10 @@ class UserHomeActivity : BaseActivity() {
         if (blacklistMenu == null) {
             return
         }
-        val wrapper = BlackListBiz.getInstance()
 
         lifecycleScope.launch(L.report) {
             val blackList = withContext(Dispatchers.IO) {
-                wrapper.getMergedBlackList(uid?.toInt() ?: 0, name)
+                blackListBiz.getMergedBlackList(uid?.toInt() ?: 0, name)
             }
             if (blackList != null) {
                 isInBlacklist = true

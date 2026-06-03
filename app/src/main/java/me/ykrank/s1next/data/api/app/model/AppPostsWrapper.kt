@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.ykrank.androidtools.ui.adapter.StableIdModel
 import com.github.ykrank.androidtools.ui.adapter.model.DiffSameItem
 import me.ykrank.s1next.data.api.business.PostFilter
-import me.ykrank.s1next.data.db.biz.BlackListBiz
+import me.ykrank.s1next.data.db.biz.bizDependencies
 import me.ykrank.s1next.data.db.dbmodel.BlackList
 import paperparcel.PaperParcel
 import paperparcel.PaperParcelable
@@ -44,7 +44,7 @@ class AppPostsWrapper() : AppListWrapper<AppPost>() {
          */
         fun filterPost(post: AppPost): AppPost? {
             var nPost: AppPost? = post
-            val blackListWrapper = BlackListBiz.getInstance()
+            val blackListWrapper = bizDependencies().blackListBiz
             val blackList = blackListWrapper.getMergedBlackList(post.authorId, post.author, enableCache = true)
             if (blackList == null || blackList.post == BlackList.NORMAL) {
                 if (post.hide) {

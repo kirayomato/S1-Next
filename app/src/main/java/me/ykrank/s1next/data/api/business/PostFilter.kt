@@ -3,7 +3,7 @@ package me.ykrank.s1next.data.api.business
 import com.github.ykrank.androidtools.util.FileUtil
 import com.github.ykrank.androidtools.util.L
 import me.ykrank.s1next.data.api.model.PostAttachment
-import me.ykrank.s1next.data.db.biz.BlackListBiz
+import me.ykrank.s1next.data.db.biz.bizDependencies
 import me.ykrank.s1next.data.db.dbmodel.BlackList
 import org.jsoup.Jsoup
 import java.util.Locale
@@ -51,7 +51,7 @@ object PostFilter {
             reply = replaceQuoteBr(reply)
             reply = replaceTextColor(reply)
             val blackList =
-                BlackListBiz.getInstance().getMergedBlackList(-1, quoteName, enableCache = true)
+                bizDependencies().blackListBiz.getMergedBlackList(-1, quoteName, enableCache = true)
             if (blackList != null && blackList.post != BlackList.NORMAL) {
                 return replaceBlockQuoteContent(reply, blackList.remark)
             }

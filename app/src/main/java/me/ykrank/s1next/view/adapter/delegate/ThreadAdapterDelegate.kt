@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewHolder
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.model.Thread
+import me.ykrank.s1next.data.db.biz.ReadProgressBiz
 import me.ykrank.s1next.data.pref.ReadPreferencesManager
 import me.ykrank.s1next.data.pref.ThemeManager
 import me.ykrank.s1next.databinding.ItemThreadBinding
@@ -20,7 +21,8 @@ class ThreadAdapterDelegate(
     private val forumId: String?,
     private val mUserViewModel: UserViewModel,
     private val mThemeManager: ThemeManager,
-    private val mReadPreferencesManager: ReadPreferencesManager
+    private val mReadPreferencesManager: ReadPreferencesManager,
+    private val readProgressBiz: ReadProgressBiz
 ) :
         BaseAdapterDelegate<Thread, SimpleRecycleViewHolder<ItemThreadBinding>>(context, Thread::class.java) {
 
@@ -32,7 +34,7 @@ class ThreadAdapterDelegate(
         binding.userViewModel = mUserViewModel
         binding.themeManager = mThemeManager
         binding.forumId = forumId
-        binding.model = ThreadViewModel(lifecycleOwner, mReadPreferencesManager)
+        binding.model = ThreadViewModel(lifecycleOwner, mReadPreferencesManager, readProgressBiz)
 
         val threadPadding = mReadPreferencesManager.threadPadding
         if (threadPadding != null && threadPadding > 0) {

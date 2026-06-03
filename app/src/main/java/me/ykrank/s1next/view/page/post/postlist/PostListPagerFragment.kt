@@ -91,6 +91,9 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
     @Inject
     internal lateinit var downloadPreferencesManager: DownloadPreferencesManager
 
+    @Inject
+    internal lateinit var readProgressBiz: ReadProgressBiz
+
     private var mThreadId: String? = null
     private var mPageNum: Int = 0
     private var mThreadInfo: Thread? = null
@@ -337,8 +340,7 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
         if (readProgress != null) {
             lifecycleScope.launch {
                 withContext(Dispatchers.IO) {
-                    val dbWrapper = ReadProgressBiz.instance
-                    dbWrapper.saveReadProgress(readProgress)
+                    readProgressBiz.saveReadProgress(readProgress)
                 }
                 showShortText(R.string.save_read_progress_success)
             }
@@ -856,11 +858,6 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
             fragment.arguments = bundle
 
             return fragment
-        }
-
-        internal fun saveReadProgressBack(readProgress: ReadProgress) {
-            val dbWrapper = ReadProgressBiz.instance
-            dbWrapper.saveReadProgressAsync(readProgress)
         }
 
         private fun filterPostAfterBlacklistChanged(dataSet: List<Any>): List<Any> {

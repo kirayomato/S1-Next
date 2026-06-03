@@ -16,6 +16,7 @@ import com.github.ykrank.androidautodispose.AndroidRxDispose
 import com.github.ykrank.androidlifecycle.event.FragmentEvent
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.RxJavaUtil
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,8 +29,13 @@ import me.ykrank.s1next.view.activity.DarkRoomActivity
 import me.ykrank.s1next.view.adapter.BlackWordCursorListViewAdapter
 import me.ykrank.s1next.view.fragment.BaseFragment
 import me.ykrank.s1next.view.internal.RequestCode
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class BlackWordSettingFragment : BaseFragment() {
+
+    @Inject
+    internal lateinit var blackWordBiz: BlackWordBiz
 
     private lateinit var mListView: ListView
     private lateinit var mListViewAdapter: BlackWordCursorListViewAdapter
@@ -88,8 +94,8 @@ class BlackWordSettingFragment : BaseFragment() {
                         }
                     }
                     lifecycleScope.launch {
-                        withContext(Dispatchers.IO){
-                            BlackWordBiz.instance.delBlackWords(blackWords)
+                        withContext(Dispatchers.IO) {
+                            blackWordBiz.delBlackWords(blackWords)
                         }
                         load()
                     }
@@ -121,7 +127,7 @@ class BlackWordSettingFragment : BaseFragment() {
     }
 
     internal val sourceObservable: Single<Cursor>
-        get() = Single.fromCallable { BlackWordBiz.instance.blackWordCursor }
+        get() = Single.fromCallable { blackWordBiz.blackWordCursor }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -139,7 +145,7 @@ class BlackWordSettingFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mListViewAdapter = BlackWordCursorListViewAdapter(requireActivity())
+        mListViewAdapter = BlackWordCursorListViewAdapter(requireActivity(), blackWordBiz)
         mListView.adapter = mListViewAdapter
         mListView.choiceMode = AbsListView.CHOICE_MODE_MULTIPLE_MODAL
         mListView.setMultiChoiceModeListener(mActionModeCallback)
@@ -207,7 +213,7 @@ class BlackWordSettingFragment : BaseFragment() {
             if (blackWord != null) {
                 lifecycleScope.launch {
                     withContext(Dispatchers.IO) {
-                        BlackWordBiz.instance.saveBlackWord(blackWord)
+                        blackWordBiz.saveBlackWord(blackWord)
                     }
                     load()
                 }

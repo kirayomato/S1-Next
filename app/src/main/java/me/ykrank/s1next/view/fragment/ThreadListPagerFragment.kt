@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import me.ykrank.s1next.data.api.model.Forum
 import me.ykrank.s1next.data.api.model.wrapper.ThreadsWrapper
+import me.ykrank.s1next.data.db.biz.ReadProgressBiz
 import me.ykrank.s1next.data.pref.GeneralPreferencesManager
 import me.ykrank.s1next.data.pref.ReadPreferencesManager
 import me.ykrank.s1next.data.pref.ThemeManager
@@ -45,6 +46,9 @@ class ThreadListPagerFragment : BaseRecyclerViewFragment<ThreadsWrapper>() {
 
     @Inject
     internal lateinit var readPreferencesManager: ReadPreferencesManager
+
+    @Inject
+    internal lateinit var readProgressBiz: ReadProgressBiz
 
     private var mForumId: String? = null
     private var mTypeId: String? = null
@@ -97,7 +101,8 @@ class ThreadListPagerFragment : BaseRecyclerViewFragment<ThreadsWrapper>() {
             mForumId,
             userViewModel,
             themeManager,
-            readPreferencesManager
+            readPreferencesManager,
+            readProgressBiz
         )
         val recyclerView = recyclerView
         val activity = requireActivity()

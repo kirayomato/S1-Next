@@ -8,7 +8,7 @@ import com.github.ykrank.androidtools.widget.EventBus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.ykrank.s1next.data.db.biz.BlackListBiz
+import me.ykrank.s1next.data.db.biz.bizDependencies
 import me.ykrank.s1next.view.page.setting.blacklist.BlackListRemarkDialogFragment
 import me.ykrank.s1next.view.event.BlackListChangeEvent
 import me.ykrank.s1next.widget.track.TrackAgentProvider
@@ -30,7 +30,7 @@ object BlacklistMenuAction {
         TrackAgentProvider.get().post(BlackListTrackEvent(false, uid.toString(), name))
         lifecycleOwner.lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                BlackListBiz.getInstance().delDefaultBlackList(uid, name)
+                bizDependencies().blackListBiz.delDefaultBlackList(uid, name)
             }
             eventBus.postDefault(BlackListChangeEvent(uid, name, null, false))
         }
