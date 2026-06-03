@@ -3,9 +3,9 @@ package me.ykrank.s1next.view.page.post.adapter
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.github.ykrank.androidtools.binding.LibTextViewBindingAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewHolder
@@ -13,7 +13,9 @@ import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.widget.EventBus
 import kotlinx.coroutines.launch
 import me.ykrank.s1next.R
+import me.ykrank.s1next.binding.ImageViewBindingAdapter
 import me.ykrank.s1next.binding.TextViewBindingAdapter
+import me.ykrank.s1next.binding.ViewBindingAdapter
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.ApiCacheProvider
 import me.ykrank.s1next.data.api.model.Post
@@ -40,7 +42,7 @@ class PostAdapterDelegate(
     private val mApiCache: ApiCacheProvider,
     private val mGeneralPreferencesManager: GeneralPreferencesManager
 ) :
-    BaseAdapterDelegate<Post, SimpleRecycleViewHolder<ItemPostBinding>>(context, Post::class.java) {
+    BaseAdapterDelegate<Post, PostViewHolder>(context, Post::class.java) {
 
     private var threadInfo: Thread? = null
     private var voteInfo: Vote? = null
@@ -60,17 +62,27 @@ class PostAdapterDelegate(
     }
 
     public override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
-        val binding = DataBindingUtil.inflate<ItemPostBinding>(
-            mLayoutInflater,
-            R.layout.item_post, parent, false
+        val binding = ItemPostBinding.inflate(mLayoutInflater, parent, false)
+        val viewModel = PostViewModel(fragment.viewLifecycleOwner, mEventBus, mUser)
+        binding.avatar.setOnClickListener(viewModel::onAvatarClick)
+        binding.avatar.setOnLongClickListener(viewModel::onAvatarLongClick)
+        binding.tvFloor.setOnClickListener(viewModel::showFloorActionMenu)
+        binding.tvShowTrade.setOnClickListener(viewModel::onExtraHtmlClick)
+        binding.tvShowVote.setOnClickListener(viewModel::onVoteClick)
+        binding.tvCastMagic.setOnClickListener(viewModel::onAppPostClick)
+        binding.ivRateAdd.setOnClickListener(viewModel::onRateClick)
+        TextViewBindingAdapter.increaseClickingArea(
+            binding.tvFloor,
+            binding.tvFloor.resources.getDimension(
+                com.github.ykrank.androidtools.R.dimen.minimum_touch_target_size
+            )
         )
-        binding.postViewModel = PostViewModel(fragment.viewLifecycleOwner, mEventBus, mUser)
 
         binding.tvReply.setSpannableFactory(FixedSpannableFactory())
 
         setTextSelectable(binding, false)
 
-        return SimpleRecycleViewHolder(binding)
+        return PostViewHolder(binding, viewModel)
     }
 
     override fun onBindViewHolder(
@@ -80,7 +92,7 @@ class PostAdapterDelegate(
         payloads: List<Any>
     ) {
 
-        val viewHolder = holder as? SimpleRecycleViewHolder<ItemPostBinding>
+        val viewHolder = holder as? PostViewHolder
         if (viewHolder == null) {
             super.onBindViewHolder(items, position, holder, payloads)
             return
@@ -92,14 +104,13 @@ class PostAdapterDelegate(
         }
         if (payloads.contains(PostShareSelectionPayload)) {
             val post = items[position] as? Post ?: return
-            bindShareSelection(viewHolder.binding, post)
+            bindShareSelection(viewHolder.binding, viewHolder.viewModel, post)
             return
         }
         if (payloads.any { it is Profile }) {
             val post = items[position] as? Post ?: return
             val profile = post.authorId?.let { authorProfiles[it] }
-            viewHolder.binding.postViewModel?.authorProfile?.set(profile)
-            viewHolder.binding.executePendingBindings()
+            viewHolder.viewModel.authorProfile.set(profile)
             bindAuthorProfile(viewHolder.binding, profile)
             return
         }
@@ -109,30 +120,42 @@ class PostAdapterDelegate(
     override fun onBindViewHolderData(
         post: Post,
         position: Int,
-        holder: SimpleRecycleViewHolder<ItemPostBinding>,
+        holder: PostViewHolder,
         payloads: List<Any>
     ) {
         val binding = holder.binding
 
-        binding.quickSidebarEnable = mGeneralPreferencesManager.isQuickSideBarEnable
+        ViewBindingAdapter.setMarginEnd(
+            binding.contentContainer,
+            if (mGeneralPreferencesManager.isQuickSideBarEnable) {
+                binding.root.resources.getDimension(com.github.ykrank.androidtools.R.dimen.spacing_normal)
+            } else {
+                0f
+            }
+        )
 
         val selectable = false
         if (selectable != binding.tvReply.isTextSelectable) {
             setTextSelectable(binding, selectable)
         }
 
-        binding.postViewModel?.let {
-            it.thread.set(threadInfo)
-            it.pageNum.set(pageNum)
-            it.post.set(post)
-            it.authorProfile.set(post.authorId?.let { authorProfiles[it] })
-
-            if ("1" == post.number) {
-                it.vote.set(voteInfo)
-            } else {
-                it.vote.set(null)
-            }
-        }
+        holder.viewModel.thread.set(threadInfo)
+        holder.viewModel.pageNum.set(pageNum)
+        holder.viewModel.post.set(post)
+        holder.viewModel.authorProfile.set(post.authorId?.let { authorProfiles[it] })
+        holder.viewModel.vote.set(if ("1" == post.number) voteInfo else null)
+        binding.threadTitle.text = threadInfo?.title
+        binding.threadTitle.visibility =
+            if (pageNum == 1 && post.isFirst && threadInfo?.title != null) View.VISIBLE else View.GONE
+        ImageViewBindingAdapter.loadAvatar(binding.avatar, null, post.authorId)
+        binding.authorName.text = post.authorName
+        binding.originalPosterTag.visibility = if (post.isOpPost) View.VISIBLE else View.GONE
+        LibTextViewBindingAdapter.setRelativeDateTime(binding.tvDatetime, post.dateTime * 1000)
+        binding.tvFloor.text = holder.viewModel.floor.get()
+        TextViewBindingAdapter.setReply(binding.tvReply, null, null, fragment.viewLifecycleOwner, post)
+        binding.tvShowTrade.visibility = if (post.isTrade) View.VISIBLE else View.GONE
+        binding.tvShowVote.visibility = if (holder.viewModel.vote.get() != null) View.VISIBLE else View.GONE
+        binding.tvCastMagic.visibility = if (post.banned) View.VISIBLE else View.GONE
 
         val rates = post.rates
         val context = binding.root.context
@@ -180,9 +203,8 @@ class PostAdapterDelegate(
             binding.recycleViewRates.visibility = View.GONE
         }
 
-        binding.executePendingBindings()
         bindAuthorProfile(binding, post.authorId?.let { authorProfiles[it] })
-        bindShareSelection(binding, post)
+        bindShareSelection(binding, holder.viewModel, post)
     }
 
     private fun bindAuthorProfile(binding: ItemPostBinding, profile: Profile?) {
@@ -192,12 +214,25 @@ class PostAdapterDelegate(
         TextViewBindingAdapter.setRegistrationAge(binding.registrationAge, profile?.regDate)
     }
 
-    private fun bindShareSelection(binding: ItemPostBinding, post: Post) {
+    private fun bindShareSelection(binding: ItemPostBinding, viewModel: PostViewModel, post: Post) {
         val shareSelectionState = postShareSelectionOwner?.postShareSelectionState
         val shareSelectionEnabled = shareSelectionState?.enabled == true
-        binding.postShareSelectionEnabled = shareSelectionEnabled
-        binding.postShareSelected = shareSelectionState?.selectedPostIds?.contains(post.id) == true
-        binding.executePendingBindings()
+        val shareSelected = shareSelectionState?.selectedPostIds?.contains(post.id) == true
+        binding.postShareScrim.visibility =
+            if (shareSelectionEnabled && shareSelected) View.VISIBLE else View.GONE
+        binding.postShareCheckboxContainer.visibility =
+            if (shareSelectionEnabled) View.VISIBLE else View.GONE
+        binding.postShareCheckbox.isChecked = shareSelected
+        ViewBindingAdapter.setMarginEnd(
+            binding.postShareCheckboxContainer,
+            binding.root.resources.getDimension(
+                if (mGeneralPreferencesManager.isQuickSideBarEnable) {
+                    R.dimen.post_share_checkbox_margin_end_with_quick_sidebar
+                } else {
+                    R.dimen.post_share_checkbox_margin_end
+                }
+            )
+        )
         val headerViews = listOf(
             binding.root,
             binding.threadTitle,
@@ -226,22 +261,22 @@ class PostAdapterDelegate(
             binding.originalPosterTag.setOnClickListener(null)
             binding.tvDatetime.setOnClickListener(null)
             binding.avatar.setOnClickListener {
-                binding.postViewModel?.onAvatarClick(it)
+                viewModel.onAvatarClick(it)
             }
             binding.avatar.setOnLongClickListener {
-                binding.postViewModel?.onAvatarLongClick(it) == true
+                viewModel.onAvatarLongClick(it)
             }
             binding.postShareScrim.setOnClickListener(null)
             binding.postShareScrim.isClickable = false
             val showPostActionMenu = View.OnLongClickListener {
-                binding.postViewModel?.showFloorActionMenu(it)
+                viewModel.showFloorActionMenu(it)
                 true
             }
             headerViews.forEach {
                 it.setOnLongClickListener(showPostActionMenu)
             }
             binding.tvFloor.setOnClickListener {
-                binding.postViewModel?.showFloorActionMenu(it)
+                viewModel.showFloorActionMenu(it)
             }
         }
     }
@@ -251,7 +286,7 @@ class PostAdapterDelegate(
     override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
         super.onViewAttachedToWindow(holder)
         if (false) {
-            val binding = (holder as SimpleRecycleViewHolder<ItemPostBinding>).binding
+            val binding = (holder as PostViewHolder).binding
             binding.authorName.isEnabled = false
             binding.tvReply.isEnabled = false
             binding.authorName.isEnabled = true
@@ -273,3 +308,8 @@ class PostAdapterDelegate(
     }
 
 }
+
+class PostViewHolder(
+    binding: ItemPostBinding,
+    val viewModel: PostViewModel
+) : SimpleRecycleViewHolder<ItemPostBinding>(binding)
