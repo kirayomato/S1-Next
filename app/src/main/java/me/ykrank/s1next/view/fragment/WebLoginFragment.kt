@@ -63,7 +63,7 @@ class WebLoginFragment : BaseFragment() {
         webView?.webViewClient = object : CookieWebViewClient() {
 
             override fun onPageFinished(view: WebView, url: String) {
-                viewModel.setFinishedLoading(true)
+                viewModel.finishedLoading = true
                 super.onPageFinished(view, url)
             }
         }

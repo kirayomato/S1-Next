@@ -57,7 +57,7 @@ class HelpFragment : Fragment() {
         mFragmentHelpBinding.setWebPageViewModel(viewModel)
         webView?.setWebViewClient(object : WebViewClient() {
             override fun onPageFinished(view: WebView, url: String) {
-                viewModel.setFinishedLoading(true)
+                viewModel.finishedLoading = true
             }
         })
 
