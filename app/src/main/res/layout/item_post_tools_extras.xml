@@ -1,47 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="@dimen/item_padding_small"
+    android:paddingRight="@dimen/item_padding_small">
 
-    <data>
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_icon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="@dimen/spacing_big"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_bold" />
 
-        <variable
-            name="model"
-            type="me.ykrank.s1next.view.page.post.internal.PostToolsExtra" />
-    </data>
-
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/item_padding_small"
-        android:paddingRight="@dimen/item_padding_small">
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/iv_icon"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="@dimen/spacing_big"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:imageResource="@{model.icon}"
-            tools:src="@drawable/ic_bold" />
-
-        <TextView
-            android:id="@+id/tv_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/spacing_normal"
-            android:layout_marginTop="@dimen/spacing_micro"
-            android:text="@{model.name}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:autoSizeTextType="uniform"
-            tools:text="BoldBold"
-            app:layout_constraintTop_toBottomOf="@id/iv_icon" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</layout>
+        android:layout_marginBottom="@dimen/spacing_normal"
+        android:layout_marginTop="@dimen/spacing_micro"
+        app:autoSizeTextType="uniform"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/iv_icon"
+        tools:text="BoldBold" />
+</androidx.constraintlayout.widget.ConstraintLayout>

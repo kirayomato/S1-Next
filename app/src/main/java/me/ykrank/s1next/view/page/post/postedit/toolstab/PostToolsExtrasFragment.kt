@@ -7,10 +7,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewAdapter
-import me.ykrank.s1next.R
 import me.ykrank.s1next.databinding.FragmentPostToolsExtrasBinding
-import me.ykrank.s1next.databinding.ItemPostToolsExtrasBinding
 import me.ykrank.s1next.view.fragment.BaseFragment
 import me.ykrank.s1next.view.page.post.internal.PostToolsExtraBold
 import me.ykrank.s1next.view.page.post.internal.PostToolsExtraCreditPermission
@@ -35,13 +32,8 @@ class PostToolsExtrasFragment : BaseFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentPostToolsExtrasBinding.inflate(inflater, container, false)
 
-        binding.recycleView.layoutManager = GridLayoutManager(context, 5, LinearLayoutManager.VERTICAL, false)
-        val adapter = SimpleRecycleViewAdapter(context!!, R.layout.item_post_tools_extras, false, createViewHolderCallback = {
-            val bind = it as ItemPostToolsExtrasBinding
-            bind.root.setOnClickListener {
-                bind.model?.onClick(provider.currentEditText)
-            }
-        })
+        binding.recycleView.layoutManager = GridLayoutManager(requireContext(), 5, LinearLayoutManager.VERTICAL, false)
+        val adapter = PostToolsExtrasAdapter(requireContext()) { provider.currentEditText }
         adapter.swapDataSet(listOf(PostToolsExtraBold(), PostToolsExtraItalic(), PostToolsExtraUnderline(),
                 PostToolsExtraImg(), PostToolsExtraLink(), PostToolsExtraStrikethrough(), PostToolsExtraQuote(),
                 PostToolsExtraCreditPermission()))

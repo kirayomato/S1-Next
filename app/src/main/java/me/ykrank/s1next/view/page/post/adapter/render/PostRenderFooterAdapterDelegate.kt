@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewAdapter
 import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewHolder
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.widget.EventBus
@@ -20,9 +19,8 @@ import me.ykrank.s1next.data.api.model.Thread
 import me.ykrank.s1next.data.api.model.Vote
 import me.ykrank.s1next.data.pref.GeneralPreferencesManager
 import me.ykrank.s1next.databinding.ItemPostRenderFooterBinding
-import me.ykrank.s1next.databinding.ItemRateDetailBinding
 import me.ykrank.s1next.view.activity.RateDetailsListActivity
-import me.ykrank.s1next.view.activity.UserHomeActivity
+import me.ykrank.s1next.view.adapter.RateDetailAdapter
 import me.ykrank.s1next.view.adapter.delegate.BaseAdapterDelegate
 import me.ykrank.s1next.view.page.post.render.PostRenderItem
 import me.ykrank.s1next.view.page.post.share.PostShareSelectionOwner
@@ -164,34 +162,13 @@ class PostRenderFooterAdapterDelegate(
         if (binding.recycleViewRates.adapter != null) {
             return
         }
-        binding.recycleViewRates.adapter = SimpleRecycleViewAdapter(
-            binding.root.context,
-            R.layout.item_rate_detail,
-            true,
-            { _, rateBinding ->
-                val bind = rateBinding as? ItemRateDetailBinding
-                bind?.model?.apply {
-                    val uid = this.uid
-                    val uname = this.uname
-                    bind.avatar.setOnClickListener {
-                        if (uid != null && uname != null) {
-                            UserHomeActivity.start(
-                                it.context,
-                                uid,
-                                uname,
-                                it
-                            )
-                        }
-                    }
-                }
-            }
-        )
+        binding.recycleViewRates.adapter = RateDetailAdapter(binding.root.context, RateDetailAdapter.Mode.COMPACT)
         binding.recycleViewRates.layoutManager = LinearLayoutManager(binding.root.context)
         binding.recycleViewRates.isNestedScrollingEnabled = false
     }
 
     private fun updateRateList(binding: ItemPostRenderFooterBinding, rates: List<me.ykrank.s1next.data.api.model.Rate>) {
-        val adapter = binding.recycleViewRates.adapter as? SimpleRecycleViewAdapter ?: return
+        val adapter = binding.recycleViewRates.adapter as? RateDetailAdapter ?: return
         if (rates.size > 10) {
             adapter.diffNewDataSet(rates.subList(0, 10), true)
         } else {

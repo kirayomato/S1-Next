@@ -6,14 +6,11 @@ import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.ykrank.androidtools.extension.dp2px
-import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewAdapter
 import com.github.ykrank.androidtools.ui.vm.LoadingViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
-import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.model.Rate
-import me.ykrank.s1next.databinding.ItemRateDetailMultiBinding
-import me.ykrank.s1next.view.activity.UserHomeActivity
+import me.ykrank.s1next.view.adapter.RateDetailAdapter
 
 /**
  * Created by ykrank on 2017/1/16.
@@ -23,7 +20,7 @@ import me.ykrank.s1next.view.activity.UserHomeActivity
 class RateDetailsListFragment : BaseRecyclerViewFragment<List<Rate>>() {
 
     private lateinit var rates: List<Rate>
-    private lateinit var mRecyclerAdapter: SimpleRecycleViewAdapter
+    private lateinit var mRecyclerAdapter: RateDetailAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,34 +36,11 @@ class RateDetailsListFragment : BaseRecyclerViewFragment<List<Rate>>() {
         super.onViewCreated(view, savedInstanceState)
 
         val recyclerView = recyclerView
-        val activity = activity
-        recyclerView.layoutManager = LinearLayoutManager(activity)
-        mRecyclerAdapter = SimpleRecycleViewAdapter(
-            activity!!,
-            R.layout.item_rate_detail_multi,
-            true,
-            { _, rateBinding ->
-                val bind = rateBinding as? ItemRateDetailMultiBinding
-                bind?.model?.apply {
-                    val uid = this.uid
-                    val uname = this.uname
-                    bind.avatar.setOnClickListener {
-                        if (uid != null && uname != null) {
-                            //个人主页
-                            UserHomeActivity.start(
-                                it.context,
-                                uid,
-                                uname,
-                                it
-                            )
-                        }
-                    }
-                }
-
-            })
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        mRecyclerAdapter = RateDetailAdapter(requireContext(), RateDetailAdapter.Mode.MULTI)
         recyclerView.adapter = mRecyclerAdapter
         recyclerView.addItemDecoration(object : RecyclerView.ItemDecoration() {
-            val d16 = 16.dp2px(context!!)
+            val d16 = 16.dp2px(requireContext())
 
             override fun getItemOffsets(
                 outRect: Rect,
