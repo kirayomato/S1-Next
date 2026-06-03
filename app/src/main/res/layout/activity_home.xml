@@ -1,40 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
-
-    <data>
-
-        <import type="android.view.View" />
-
-        <import type="com.github.ykrank.androidtools.util.ResourceUtil" />
-
-        <variable
-            name="data"
-            type="me.ykrank.s1next.data.api.model.Profile" />
-
-        <variable
-            name="me"
-            type="boolean" />
-
-        <variable
-            name="thumb"
-            type="String" />
-
-        <variable
-            name="lifecycleOwner"
-            type="androidx.lifecycle.LifecycleOwner" />
-
-        <variable
-            name="downloadPreferencesManager"
-            type="me.ykrank.s1next.data.pref.DownloadPreferencesManager" />
-    </data>
-
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/coordinator_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinator_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/app_bar"
@@ -48,9 +19,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="336dp"
                 android:fitsSystemWindows="true"
-                app:blurUid="@{data.homeUid}"
                 app:contentScrim="?attr/colorPrimaryDark"
-                app:downloadPreferencesManager="@{downloadPreferencesManager}"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 app:scrimAnimationDuration="@integer/scrim_animation_duration"
                 app:statusBarScrim="?attr/colorPrimaryDark"
@@ -78,10 +47,6 @@
                         android:layout_marginTop="@dimen/spacing_xlarge"
                         android:contentDescription="@string/avatar_content_desc"
                         android:transitionName="@string/transition_avatar"
-                        android:visibility="@{downloadPreferencesManager.isAvatarsDownload ? View.VISIBLE : View.GONE}"
-                        app:downloadPreferencesManager="@{downloadPreferencesManager}"
-                        app:thumb="@{thumb}"
-                        app:uid="@{data.homeUid}"
                         tools:src="@drawable/ic_avatar_placeholder" />
 
                     <View
@@ -99,7 +64,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
-                            android:text="@{data.homeUsername}"
                             android:textAppearance="@style/TextAppearance.AppCompat.Shadow"
                             android:textSize="@dimen/text_size_title"
                             tools:text="ykrank" />
@@ -122,18 +86,18 @@
                         android:layout_weight="20" />
 
                     <TextView
+                        android:id="@+id/tv_uid"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/spacing_micro"
-                        android:text='@{"UID: "+data.homeUid}'
                         android:textAppearance="@style/TextAppearance.AppCompat.Shadow"
                         tools:text="UID: 123456" />
 
                     <TextView
+                        android:id="@+id/tv_group_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/spacing_micro"
-                        android:text="@{data.groupTitle}"
                         android:textAppearance="@style/TextAppearance.AppCompat.Shadow"
                         tools:text="大贤者" />
 
@@ -160,7 +124,6 @@
                             android:layout_marginBottom="@dimen/spacing_micro"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:text="@{@string/home_label_friends(data.friends)}"
                             android:textAppearance="@style/TextAppearance.AppCompat.Shadow"
                             tools:text="123\n好友" />
 
@@ -179,7 +142,6 @@
                             android:layout_marginBottom="@dimen/spacing_micro"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:text="@{@string/home_label_threads(data.threads)}"
                             android:textAppearance="@style/TextAppearance.AppCompat.Shadow"
                             tools:text="12345\n主题" />
 
@@ -198,7 +160,6 @@
                             android:layout_marginBottom="@dimen/spacing_micro"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:text="@{@string/home_label_replies(data.replies)}"
                             android:textAppearance="@style/TextAppearance.AppCompat.Shadow"
                             tools:text="123568\n回帖" />
                     </LinearLayout>
@@ -220,7 +181,6 @@
                         style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@{data.homeUsername}"
                         android:visibility="invisible"
                         tools:text="ykrank" />
                 </androidx.appcompat.widget.Toolbar>
@@ -237,9 +197,9 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:id="@+id/layout_content"
                 android:layout_marginBottom="@dimen/spacing_normal"
-                android:orientation="vertical"
-                android:paddingBottom="@{ResourceUtil.getNavigationBarHeight(context)}">
+                android:orientation="vertical">
 
                 <androidx.cardview.widget.CardView
                     style="?attr/materialCardViewStyle"
@@ -259,6 +219,7 @@
                         android:orientation="vertical">
 
                         <TextView
+                            android:id="@+id/tv_signature"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
@@ -275,8 +236,6 @@
                             android:layout_marginRight="@dimen/spacing_big"
                             android:layout_marginBottom="@dimen/spacing_normal"
                             android:textIsSelectable="true"
-                            app:lifecycleOwner="@{lifecycleOwner}"
-                            app:html="@{data.signHtml}"
                             tools:text="S1Next-Goose-0.7.2
 项目：https://github.com/ykrank/S1-Next
 下载：
@@ -306,12 +265,13 @@ googleplay: https://play.google.com/store/apps/details?id=me.ykrank.s1next
                         android:orientation="vertical">
 
                         <LinearLayout
+                            android:id="@+id/layout_manager"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="@dimen/spacing_big"
                             android:layout_marginRight="@dimen/spacing_big"
                             android:orientation="vertical"
-                            android:visibility="@{data.manager!=null ? View.VISIBLE : View.GONE}">
+                            android:visibility="gone">
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -324,9 +284,9 @@ googleplay: https://play.google.com/store/apps/details?id=me.ykrank.s1next
                                 tools:text="管理板块" />
 
                             <TextView
+                                android:id="@+id/tv_manager"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@{data.managerString}"
                                 tools:text="7177 小时" />
 
                             <View
@@ -354,9 +314,9 @@ googleplay: https://play.google.com/store/apps/details?id=me.ykrank.s1next
                                 tools:text="在线时间" />
 
                             <TextView
+                                android:id="@+id/tv_online_time"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@{@string/online_time_content(data.onlineHour)}"
                                 tools:text="7177 小时" />
 
                             <View
@@ -384,9 +344,9 @@ googleplay: https://play.google.com/store/apps/details?id=me.ykrank.s1next
                                 tools:text="注册时间" />
 
                             <TextView
+                                android:id="@+id/tv_reg_date"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                app:secondTime="@{data.regDate}"
                                 tools:text="2008-6-19 19:50" />
 
                             <View
@@ -414,9 +374,9 @@ googleplay: https://play.google.com/store/apps/details?id=me.ykrank.s1next
                                 tools:text="最后访问" />
 
                             <TextView
+                                android:id="@+id/tv_last_visit_date"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                app:secondTime="@{data.lastVisitDate}"
                                 tools:text="2017-1-12 14:11" />
 
                             <View
@@ -444,9 +404,9 @@ googleplay: https://play.google.com/store/apps/details?id=me.ykrank.s1next
                                 tools:text="上次活动时间" />
 
                             <TextView
+                                android:id="@+id/tv_last_active_date"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                app:secondTime="@{data.lastActiveDate}"
                                 tools:text="2017-1-14 19:40" />
 
                             <View
@@ -474,9 +434,9 @@ googleplay: https://play.google.com/store/apps/details?id=me.ykrank.s1next
                                 tools:text="上次发表时间" />
 
                             <TextView
+                                android:id="@+id/tv_last_post_date"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                app:secondTime="@{data.lastPostDate}"
                                 tools:text="2017-1-14 19:40" />
 
                         </LinearLayout>
@@ -507,6 +467,4 @@ googleplay: https://play.google.com/store/apps/details?id=me.ykrank.s1next
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-</layout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

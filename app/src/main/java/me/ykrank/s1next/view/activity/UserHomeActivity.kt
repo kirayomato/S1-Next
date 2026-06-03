@@ -10,14 +10,15 @@ import android.view.View
 import androidx.annotation.MainThread
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
+import com.github.ykrank.androidtools.binding.LibTextViewBindingAdapter
 import com.github.ykrank.androidautodispose.AndroidRxDispose
 import com.github.ykrank.androidlifecycle.event.ActivityEvent
 import com.github.ykrank.androidtools.util.AnimUtils
 import com.github.ykrank.androidtools.util.ContextUtils
 import com.github.ykrank.androidtools.util.L
+import com.github.ykrank.androidtools.util.ResourceUtil
 import com.github.ykrank.androidtools.util.RxJavaUtil
 import com.github.ykrank.androidtools.widget.AppBarOffsetChangedListener
 import com.github.ykrank.androidtools.widget.glide.model.ImageInfo
@@ -28,6 +29,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.ykrank.s1next.R
+import me.ykrank.s1next.binding.ImageViewBindingAdapter
+import me.ykrank.s1next.binding.TextViewBindingAdapter
+import me.ykrank.s1next.binding.ViewBindingAdapter
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.data.api.ProfileProvider
 import me.ykrank.s1next.data.api.model.Profile
@@ -38,7 +42,6 @@ import me.ykrank.s1next.view.dialog.LoginPromptDialogFragment
 import me.ykrank.s1next.view.event.BlackListChangeEvent
 import me.ykrank.s1next.view.internal.BlacklistMenuAction
 import me.ykrank.s1next.widget.glide.AvatarFailUrlsCache
-import me.ykrank.s1next.widget.image.ImageBiz
 import me.ykrank.s1next.widget.track.event.ViewHomeTrackEvent
 import javax.inject.Inject
 
@@ -61,10 +64,8 @@ class UserHomeActivity : BaseActivity() {
     private var isInBlacklist: Boolean = false
     private var blacklistMenu: MenuItem? = null
     private lateinit var adapter: HomeStatAdapter
-
-    private val imageBiz by lazy {
-        ImageBiz(mDownloadPreferencesManager)
-    }
+    private var profile: Profile? = null
+    private var thumbUrl: String? = null
 
     override val isTranslucent: Boolean
         get() = true
@@ -75,17 +76,22 @@ class UserHomeActivity : BaseActivity() {
         uid = intent.getStringExtra(ARG_UID)
         name = intent.getStringExtra(ARG_USERNAME)
         val thumbImageInfo = intent.getParcelableExtra<ImageInfo>(ARG_IMAGE_INFO)
+        thumbUrl = thumbImageInfo?.url
         trackAgent.post(ViewHomeTrackEvent(uid, name))
         leavePageMsg("UserHomeActivity##uid:$uid,name:$name")
 
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
-        binding.downloadPreferencesManager = mDownloadPreferencesManager
-        binding.thumb = thumbImageInfo?.url
-        binding.lifecycleOwner = this
+        binding = ActivityHomeBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        binding.layoutContent.setPadding(
+            binding.layoutContent.paddingLeft,
+            binding.layoutContent.paddingTop,
+            binding.layoutContent.paddingRight,
+            ResourceUtil.getNavigationBarHeight(this)
+        )
         val profile = Profile()
         profile.homeUid = uid
         profile.homeUsername = name
-        binding.data = profile
+        bindProfile(profile)
 
         initTransition()
         initListener()
@@ -207,7 +213,7 @@ class UserHomeActivity : BaseActivity() {
         }
 
         binding.ivNewPm.setOnClickListener { v ->
-            binding.data?.let {
+            profile?.let {
                 NewPmActivity.startNewPmActivityForResultMessage(
                     this,
                     it.homeUid, it.homeUsername
@@ -232,7 +238,7 @@ class UserHomeActivity : BaseActivity() {
     }
 
     private fun loadData() {
-        val profileUid = binding.data?.homeUid ?: return
+        val profileUid = profile?.homeUid ?: return
         lifecycleScope.launch(L.report) {
             try {
                 val profile = withContext(Dispatchers.IO) {
@@ -252,8 +258,48 @@ class UserHomeActivity : BaseActivity() {
         if (profile.homeUsername.isNullOrEmpty()) {
             profile.homeUsername = name
         }
-        binding.data = profile
+        bindProfile(profile)
         adapter.swapDataSet(profile.stats)
+    }
+
+    private fun bindProfile(profile: Profile) {
+        this.profile = profile
+        ViewBindingAdapter.setUserBlurBackground(
+            binding.collapsingToolbarLayout,
+            null,
+            null,
+            mDownloadPreferencesManager,
+            profile.homeUid
+        )
+        binding.avatar.visibility = if (mDownloadPreferencesManager.isAvatarsDownload) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
+        ImageViewBindingAdapter.loadAvatar(
+            binding.avatar,
+            null,
+            null,
+            null,
+            mDownloadPreferencesManager,
+            profile.homeUid,
+            thumbUrl
+        )
+        binding.tvName.text = profile.homeUsername
+        binding.tvUid.text = getString(R.string.home_label_uid, profile.homeUid)
+        binding.tvGroupTitle.text = profile.groupTitle
+        binding.tvFriends.text = getString(R.string.home_label_friends, profile.friends)
+        binding.tvThreads.text = getString(R.string.home_label_threads, profile.threads)
+        binding.tvReplies.text = getString(R.string.home_label_replies, profile.replies)
+        binding.toolbarTitle.text = profile.homeUsername
+        TextViewBindingAdapter.setHtml(binding.tvSignature, this, profile.signHtml)
+        binding.layoutManager.visibility = if (profile.manager != null) View.VISIBLE else View.GONE
+        binding.tvManager.text = profile.managerString
+        binding.tvOnlineTime.text = getString(R.string.online_time_content, profile.onlineHour)
+        LibTextViewBindingAdapter.setSecondTime(binding.tvRegDate, profile.regDate)
+        LibTextViewBindingAdapter.setSecondTime(binding.tvLastVisitDate, profile.lastVisitDate)
+        LibTextViewBindingAdapter.setSecondTime(binding.tvLastActiveDate, profile.lastActiveDate)
+        LibTextViewBindingAdapter.setSecondTime(binding.tvLastPostDate, profile.lastPostDate)
     }
 
     @MainThread

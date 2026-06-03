@@ -268,6 +268,7 @@
     <string name="menu_random_image">Random image</string>
     <string name="title_user_home">User Home</string>
     <string name="home_label_friends">%1$d\nFriends</string>
+    <string name="home_label_uid">UID: %1$s</string>
     <string name="home_label_threads">%1$d\nThreads</string>
     <string name="home_label_replies">%1$d\nReplies</string>
     <string name="personal_signature">Personal signature</string>

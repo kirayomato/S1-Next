@@ -257,7 +257,8 @@
     <string name="title_user_home">個人空間</string>
         
     <string name="home_label_friends">%1$d\n好友</string>
-        
+    <string name="home_label_uid">UID: %1$s</string>
+
     <string name="home_label_replies">%1$d\n回帖</string>
         
     <string name="home_label_threads">%1$d\n主題</string>
