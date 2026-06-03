@@ -8,7 +8,6 @@ import android.widget.AdapterView
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NavUtils
 import androidx.core.app.TaskStackBuilder
-import androidx.databinding.DataBindingUtil
 import com.github.ykrank.androidautodispose.AndroidRxDispose
 import com.github.ykrank.androidlifecycle.event.ActivityEvent
 import com.github.ykrank.androidtools.util.L
@@ -17,13 +16,13 @@ import com.google.common.base.Optional
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
 import me.ykrank.s1next.R
+import me.ykrank.s1next.binding.SpinnerBindingAdapter
 import me.ykrank.s1next.data.pref.ReadPreferencesManager
 import me.ykrank.s1next.databinding.ToolbarSpinnerBinding
 import me.ykrank.s1next.view.event.LoginEvent
 import me.ykrank.s1next.view.fragment.ForumFragment
 import me.ykrank.s1next.view.internal.ToolbarDropDownInterface
 import me.ykrank.s1next.view.page.post.postlist.PostListActivity
-import me.ykrank.s1next.viewmodel.DropDownItemListViewModel
 import javax.inject.Inject
 
 /**
@@ -94,27 +93,22 @@ class ForumActivity : BaseActivity(), ToolbarDropDownInterface.Callback, Adapter
             setTitle("")
 
             // add Spinner to Toolbar
-            binding = DataBindingUtil.inflate<ToolbarSpinnerBinding>(
+            binding = ToolbarSpinnerBinding.inflate(
                 layoutInflater,
-                R.layout.toolbar_spinner, toolbar.get(), true
+                toolbar.get(),
+                true
             )
             binding.spinner.onItemSelectedListener = this
             // let spinner's parent to handle clicking event in order
             // to increase spinner's clicking area.
             binding.spinnerContainer.setOnClickListener { v -> binding.spinner.performClick() }
-            binding.dropDownItemListViewModel = DropDownItemListViewModel()
 
             mToolbarSpinnerBinding = binding
         } else {
             binding = mToolbarSpinnerBinding as ToolbarSpinnerBinding
         }
 
-        val viewModel = binding.dropDownItemListViewModel
-        viewModel?.let {
-            it.selectedItemPosition = mSelectedPosition
-            it.dropDownItemList.clear()
-            it.dropDownItemList.addAll(dropDownItemList)
-        }
+        SpinnerBindingAdapter.setForumGroupNameList(binding.spinner, dropDownItemList, mSelectedPosition)
 
     }
 

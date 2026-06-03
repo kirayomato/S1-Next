@@ -1,37 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="me.ykrank.s1next.view.page.post.postedit.toolstab.emoticon.adapter.EmoticonGridRecyclerAdapter">
-
-    <data>
-
-        <import type="android.net.Uri" />
-
-        <variable
-            name="emoticonViewModel"
-            type="me.ykrank.s1next.viewmodel.EmoticonViewModel" />
-
-        <variable
-            name="rxBus"
-            type="com.github.ykrank.androidtools.widget.EventBus" />
-
-        <variable
-            name="requestManager"
-            type="com.bumptech.glide.RequestManager" />
-
-    </data>
-
-    <ImageView
-        android:id="@+id/image"
-        style="?attr/android:borderlessButtonStyle"
-        android:layout_width="@dimen/minimum_touch_target_size"
-        android:layout_height="@dimen/minimum_touch_target_size"
-        android:contentDescription="@null"
-        android:padding="@dimen/emoticon_padding"
-        app:emoticonRequestManager="@{requestManager}"
-        app:emoticon="@{emoticonViewModel.emoticon}"
-        app:onClickListener="@{emoticonViewModel.clickEmotion(rxBus)}" />
-
-</layout>
+<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/image"
+    style="?attr/android:borderlessButtonStyle"
+    android:layout_width="@dimen/minimum_touch_target_size"
+    android:layout_height="@dimen/minimum_touch_target_size"
+    android:contentDescription="@null"
+    android:padding="@dimen/emoticon_padding" />

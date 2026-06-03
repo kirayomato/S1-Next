@@ -3,11 +3,12 @@ package com.github.ykrank.androidtools.ui.dialog;
 import androidx.appcompat.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.widget.EditText;
 import android.widget.SeekBar;
 
@@ -52,8 +53,8 @@ public final class PageJumpDialogFragment extends LibBaseDialogFragment {
     @NonNull
     @Override
     public final Dialog onCreateDialog(Bundle savedInstanceState) {
-        DialogPageJumpBinding binding = DataBindingUtil.inflate(getActivity().getLayoutInflater(),
-                R.layout.dialog_page_jump, null, false);
+        DialogPageJumpBinding binding = DialogPageJumpBinding.inflate(getActivity().getLayoutInflater(),
+                null, false);
 
         int seekBarProgress;
         if (savedInstanceState == null) {
@@ -65,7 +66,7 @@ public final class PageJumpDialogFragment extends LibBaseDialogFragment {
         // SeekBar max is zero-based
         mPageJumpViewModel = new PageJumpViewModel(getArguments().getInt(ARG_TOTAL_PAGES) - 1,
                 seekBarProgress);
-        binding.setPageJumpViewModel(mPageJumpViewModel);
+        bindPageJumpControls(binding);
 
         AlertDialog alertDialog = new AlertDialog.Builder(getContext())
                 .setTitle(R.string.menu_page_jump)
@@ -81,6 +82,59 @@ public final class PageJumpDialogFragment extends LibBaseDialogFragment {
         ViewUtil.consumeRunnableWhenImeActionPerformed(binding.value, () ->
                 alertDialog.getButton(DialogInterface.BUTTON_POSITIVE).performClick());
         return alertDialog;
+    }
+
+    private void bindPageJumpControls(DialogPageJumpBinding binding) {
+        binding.seekBar.setMax(mPageJumpViewModel.getSeekBarMax());
+        binding.seekBar.setProgress(mPageJumpViewModel.getSeekBarProgress());
+        binding.value.setFilters(mPageJumpViewModel.getFilters());
+        binding.value.setText(mPageJumpViewModel.getSeekBarProgressText());
+        binding.value.setSelection(binding.value.getText().length());
+
+        SeekBar.OnSeekBarChangeListener seekBarChangeListener = mPageJumpViewModel.getOnSeekBarChangeListener();
+        binding.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                seekBarChangeListener.onProgressChanged(seekBar, progress, fromUser);
+                CharSequence progressText = mPageJumpViewModel.getSeekBarProgressText();
+                if (!TextUtils.equals(binding.value.getText(), progressText)) {
+                    binding.value.setText(progressText);
+                    binding.value.setSelection(binding.value.getText().length());
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                seekBarChangeListener.onStartTrackingTouch(seekBar);
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                seekBarChangeListener.onStopTrackingTouch(seekBar);
+            }
+        });
+
+        TextWatcher textWatcher = mPageJumpViewModel.getTextWatcher();
+        binding.value.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                textWatcher.beforeTextChanged(s, start, count, after);
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                textWatcher.onTextChanged(s, start, before, count);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                textWatcher.afterTextChanged(s);
+                int progress = mPageJumpViewModel.getSeekBarProgress();
+                if (binding.seekBar.getProgress() != progress) {
+                    binding.seekBar.setProgress(progress);
+                }
+            }
+        });
     }
 
     @Override

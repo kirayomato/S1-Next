@@ -2,12 +2,10 @@ package me.ykrank.s1next.view.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
 
-import me.ykrank.s1next.R;
+import me.ykrank.s1next.binding.TextViewBindingAdapter;
 import me.ykrank.s1next.databinding.ActivityOpenSourceLicenseDetailBinding;
-import me.ykrank.s1next.viewmodel.TextAssetViewModel;
 
 /**
  * An Activity shows the open source license for corresponding library or file.
@@ -28,14 +26,14 @@ public final class OpenSourceLicenseDetailActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActivityOpenSourceLicenseDetailBinding binding = DataBindingUtil.setContentView(this,
-                R.layout.activity_open_source_license_detail);
+        ActivityOpenSourceLicenseDetailBinding binding = ActivityOpenSourceLicenseDetailBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         Intent intent = getIntent();
         String libraryOrFileName = intent.getStringExtra(EXTRA_LIBRARY_OR_FILE_NAME);
         setTitle(libraryOrFileName);
 
-        binding.setTextAssetViewModel(new TextAssetViewModel(intent.getStringExtra(
-                EXTRA_LICENSE_FILE_PATH)));
+        TextViewBindingAdapter.loadTextAsset(binding.licenseText, intent.getStringExtra(
+                EXTRA_LICENSE_FILE_PATH));
     }
 }

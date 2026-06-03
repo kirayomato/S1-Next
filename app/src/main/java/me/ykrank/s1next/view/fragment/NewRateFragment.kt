@@ -9,7 +9,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import androidx.databinding.DataBindingUtil
 import com.github.ykrank.androidautodispose.AndroidRxDispose
 import com.github.ykrank.androidlifecycle.event.FragmentEvent
 import com.github.ykrank.androidtools.util.RxJavaUtil
@@ -21,7 +20,6 @@ import me.ykrank.s1next.databinding.FragmentNewRateBinding
 import me.ykrank.s1next.view.adapter.RateReasonAdapter
 import me.ykrank.s1next.view.adapter.SimpleSpinnerAdapter
 import me.ykrank.s1next.view.dialog.requestdialog.RateRequestDialogFragment
-import me.ykrank.s1next.viewmodel.NewRateViewModel
 import javax.inject.Inject
 
 /**
@@ -53,8 +51,7 @@ class NewRateFragment : BaseFragment() {
         }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_new_rate, container, false)
-        binding.model = NewRateViewModel()
+        binding = FragmentNewRateBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -102,7 +99,7 @@ class NewRateFragment : BaseFragment() {
                 .to(AndroidRxDispose.withSingle(this, FragmentEvent.DESTROY))
                 .subscribe({ info ->
                     ratePreInfo = info
-                    binding.model?.info?.set(info)
+                    binding.bindInfo(info)
                     setSpinner(info.scoreChoices)
                     setReasonRecycleView(info.reasons)
                 }, { e ->
@@ -123,6 +120,13 @@ class NewRateFragment : BaseFragment() {
 
     private fun setReasonRecycleView(reasons: List<String>) {
         reasonAdapter.refreshDataSet(reasons, false)
+    }
+
+    private fun FragmentNewRateBinding.bindInfo(info: RatePreInfo) {
+        scoreRegion.text = getString(R.string.score_region_format, info.minScore, info.maxScore)
+        scoreTodayLeft.text = info.totalScore
+        checkBox.isEnabled = !info.isDisabled
+        checkBox.isChecked = info.isChecked
     }
 
     private fun postRate() {
