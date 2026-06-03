@@ -7,9 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.ykrank.androidtools.extension.toast
-import com.github.ykrank.androidtools.ui.adapter.simple.BindViewHolderCallback
-import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.zip
@@ -21,7 +20,6 @@ import me.ykrank.s1next.data.api.app.AppService
 import me.ykrank.s1next.data.api.model.Vote
 import me.ykrank.s1next.data.api.runApiCatching
 import me.ykrank.s1next.data.api.toastError
-import me.ykrank.s1next.databinding.ItemVoteBinding
 import me.ykrank.s1next.databinding.LayoutVoteBinding
 import me.ykrank.s1next.viewmodel.ItemVoteViewModel
 import me.ykrank.s1next.viewmodel.VoteViewModel
@@ -45,7 +43,7 @@ class VoteDialogFragment : BaseDialogFragment(), VoteViewModel.VoteVmAction {
     private lateinit var tid: String
     private lateinit var mVote: Vote
     private lateinit var binding: LayoutVoteBinding
-    private lateinit var adapter: SimpleRecycleViewAdapter
+    private lateinit var adapter: VoteOptionsAdapter
 
     private lateinit var data: List<ItemVoteViewModel>
 
@@ -54,15 +52,7 @@ class VoteDialogFragment : BaseDialogFragment(), VoteViewModel.VoteVmAction {
         tid = requireArguments().getString(ARG_THREAD_ID)!!
         mVote = requireArguments().getParcelable(ARG_VOTE)!!
 
-        adapter = SimpleRecycleViewAdapter(
-            requireContext(),
-            R.layout.item_vote,
-            false,
-            BindViewHolderCallback { position, itemBind ->
-            itemBind as ItemVoteBinding
-            itemBind.radio.setOnClickListener { refreshSelectedItem(position, itemBind) }
-            itemBind.checkBox.setOnClickListener { refreshSelectedItem(position, itemBind) }
-        })
+        adapter = VoteOptionsAdapter(::refreshSelectedItem)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -72,7 +62,7 @@ class VoteDialogFragment : BaseDialogFragment(), VoteViewModel.VoteVmAction {
         binding.model = model
 
         binding.recycleView.adapter = adapter
-        binding.recycleView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
+        binding.recycleView.layoutManager = LinearLayoutManager(requireContext())
         mVote.voteOptions?.let {
             data = it.values.map { ItemVoteViewModel(binding.model!!, it) }
             adapter.swapDataSet(data)
@@ -134,16 +124,15 @@ class VoteDialogFragment : BaseDialogFragment(), VoteViewModel.VoteVmAction {
         }
     }
 
-    private fun refreshSelectedItem(position: Int, itemBind: ItemVoteBinding) {
+    private fun refreshSelectedItem(position: Int) {
         if (mVote.isMultiple) {
-            itemBind.model?.let {
-                if (it.selected.get()) {
-                    it.selected.set(false)
-                } else {
-                    val selected = data.filter { it.selected.get() }
-                    if (selected.size < mVote.maxChoices) {
-                        it.selected.set(true)
-                    }
+            val vm = data[position]
+            if (vm.selected.get()) {
+                vm.selected.set(false)
+            } else {
+                val selected = data.filter { it.selected.get() }
+                if (selected.size < mVote.maxChoices) {
+                    vm.selected.set(true)
                 }
             }
         } else {
