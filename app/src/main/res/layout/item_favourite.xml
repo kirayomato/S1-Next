@@ -1,46 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="me.ykrank.s1next.view.adapter.delegate.FavouriteAdapterDelegate">
-
-    <data>
-
-        <variable
-            name="rxBus"
-            type="com.github.ykrank.androidtools.widget.EventBus" />
-
-        <variable
-            name="model"
-            type="me.ykrank.s1next.viewmodel.FavouriteViewModel" />
-
-    </data>
-
-    <!-- May change this TextView padding or height after because we
-    can't find any spec in the material design guidelines whose line count
-    is not sure (less than 4) and each line are all primary.
-    We set top/bottom padding to 14.5dp because `includeFontPadding`
-    doesn't remove all extra space. -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground"
-        android:clickable="true"
-        android:ellipsize="end"
-        android:gravity="center_vertical"
-        android:includeFontPadding="false"
-        android:lineSpacingExtra="@dimen/text_line_spacing_extra"
-        android:maxLines="@integer/list_max_line"
-        android:paddingBottom="14.5dp"
-        android:paddingEnd="@dimen/item_padding"
-        android:paddingLeft="@dimen/item_padding"
-        android:paddingRight="@dimen/item_padding"
-        android:paddingStart="@dimen/item_padding"
-        android:paddingTop="14.5dp"
-        android:text="@{model.favourite.title}"
-        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-        app:bindEvent="@{model.onBind()}"
-        app:onLongClickListener="@{model.removeFromFavourites(rxBus)}" />
-
-</layout>
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:ellipsize="end"
+    android:gravity="center_vertical"
+    android:includeFontPadding="false"
+    android:lineSpacingExtra="@dimen/text_line_spacing_extra"
+    android:maxLines="@integer/list_max_line"
+    android:paddingStart="@dimen/item_padding"
+    android:paddingLeft="@dimen/item_padding"
+    android:paddingTop="14.5dp"
+    android:paddingEnd="@dimen/item_padding"
+    android:paddingRight="@dimen/item_padding"
+    android:paddingBottom="14.5dp"
+    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+    tools:text="Favourite title" />

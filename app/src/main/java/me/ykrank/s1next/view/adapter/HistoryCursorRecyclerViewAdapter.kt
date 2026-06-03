@@ -5,9 +5,12 @@ import android.database.Cursor
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
-import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewHolder
+import androidx.recyclerview.widget.RecyclerView
+import me.ykrank.s1next.binding.TextViewBindingAdapter
+import me.ykrank.s1next.binding.ViewBindingAdapter
 import me.ykrank.s1next.data.db.biz.HistoryBiz
 import me.ykrank.s1next.data.db.biz.ReadProgressBiz
+import me.ykrank.s1next.data.db.dbmodel.History
 import me.ykrank.s1next.data.pref.ReadPreferencesManager
 import me.ykrank.s1next.databinding.ItemHistoryBinding
 import me.ykrank.s1next.viewmodel.HistoryViewModel
@@ -19,7 +22,7 @@ class HistoryCursorRecyclerViewAdapter(
     private val readProgressBiz: ReadProgressBiz,
     private val historyBiz: HistoryBiz
 ) :
-    CursorRecyclerViewAdapter<SimpleRecycleViewHolder<ItemHistoryBinding>>(activity, null) {
+    CursorRecyclerViewAdapter<HistoryCursorRecyclerViewAdapter.ViewHolder>(activity, null) {
     private val mLayoutInflater: LayoutInflater
 
     init {
@@ -29,17 +32,33 @@ class HistoryCursorRecyclerViewAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): SimpleRecycleViewHolder<ItemHistoryBinding> {
+    ): ViewHolder {
         val binding = ItemHistoryBinding.inflate(mLayoutInflater, parent, false)
-        binding.setModel(HistoryViewModel(lifecycleOwner, readPreferencesManager, readProgressBiz))
-        return SimpleRecycleViewHolder(binding)
+        return ViewHolder(
+            binding,
+            HistoryViewModel(lifecycleOwner, readPreferencesManager, readProgressBiz)
+        )
     }
 
     override fun onBindViewHolder(
-        viewHolder: SimpleRecycleViewHolder<ItemHistoryBinding>,
+        viewHolder: ViewHolder,
         cursor: Cursor
     ) {
-        val binding = viewHolder.binding
-        binding.getModel()?.history?.set(historyBiz.fromCursor(cursor))
+        viewHolder.bind(historyBiz.fromCursor(cursor))
+    }
+
+    class ViewHolder(
+        private val binding: ItemHistoryBinding,
+        private val model: HistoryViewModel
+    ) : RecyclerView.ViewHolder(binding.root) {
+
+        init {
+            ViewBindingAdapter.setOnViewBind(binding.root, model.onBind())
+        }
+
+        fun bind(history: History) {
+            model.history.set(history)
+            TextViewBindingAdapter.setHomeThread(binding.root, history)
+        }
     }
 }

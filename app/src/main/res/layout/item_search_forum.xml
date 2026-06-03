@@ -1,39 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="me.ykrank.s1next.view.adapter.delegate.SearchForumAdapterDelegate">
+    style="?attr/materialCardViewStyle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/card_view_vertical_margin"
+    android:layout_marginBottom="@dimen/card_view_vertical_margin"
+    app:cardCornerRadius="0dp">
 
-    <data>
-        <import type="me.ykrank.s1next.widget.span.SearchMovementMethod" />
-
-        <variable
-            name="model"
-            type="me.ykrank.s1next.data.api.model.search.ForumSearchResult" />
-    </data>
-
-    <androidx.cardview.widget.CardView
-        style="?attr/materialCardViewStyle"
+    <TextView
+        android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/card_view_vertical_margin"
-        android:layout_marginTop="@dimen/card_view_vertical_margin"
-        app:cardCornerRadius="0dp">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/item_padding_small"
-            android:ellipsize="end"
-            android:gravity="center_vertical"
-            android:includeFontPadding="false"
-            android:lineSpacingExtra="@dimen/text_line_spacing_extra"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:textIsSelectable="true"
-            android:text="@{model.htmlContent}"
-            app:movementMethod="@{SearchMovementMethod.getInstance()}"
-            tools:text="ABC\nkhk"/>
-
-    </androidx.cardview.widget.CardView>
-</layout>
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:includeFontPadding="false"
+        android:lineSpacingExtra="@dimen/text_line_spacing_extra"
+        android:padding="@dimen/item_padding_small"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textIsSelectable="true"
+        tools:text="ABC\nkhk" />
+</androidx.cardview.widget.CardView>

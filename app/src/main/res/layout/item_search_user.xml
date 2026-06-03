@@ -1,56 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="me.ykrank.s1next.view.adapter.delegate.SearchForumAdapterDelegate">
+    style="?attr/materialCardViewStyle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/card_view_vertical_margin"
+    android:layout_marginBottom="@dimen/card_view_vertical_margin"
+    app:cardCornerRadius="0dp">
 
-    <data>
-
-        <import type="me.ykrank.s1next.widget.span.SearchMovementMethod" />
-
-        <variable
-            name="model"
-            type="me.ykrank.s1next.viewmodel.SearchUserViewModel" />
-    </data>
-
-    <androidx.cardview.widget.CardView
-        style="?attr/materialCardViewStyle"
+    <LinearLayout
+        android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/card_view_vertical_margin"
-        android:layout_marginTop="@dimen/card_view_vertical_margin"
-        app:cardCornerRadius="0dp">
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="@dimen/item_padding_small">
 
-        <LinearLayout
+        <ImageView
+            android:id="@+id/avatar"
+            android:layout_width="@dimen/avatar_size"
+            android:layout_height="@dimen/avatar_size"
+            android:layout_marginEnd="@dimen/item_padding"
+            android:layout_marginRight="@dimen/item_padding"
+            android:contentDescription="@string/avatar_content_desc"
+            tools:src="@drawable/ic_avatar_placeholder" />
+
+        <TextView
+            android:id="@+id/name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
             android:gravity="center_vertical"
-            android:onClick="@{v->model.onClick(v, avatar)}"
-            android:orientation="horizontal"
-            android:padding="@dimen/item_padding_small">
-
-            <ImageView
-                android:id="@+id/avatar"
-                android:layout_width="@dimen/avatar_size"
-                android:layout_height="@dimen/avatar_size"
-                android:layout_marginEnd="@dimen/item_padding"
-                android:layout_marginRight="@dimen/item_padding"
-                android:contentDescription="@string/avatar_content_desc"
-                app:uid="@{model.search.uid}"
-                tools:src="@drawable/ic_avatar_placeholder" />
-
-            <TextView
-                android:id="@+id/name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:gravity="center_vertical"
-                android:padding="@dimen/item_padding_small"
-                android:text="@{model.search.name}"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                tools:text="ykrank" />
-        </LinearLayout>
-
-    </androidx.cardview.widget.CardView>
-</layout>
+            android:padding="@dimen/item_padding_small"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            tools:text="ykrank" />
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

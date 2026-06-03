@@ -1,36 +1,39 @@
 package me.ykrank.s1next.view.adapter.delegate
 
 import android.content.Context
-import androidx.databinding.DataBindingUtil
-import androidx.recyclerview.widget.RecyclerView
 import android.view.ViewGroup
-import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewHolder
-import me.ykrank.s1next.R
+import androidx.recyclerview.widget.RecyclerView
 import me.ykrank.s1next.data.api.model.search.ForumSearchResult
 import me.ykrank.s1next.databinding.ItemSearchForumBinding
+import me.ykrank.s1next.widget.span.SearchMovementMethod
 
 class SearchForumAdapterDelegate(context: Context) :
-    BaseAdapterDelegate<ForumSearchResult, SimpleRecycleViewHolder<ItemSearchForumBinding>>(
+    BaseAdapterDelegate<ForumSearchResult, SearchForumAdapterDelegate.ViewHolder>(
         context,
         ForumSearchResult::class.java
     ) {
 
     public override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
-        val binding = DataBindingUtil.inflate<ItemSearchForumBinding>(
-            mLayoutInflater,
-            R.layout.item_search_forum, parent, false
-        )
-
-        return SimpleRecycleViewHolder(binding)
+        val binding = ItemSearchForumBinding.inflate(mLayoutInflater, parent, false)
+        return ViewHolder(binding)
     }
 
     override fun onBindViewHolderData(
         t: ForumSearchResult,
         position: Int,
-        holder: SimpleRecycleViewHolder<ItemSearchForumBinding>,
+        holder: ViewHolder,
         payloads: List<Any>
     ) {
-        val binding = holder.binding
-        binding.model = t
+        holder.bind(t)
+    }
+
+    class ViewHolder(private val binding: ItemSearchForumBinding) : RecyclerView.ViewHolder(binding.root) {
+        init {
+            binding.content.movementMethod = SearchMovementMethod.instance
+        }
+
+        fun bind(result: ForumSearchResult) {
+            binding.content.text = result.htmlContent
+        }
     }
 }
