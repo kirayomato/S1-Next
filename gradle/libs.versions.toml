@@ -9,7 +9,7 @@ constraintlayout = "2.1.4"
 bugly_crashreport = "4.1.9.3"
 bugly_crashreport_upgrade = "1.6.1"
 bugly_nativecrashreport = "3.9.2"
-dagger = "2.57.1"
+dagger = "2.59.2"
 flipper = "0.271.0"
 glide = "4.16.0"
 guava = "33.2.0-android"
@@ -35,8 +35,8 @@ rxjava = "2.2.21"
 rxkotlin = "2.4.0"
 soloader = "0.11.0"
 gradleVersionsPlugin = "0.51.0"
-kotlin = "2.0.0"
-kotlinKsp = "2.0.0-1.0.21"
+kotlin = "2.3.20"
+kotlinKsp = "2.3.8"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -48,7 +48,7 @@ transition = "1.5.0"
 largeimageview = "1.1.0"
 compileSdk = "34"
 targetSdk = "34"
-agp = "8.7.3"
+agp = "9.2.0"
 
 [libraries]
 adapterdelegates3 = { module = "com.hannesdorfmann:adapterdelegates3", version.ref = "adapterdelegates3" }
@@ -112,7 +112,8 @@ largeimageview = { module = "com.shizhefei:LargeImageView", version.ref = "large
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
-kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+androidLegacyKapt = { id = "com.android.legacy-kapt", version.ref = "agp" }
+kotlinParcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 gradleVersionsPlugin = { id = "com.github.ben-manes.versions", version.ref = "gradleVersionsPlugin" }
 androidKsp = { id = "com.google.devtools.ksp", version.ref = "kotlinKsp" }
 hiltAndroid = { id = "com.google.dagger.hilt.android", version.ref = "dagger" }

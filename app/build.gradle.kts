@@ -2,12 +2,11 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
 plugins {
     alias(libs.plugins.androidApplication)
-    alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.gradleVersionsPlugin)
     alias(libs.plugins.androidKsp)
     alias(libs.plugins.hiltAndroid)
-    kotlin("kapt")
-    id("kotlin-parcelize")
+    alias(libs.plugins.androidLegacyKapt)
+    alias(libs.plugins.kotlinParcelize)
 }
 
 val properties = gradleLocalProperties(rootDir, providers)
@@ -52,9 +51,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
     buildFeatures {
         dataBinding = true
         buildConfig = true
@@ -86,7 +82,7 @@ android {
             }
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
 
             matchingFallbacks += listOf("release", "debug")
         }
@@ -98,7 +94,7 @@ android {
             }
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 
@@ -127,6 +123,12 @@ android {
 
 ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
+}
+
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xannotation-default-target=param-property")
+    }
 }
 
 kapt {

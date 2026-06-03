@@ -3,7 +3,6 @@ package me.ykrank.s1next.binding
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
-import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.text.LineBreaker
 import android.os.Build
@@ -14,7 +13,6 @@ import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.TextUtils
-import android.text.format.DateUtils
 import android.text.style.TextAppearanceSpan
 import android.view.TouchDelegate
 import android.view.View
@@ -68,14 +66,6 @@ object TextViewBindingAdapter {
             // use TouchDelegate to increase count's clicking area
             parent.touchDelegate = TouchDelegate(rect, textView)
         }
-    }
-
-    @JvmStatic
-    @BindingAdapter("underlineText")
-    fun setUnderlineText(textView: TextView, text: String?) {
-        textView.paintFlags = textView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
-        textView.paint.isAntiAlias = true
-        textView.text = text
     }
 
     @JvmStatic
@@ -175,14 +165,6 @@ object TextViewBindingAdapter {
             textView,
             repliesStr,
             if (hasPermission) themeManager.gentleAccentColor else themeManager.hintOrDisabledGentleAccentColor
-        )
-    }
-
-    @JvmStatic
-    @BindingAdapter("relativeDateTime")
-    fun setRelativeDateTime(textView: TextView, datetime: Long) {
-        textView.text = DateUtils.getRelativeDateTimeString(
-            textView.context, datetime, DateUtils.MINUTE_IN_MILLIS, DateUtils.DAY_IN_MILLIS, 0
         )
     }
 

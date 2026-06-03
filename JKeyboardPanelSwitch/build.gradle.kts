@@ -5,6 +5,7 @@ plugins {
 
 android {
     namespace = "cn.dreamtobe.kpswitch"
+    enableKotlin = false
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {

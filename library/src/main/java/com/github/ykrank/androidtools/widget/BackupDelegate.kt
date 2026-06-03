@@ -156,6 +156,7 @@ class BackupDelegate(
     }
 
     @IntDef(SUCCESS, CANCELED, NO_DATA, PERMISSION_DENY, IO_EXCEPTION, UNKNOWN_EXCEPTION)
+    @Retention(AnnotationRetention.SOURCE)
     annotation class BackupResult
 
     interface AfterBackup {

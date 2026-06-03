@@ -1,8 +1,7 @@
 plugins {
     alias(libs.plugins.androidLibrary)
-    alias(libs.plugins.kotlinAndroid)
-    kotlin("kapt")
-    id("kotlin-parcelize")
+    alias(libs.plugins.androidLegacyKapt)
+    alias(libs.plugins.kotlinParcelize)
 }
 
 android {
@@ -23,9 +22,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
     buildFeatures {
         dataBinding = true
         buildConfig = true
@@ -39,6 +35,12 @@ android {
         create("normal") {
             dimension = "market"
         }
+    }
+}
+
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xannotation-default-target=param-property")
     }
 }
 

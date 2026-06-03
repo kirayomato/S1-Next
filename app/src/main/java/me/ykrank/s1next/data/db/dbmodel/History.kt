@@ -3,6 +3,7 @@ package me.ykrank.s1next.data.db.dbmodel
 import androidx.annotation.Keep
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
@@ -36,6 +37,7 @@ class History {
     @ColumnInfo(name = "Timestamp")
     var timestamp: Long = 0
 
+    @Ignore
     constructor(id: Long?, threadId: Int, title: String?, timestamp: Long) {
         this.id = id
         this.threadId = threadId
@@ -44,6 +46,7 @@ class History {
     }
 
     @Keep
+    @Ignore
     constructor(threadId: Int, title: String?) {
         this.threadId = threadId
         this.title = title

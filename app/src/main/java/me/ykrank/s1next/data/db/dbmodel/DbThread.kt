@@ -4,6 +4,7 @@ import android.os.Parcel
 import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.common.base.Objects
@@ -41,6 +42,7 @@ class DbThread : Parcelable {
     @ColumnInfo(name = "Timestamp")
     var timestamp: Long
 
+    @Ignore
     constructor(id: Long?, threadId: Int, lastCountWhenView: Int, timestamp: Long) {
         this.id = id
         this.threadId = threadId
@@ -48,6 +50,7 @@ class DbThread : Parcelable {
         this.timestamp = timestamp
     }
 
+    @Ignore
     constructor(threadId: Int, lastCountWhenView: Int) {
         this.threadId = threadId
         this.lastCountWhenView = lastCountWhenView
@@ -58,6 +61,7 @@ class DbThread : Parcelable {
         timestamp = System.currentTimeMillis()
     }
 
+    @Ignore
     protected constructor(`in`: Parcel) {
         val hasId = `in`.readByte().toInt() == 1
         if (hasId) {

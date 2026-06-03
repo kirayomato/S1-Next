@@ -2,6 +2,7 @@ package me.ykrank.s1next.data.db.dbmodel
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
@@ -69,6 +70,7 @@ class UserProfile {
 
     constructor()
 
+    @Ignore
     constructor(
         uid: String,
         username: String?,

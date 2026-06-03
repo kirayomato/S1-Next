@@ -110,10 +110,10 @@ class Rate(
                 val rateElementList = document.select("table>tbody>tr")
                 rateElementList.forEach {
                     val rate = Rate()
-                    rate.score = it.child(0).text()?.let {
+                    rate.score = it.child(0).text().let {
                         //In java 1.6, Integer.parseInt could not parse like "+1"
                         it.substring(3, it.length - 1).replace("+", "").trim()
-                    }?.toInt()
+                    }.toInt()
                     it.child(1).child(0).also {
                         UserLink.parse(it.attr("href"))?.apply {
                             rate.uid = this.uid

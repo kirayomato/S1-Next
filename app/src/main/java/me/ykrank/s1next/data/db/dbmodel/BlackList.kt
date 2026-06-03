@@ -6,6 +6,7 @@ import androidx.annotation.IntDef
 import androidx.annotation.StringRes
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import me.ykrank.s1next.R
@@ -76,6 +77,7 @@ class BlackList : Parcelable {
     @ColumnInfo(name = "Upload")
     var isUpload = false
 
+    @Ignore
     constructor(`in`: Parcel) {
         val hasId = `in`.readByte().toInt() == 1
         if (hasId) {
@@ -94,6 +96,7 @@ class BlackList : Parcelable {
         timestamp = System.currentTimeMillis()
     }
 
+    @Ignore
     constructor(authorId: Int, name: String?, @PostFLag post: Int, @ForumFLag forum: Int) {
         this.authorId = authorId
         author = name
@@ -104,6 +107,7 @@ class BlackList : Parcelable {
         isUpload = false
     }
 
+    @Ignore
     constructor(
         id: Long?, authorId: Int, author: String?, post: Int, forum: Int, remark: String?,
         timestamp: Long, upload: Boolean

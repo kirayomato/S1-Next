@@ -6,6 +6,7 @@ import androidx.annotation.IntDef
 import androidx.annotation.StringRes
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import me.ykrank.s1next.R
@@ -53,6 +54,7 @@ class BlackWord : Parcelable {
         timestamp = System.currentTimeMillis()
     }
 
+    @Ignore
     constructor(word: String?, stat: Int) {
         this.word = word
         this.stat = stat
@@ -60,6 +62,7 @@ class BlackWord : Parcelable {
         isUpload = false
     }
 
+    @Ignore
     protected constructor(`in`: Parcel) {
         id = if (`in`.readByte().toInt() == 0) {
             null
@@ -72,6 +75,7 @@ class BlackWord : Parcelable {
         isUpload = `in`.readByte().toInt() != 0
     }
 
+    @Ignore
     constructor(id: Long?, word: String?, stat: Int, timestamp: Long, upload: Boolean) {
         this.id = id
         this.word = word

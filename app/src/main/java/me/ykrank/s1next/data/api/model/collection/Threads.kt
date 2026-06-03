@@ -134,9 +134,9 @@ class Threads @JsonCreator constructor(
     override fun hashCode(): Int {
         var result = super.hashCode()
         result = 31 * result + (threadListInfo?.hashCode() ?: 0)
-        result = 31 * result + (threadList?.hashCode() ?: 0)
-        result = 31 * result + (subForumList?.hashCode() ?: 0)
-        result = 31 * result + (threadTypes?.hashCode() ?: 0)
+        result = 31 * result + threadList.hashCode()
+        result = 31 * result + subForumList.hashCode()
+        result = 31 * result + threadTypes.hashCode()
         return result
     }
 }
