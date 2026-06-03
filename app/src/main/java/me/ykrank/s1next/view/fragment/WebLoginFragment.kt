@@ -10,15 +10,12 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ProgressBar
-import androidx.databinding.DataBindingUtil
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.WebViewUtils
 import dagger.hilt.android.AndroidEntryPoint
-import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.databinding.FragmentWebviewBinding
 import me.ykrank.s1next.view.activity.ForumActivity
-import me.ykrank.s1next.viewmodel.WebPageViewModel
 import me.ykrank.s1next.widget.hostcheck.AppHostUrl
 import java.net.URI
 import java.util.Arrays
@@ -42,8 +39,7 @@ class WebLoginFragment : BaseFragment() {
     private lateinit var mProgressBar: ProgressBar
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        mFragmentHelpBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_webview, container,
-                false)
+        mFragmentHelpBinding = FragmentWebviewBinding.inflate(inflater, container, false)
         webView = mFragmentHelpBinding.webView
         mProgressBar = mFragmentHelpBinding.progressBar
 
@@ -55,15 +51,12 @@ class WebLoginFragment : BaseFragment() {
 
         WebViewUtils.clearWebViewCookies(context!!)
 
-        val viewModel = WebPageViewModel()
-        mFragmentHelpBinding.webPageViewModel = viewModel
-
         initWebViewSetting()
 
         webView?.webViewClient = object : CookieWebViewClient() {
 
             override fun onPageFinished(view: WebView, url: String) {
-                viewModel.finishedLoading = true
+                view.visibility = View.VISIBLE
                 super.onPageFinished(view, url)
             }
         }

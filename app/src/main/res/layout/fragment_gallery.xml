@@ -1,68 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     tools:context="me.ykrank.s1next.view.activity.GalleryActivity">
 
-    <data>
-
-        <import type="android.view.View" />
-
-        <variable
-            name="imageViewModel"
-            type="me.ykrank.s1next.viewmodel.ImageViewModel" />
-
-        <variable
-            name="downloadPrefManager"
-            type="me.ykrank.s1next.data.pref.DownloadPreferencesManager" />
-
-        <variable
-            name="large"
-            type="boolean" />
-
-        <variable
-            name="progress"
-            type="com.github.ykrank.androidtools.ui.adapter.delegate.item.ProgressItem" />
-    </data>
-
-    <FrameLayout
+    <com.github.chrisbanes.photoview.PhotoView
+        android:id="@+id/photo_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:contentDescription="@string/picture_content_desc"
+        android:transitionName="@string/gallery_transition" />
 
-        <com.github.chrisbanes.photoview.PhotoView
-            android:id="@+id/photo_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:contentDescription="@string/picture_content_desc"
-            android:transitionName="@string/gallery_transition"
-            android:visibility="@{large?View.GONE:View.VISIBLE}"
-            app:manager="@{downloadPrefManager}"
-            app:thumbUrl="@{imageViewModel.thumbUrl}"
-            app:url="@{imageViewModel.url}" />
+    <com.shizhefei.view.largeimage.LargeImageView
+        android:id="@+id/largeImageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@string/picture_content_desc"
+        android:visibility="gone" />
 
-        <com.shizhefei.view.largeimage.LargeImageView
-            android:id="@+id/largeImageView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:contentDescription="@string/picture_content_desc"
-            android:visibility="@{large?View.VISIBLE:View.GONE}"
-            app:manager="@{downloadPrefManager}"
-            app:show="@{large}"
-            app:thumbUrl="@{imageViewModel.thumbUrl}"
-            app:url="@{imageViewModel.url}" />
-
-        <TextView
-            android:id="@+id/tv_progress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal|bottom"
-            android:layout_marginBottom="@dimen/spacing_huge"
-            android:textColor="@color/white_100p"
-            android:text="@{progress.kbStr}"
-            android:visibility="@{progress.finished?View.GONE:View.VISIBLE}"
-            tools:text="1000/2048KB" />
-
-    </FrameLayout>
-
-</layout>
+    <TextView
+        android:id="@+id/tv_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginBottom="@dimen/spacing_huge"
+        android:textColor="@color/white_100p"
+        android:visibility="gone"
+        tools:text="1000/2048KB"
+        tools:visibility="visible" />
+</FrameLayout>

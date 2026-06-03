@@ -32,12 +32,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.ykrank.s1next.App
 import me.ykrank.s1next.R
+import me.ykrank.s1next.binding.LargeImageViewBindingAdapter
+import me.ykrank.s1next.binding.PhotoViewBindingAdapter
 import me.ykrank.s1next.data.pref.DownloadPreferencesManager
 import me.ykrank.s1next.databinding.FragmentGalleryBinding
 import me.ykrank.s1next.databinding.MenuGalleryLargeImageSwitchBinding
 import me.ykrank.s1next.util.AppFileUtil
 import me.ykrank.s1next.util.IntentUtil
-import me.ykrank.s1next.viewmodel.ImageViewModel
 import me.ykrank.s1next.widget.download.DownloadProgressModel
 import me.ykrank.s1next.widget.download.DownloadTask
 import me.ykrank.s1next.widget.download.ProgressListener
@@ -100,8 +101,7 @@ class GalleryFragment : Fragment() {
 
         preload()
 
-        binding.downloadPrefManager = mDownloadPrefManager
-        binding.imageViewModel = ImageViewModel(mImageUrl, mImageThumbUrl)
+        PhotoViewBindingAdapter.loadImage(binding.photoView, mImageUrl, mImageThumbUrl, mDownloadPrefManager)
 
         mPhotoView.attacher.scaleType = ImageView.ScaleType.CENTER_INSIDE
 
@@ -168,12 +168,24 @@ class GalleryFragment : Fragment() {
         largeModeMenu?.isChecked = large
         largeModeBinding?.switchLarge?.isChecked = large
 
-        binding.large = large
+        bindLargeMode()
         if (large) {
             mImageUrl?.let {
                 trackAgent.post(LargeImageTrackEvent(it.toString(), mImageThumbUrl?.toString()))
             }
         }
+    }
+
+    private fun bindLargeMode() {
+        binding.photoView.visibility = if (large) View.GONE else View.VISIBLE
+        binding.largeImageView.visibility = if (large) View.VISIBLE else View.GONE
+        LargeImageViewBindingAdapter.loadImage(
+            binding.largeImageView,
+            mImageUrl,
+            mImageThumbUrl,
+            mDownloadPrefManager,
+            large
+        )
     }
 
     private fun downloadImage() {
@@ -241,8 +253,7 @@ class GalleryFragment : Fragment() {
         val progressListener = object : ProgressListener {
 
             override fun onProgress(task: DownloadTask, progress: DownloadProgressModel) {
-                binding.progress =
-                    ProgressItem(progress.totalLength, progress.currentOffset, progress.done)
+                bindProgress(ProgressItem(progress.totalLength, progress.currentOffset, progress.done))
             }
         }
         downloadId?.also {
@@ -252,6 +263,11 @@ class GalleryFragment : Fragment() {
             mProgressManager.addListener(it, progressListener)
         }
         mProgressListener = progressListener
+    }
+
+    private fun bindProgress(progress: ProgressItem) {
+        binding.tvProgress.text = progress.kbStr
+        binding.tvProgress.visibility = if (progress.finished) View.GONE else View.VISIBLE
     }
 
     override fun onDestroy() {

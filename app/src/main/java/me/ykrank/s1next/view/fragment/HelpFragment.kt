@@ -12,7 +12,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.github.ykrank.androidtools.ui.internal.CoordinatorLayoutAnchorDelegate
 import com.github.ykrank.androidtools.util.L.leaveMsg
@@ -21,7 +20,6 @@ import me.ykrank.s1next.R
 import me.ykrank.s1next.databinding.FragmentWebviewBinding
 import me.ykrank.s1next.view.activity.OpenSourceLicensesActivity
 import me.ykrank.s1next.view.dialog.VersionInfoDialogFragment
-import me.ykrank.s1next.viewmodel.WebPageViewModel
 
 /**
  * A Fragment represents a help page.
@@ -42,10 +40,7 @@ class HelpFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        mFragmentHelpBinding = DataBindingUtil.inflate(
-            inflater, R.layout.fragment_webview, container,
-            false
-        )
+        mFragmentHelpBinding = FragmentWebviewBinding.inflate(inflater, container, false)
         webView = mFragmentHelpBinding.webView
         return mFragmentHelpBinding.root
     }
@@ -53,11 +48,9 @@ class HelpFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         leaveMsg("HelpFragment")
-        val viewModel = WebPageViewModel()
-        mFragmentHelpBinding.setWebPageViewModel(viewModel)
         webView?.setWebViewClient(object : WebViewClient() {
             override fun onPageFinished(view: WebView, url: String) {
-                viewModel.finishedLoading = true
+                view.visibility = View.VISIBLE
             }
         })
 

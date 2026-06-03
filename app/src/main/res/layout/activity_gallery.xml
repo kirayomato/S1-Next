@@ -1,48 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     tools:context="me.ykrank.s1next.view.activity.GalleryActivity">
 
-    <data>
-
-        <import type="android.view.View" />
-
-        <variable
-            name="position"
-            type="int" />
-
-        <variable
-            name="size"
-            type="int" />
-    </data>
-
-    <FrameLayout
+    <com.github.ykrank.androidtools.widget.uglyfix.FixViewPager
+        android:id="@+id/view_pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent" />
 
-        <com.github.ykrank.androidtools.widget.uglyfix.FixViewPager
-            android:id="@+id/view_pager"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text='@{String.format("%s/%s", position+1, size)}'
-                android:visibility="@{size > 1 ? View.VISIBLE:View.GONE}"
-                tools:text="1/10" />
-        </androidx.appcompat.widget.Toolbar>
-
-    </FrameLayout>
-
-</layout>
+        <TextView
+            android:id="@+id/tv_gallery_position"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            tools:text="1/10"
+            tools:visibility="visible" />
+    </androidx.appcompat.widget.Toolbar>
+</FrameLayout>

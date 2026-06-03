@@ -5,8 +5,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.viewpager.widget.ViewPager
 import com.github.ykrank.androidtools.widget.track.DataTrackAgent
 import com.github.ykrank.androidtools.widget.track.event.page.ActivityEndEvent
@@ -34,7 +34,8 @@ class GalleryActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_gallery)
+        binding = ActivityGalleryBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         imageUrls = intent.getParcelableArrayListExtra(ARG_IMAGE_URL) ?: arrayListOf()
         position = intent.getIntExtra(ARG_POSITION, 0)
 
@@ -42,16 +43,20 @@ class GalleryActivity : AppCompatActivity() {
         title = null
         toolbarDelegate.setupNavCrossIcon()
 
-        binding.size = imageUrls.size
-        binding.position = position
+        bindPosition(position)
 
         binding.viewPager.adapter = GalleryViewPagerAdapter(supportFragmentManager, imageUrls)
         binding.viewPager.currentItem = position
         binding.viewPager.addOnPageChangeListener(object : ViewPager.SimpleOnPageChangeListener() {
             override fun onPageSelected(pos: Int) {
-                binding.position = pos
+                bindPosition(pos)
             }
         })
+    }
+
+    private fun bindPosition(position: Int) {
+        binding.tvGalleryPosition.visibility = if (imageUrls.size > 1) View.VISIBLE else View.GONE
+        binding.tvGalleryPosition.text = String.format("%s/%s", position + 1, imageUrls.size)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

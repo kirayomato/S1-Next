@@ -10,13 +10,10 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ProgressBar
-import androidx.databinding.DataBindingUtil
 import com.github.ykrank.androidtools.util.WebViewUtils
 import dagger.hilt.android.AndroidEntryPoint
-import me.ykrank.s1next.R
 import me.ykrank.s1next.databinding.FragmentWebviewBinding
 import me.ykrank.s1next.view.internal.BackPressDelegate
-import me.ykrank.s1next.viewmodel.WebPageViewModel
 import java.net.CookieManager
 import javax.inject.Inject
 
@@ -36,7 +33,7 @@ class WebViewFragment : BaseFragment(), BackPressDelegate {
     private lateinit var binding: FragmentWebviewBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_webview, container, false)
+        binding = FragmentWebviewBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -47,8 +44,6 @@ class WebViewFragment : BaseFragment(), BackPressDelegate {
         url = bundle.getString(ARG_URL)!!
         enableJs = bundle.getBoolean(ARG_ENABLE_JS)
         pcAgent = bundle.getBoolean(ARG_PC_AGENT)
-
-        binding.webPageViewModel = WebPageViewModel()
 
         initWebViewSetting()
         initWebViewClient()
@@ -114,7 +109,7 @@ class WebViewFragment : BaseFragment(), BackPressDelegate {
         binding.webView.webViewClient = object : WebViewClient() {
 
             override fun onPageFinished(view: WebView, url: String) {
-                binding.webPageViewModel?.finishedLoading = true
+                binding.webView.visibility = View.VISIBLE
                 super.onPageFinished(view, url)
             }
         }

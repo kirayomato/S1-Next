@@ -1,35 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     tools:context="me.ykrank.s1next.view.fragment.HelpFragment">
 
-    <data>
 
-        <variable
-            name="webPageViewModel"
-            type="me.ykrank.s1next.viewmodel.WebPageViewModel" />
-    </data>
-
-    <FrameLayout
-        android:id="@+id/layout_root"
+    <WebView
+        android:id="@+id/webView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:visibility="invisible" />
 
-
-        <WebView
-            android:id="@+id/webView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="@{webPageViewModel.webViewVisibility}" />
-
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_x="172dp"
-            android:layout_y="1dp" />
-    </FrameLayout>
-
-</layout>
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_x="172dp"
+        android:layout_y="1dp" />
+</FrameLayout>
