@@ -2,14 +2,11 @@ package me.ykrank.s1next.view.page.setting.blacklist
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import me.ykrank.s1next.R
 import me.ykrank.s1next.data.db.dbmodel.BlackList
 import me.ykrank.s1next.databinding.ItemBlacklistBinding
-import me.ykrank.s1next.viewmodel.BlackListViewModel
 
 class BlackListPagingAdapter :
     PagingDataAdapter<BlackList, BlackListPagingAdapter.ViewHolder>(DIFF_CALLBACK) {
@@ -25,18 +22,27 @@ class BlackListPagingAdapter :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
-        holder.binding.blackListViewModel?.blacklist?.set(item)
+        holder.bind(item)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val itemBlacklistBinding = DataBindingUtil.inflate<ItemBlacklistBinding>(
+        val itemBlacklistBinding = ItemBlacklistBinding.inflate(
             LayoutInflater.from(parent.context),
-            R.layout.item_blacklist, parent, false
+            parent,
+            false
         )
-        itemBlacklistBinding.blackListViewModel = BlackListViewModel()
         return ViewHolder(itemBlacklistBinding)
     }
 
-    inner class ViewHolder(val binding: ItemBlacklistBinding) :
-        RecyclerView.ViewHolder(binding.root)
+    inner class ViewHolder(private val binding: ItemBlacklistBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(blackList: BlackList?) {
+            binding.authorId.text = blackList?.authorId?.toString()
+            binding.authorName.text = blackList?.author
+            blackList?.forumRes?.let(binding.forum::setText) ?: run { binding.forum.text = null }
+            blackList?.postRes?.let(binding.post::setText) ?: run { binding.post.text = null }
+            binding.time.text = blackList?.time
+        }
+    }
 }

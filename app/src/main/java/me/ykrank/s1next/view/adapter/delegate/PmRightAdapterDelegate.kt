@@ -3,20 +3,22 @@ package me.ykrank.s1next.view.adapter.delegate
 import android.content.Context
 import android.text.TextUtils
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
-import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewHolder
-import me.ykrank.s1next.R
+import androidx.recyclerview.widget.RecyclerView
+import com.github.ykrank.androidtools.binding.LibTextViewBindingAdapter
+import me.ykrank.s1next.binding.ImageViewBindingAdapter
+import me.ykrank.s1next.binding.TextViewBindingAdapter
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.model.Pm
 import me.ykrank.s1next.databinding.ItemPmRightBinding
-import me.ykrank.s1next.viewmodel.PmViewModel
+import me.ykrank.s1next.view.activity.UserHomeActivity
+import me.ykrank.s1next.widget.span.PostMovementMethod
 
 class PmRightAdapterDelegate(
     context: Context,
     private val lifecycleOwner: LifecycleOwner,
     private val user: User
-) : BaseAdapterDelegate<Pm, SimpleRecycleViewHolder<ItemPmRightBinding>>(context, Pm::class.java) {
+) : BaseAdapterDelegate<Pm, PmRightAdapterDelegate.ViewHolder>(context, Pm::class.java) {
 
     override fun isForViewType(items: MutableList<Any>, position: Int): Boolean {
         val item = items[position]
@@ -25,16 +27,13 @@ class PmRightAdapterDelegate(
         } else false
     }
 
-    public override fun onCreateViewHolder(parent: ViewGroup): androidx.recyclerview.widget.RecyclerView.ViewHolder {
-        val binding = DataBindingUtil.inflate<ItemPmRightBinding>(mLayoutInflater,
-                R.layout.item_pm_right, parent, false)
-        binding.pmViewModel = PmViewModel(lifecycleOwner)
-        return SimpleRecycleViewHolder<ItemPmRightBinding>(binding)
+    public override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
+        val binding = ItemPmRightBinding.inflate(mLayoutInflater, parent, false)
+        return ViewHolder(binding, lifecycleOwner)
     }
 
-    override fun onBindViewHolderData(t: Pm, position: Int, holder: SimpleRecycleViewHolder<ItemPmRightBinding>, payloads: List<Any>) {
-        val binding = holder.binding
-        binding.pmViewModel?.pm?.set(t)
+    override fun onBindViewHolderData(t: Pm, position: Int, holder: ViewHolder, payloads: List<Any>) {
+        holder.bind(t)
     }
 
     /**
@@ -44,9 +43,43 @@ class PmRightAdapterDelegate(
      */
     override fun onViewAttachedToWindow(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder) {
         super.onViewAttachedToWindow(holder)
-        val binding = (holder as SimpleRecycleViewHolder<ItemPmRightBinding>).binding
-        binding.tvMessage.isEnabled = false
-        binding.tvMessage.isEnabled = true
+        (holder as ViewHolder).refreshSelectableText()
+    }
+
+    class ViewHolder(
+        private val binding: ItemPmRightBinding,
+        private val lifecycleOwner: LifecycleOwner
+    ) : RecyclerView.ViewHolder(binding.root) {
+        private var avatarUid: String? = null
+        private var message: String? = null
+
+        init {
+            binding.tvMessage.movementMethod = PostMovementMethod.instance
+        }
+
+        fun bind(pm: Pm) {
+            LibTextViewBindingAdapter.setRelativeDateTime(binding.tvTime, pm.dateline * 1000)
+            ImageViewBindingAdapter.loadAvatar(binding.avatar, oldUid = avatarUid, newUid = pm.authorId)
+            avatarUid = pm.authorId
+            binding.avatar.setOnClickListener {
+                pm.authorId?.let { uid ->
+                    UserHomeActivity.start(it.context, uid, pm.author, it)
+                }
+            }
+            TextViewBindingAdapter.setHtmlWithImage(
+                binding.tvMessage,
+                lifecycleOwner,
+                message,
+                lifecycleOwner,
+                pm.message
+            )
+            message = pm.message
+        }
+
+        fun refreshSelectableText() {
+            binding.tvMessage.isEnabled = false
+            binding.tvMessage.isEnabled = true
+        }
     }
 
 }

@@ -1,73 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="me.ykrank.s1next.view.adapter.delegate.FavouriteAdapterDelegate">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="@dimen/item_padding_small"
+    android:paddingRight="@dimen/item_padding_small">
 
-    <data>
-
-        <import type="me.ykrank.s1next.widget.span.PostMovementMethod" />
-
-        <variable
-            name="pmViewModel"
-            type="me.ykrank.s1next.viewmodel.PmViewModel" />
-    </data>
-
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/tv_time"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/item_padding_small"
-        android:paddingRight="@dimen/item_padding_small">
+        android:includeFontPadding="false"
+        android:lines="1"
+        android:paddingTop="@dimen/item_padding"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="1602-46-52" />
 
-        <TextView
-            android:id="@+id/tv_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:includeFontPadding="false"
-            android:lines="1"
-            android:paddingTop="@dimen/item_padding"
-            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:relativeDateTime="@{pmViewModel.pm.dateline*1000}"
-            tools:text="1602-46-52" />
+    <ImageView
+        android:id="@+id/avatar"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="@dimen/item_padding_small"
+        android:contentDescription="@string/avatar_content_desc"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_time"
+        tools:src="@drawable/ic_avatar_placeholder" />
 
-        <ImageView
-            android:id="@+id/avatar"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="@dimen/item_padding_small"
-            android:contentDescription="@string/avatar_content_desc"
-            android:onClick="@{pmViewModel::onAvatarClick}"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_time"
-            app:uid="@{pmViewModel.pm.authorId}"
-            tools:src="@drawable/ic_avatar_placeholder" />
-
-        <TextView
-            android:id="@+id/tv_message"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/spacing_micro"
-            android:layout_marginLeft="@dimen/spacing_huge"
-            android:layout_marginRight="@dimen/spacing_micro"
-            android:layout_marginStart="@dimen/spacing_huge"
-            android:layout_marginTop="@dimen/item_padding_small"
-            android:background="?attr/chatToBackground"
-            android:lineSpacingExtra="@dimen/text_line_spacing_extra"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:textIsSelectable="true"
-            app:lifecycleOwner="@{pmViewModel.lifecycleOwner}"
-            app:imgHtml="@{pmViewModel.pm.message}"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/avatar"
-            app:layout_constraintTop_toBottomOf="@+id/tv_time"
-            app:movementMethod="@{PostMovementMethod.getInstance()}"
-            tools:text="content" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</layout>
+    <TextView
+        android:id="@+id/tv_message"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/spacing_huge"
+        android:layout_marginLeft="@dimen/spacing_huge"
+        android:layout_marginTop="@dimen/item_padding_small"
+        android:layout_marginEnd="@dimen/spacing_micro"
+        android:layout_marginRight="@dimen/spacing_micro"
+        android:background="?attr/chatToBackground"
+        android:lineSpacingExtra="@dimen/text_line_spacing_extra"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textIsSelectable="true"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/avatar"
+        app:layout_constraintTop_toBottomOf="@+id/tv_time"
+        tools:text="content" />
+</androidx.constraintlayout.widget.ConstraintLayout>
