@@ -10,10 +10,6 @@ interface AppDataProvider {
     val logTag: String
     val debug: Boolean
     val buildType: String
-    /**
-     * recycleView的item中的主数据model的BR id
-     */
-    val itemModelBRid: Int
     val recycleViewLoadingImgId: Int
     val recycleViewErrorImgId: Int
     /**

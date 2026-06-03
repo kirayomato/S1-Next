@@ -9,8 +9,6 @@ import com.github.ykrank.androidtools.util.ErrorParser
 abstract class DefaultAppDataProvider : AppDataProvider {
     override val errorParser: ErrorParser?
         get() = DefaultErrorParser
-    override val itemModelBRid: Int
-        get() = BR.model
     override val recycleViewLoadingImgId: Int
         get() = R.drawable.loading
     override val recycleViewErrorImgId: Int
