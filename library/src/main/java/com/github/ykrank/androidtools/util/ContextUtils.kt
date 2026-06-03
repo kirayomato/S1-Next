@@ -53,6 +53,13 @@ object ContextUtils {
         return context.applicationContext
     }
 
+    fun findFragmentActivity(context: Context): FragmentActivity? {
+        if (context is FragmentActivity) {
+            return context
+        }
+        return getBaseContext(context) as? FragmentActivity
+    }
+
     /**
      * Returns class name for this fragment with the package prefix removed.
      * This is the default name used to read and write settings.

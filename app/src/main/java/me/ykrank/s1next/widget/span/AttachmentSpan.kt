@@ -9,7 +9,6 @@ import android.view.View
 import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
-import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import com.github.ykrank.androidtools.util.ContextUtils
 import com.github.ykrank.androidtools.util.L
@@ -76,7 +75,7 @@ class AttachmentSpan {
         private fun go(v: View, span: AttachmentHref) {
             val popup = PopupMenu(v.context, v)
             popup.setOnMenuItemClickListener { menuitem: MenuItem ->
-                val activity = ContextUtils.getBaseContext(v.context) as? FragmentActivity
+                val activity = ContextUtils.findFragmentActivity(v.context)
                 activity?.supportFragmentManager?.apply {
                     download(activity, this, span)
                 }

@@ -375,10 +375,11 @@ class UserHomeActivity : BaseActivity() {
             uid: String,
             userName: String?
         ): FragmentActivity? {
-            val baseContext = ContextUtils.getBaseContext(context)
-            if (baseContext is FragmentActivity) {
-                return baseContext
+            val activity = ContextUtils.findFragmentActivity(context)
+            if (activity != null) {
+                return activity
             }
+            val baseContext = ContextUtils.getBaseContext(context)
             L.leaveMsg("uid:$uid")
             L.leaveMsg("userName:$userName")
             L.report(

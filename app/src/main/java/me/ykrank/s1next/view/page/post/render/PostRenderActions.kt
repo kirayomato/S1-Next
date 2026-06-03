@@ -2,7 +2,6 @@ package me.ykrank.s1next.view.page.post.render
 
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import com.github.ykrank.androidtools.util.ClipboardUtil
 import com.github.ykrank.androidtools.ui.internal.CoordinatorLayoutAnchorDelegate
@@ -130,19 +129,16 @@ object PostRenderActions {
     }
 
     private fun showCopyDialog(anchor: View, fragment: Fragment?, post: Post) {
-        val fragmentManager = fragment?.childFragmentManager ?: findFragmentActivity(anchor)?.supportFragmentManager ?: return
+        val fragmentManager =
+            fragment?.childFragmentManager ?: ContextUtils.findFragmentActivity(anchor.context)?.supportFragmentManager ?: return
         PostCopyDialogFragment.newInstance(
             post.authorName,
             if (post.isTrade) post.extraHtml.orEmpty() else post.reply.orEmpty()
         ).show(fragmentManager, PostCopyDialogFragment.TAG)
     }
 
-    private fun findFragmentActivity(anchor: View): FragmentActivity? {
-        return ContextUtils.getBaseContext(anchor.context) as? FragmentActivity
-    }
-
     private fun findFeedbackFragmentManager(anchor: View, fragment: Fragment?): FragmentManager? {
-        return fragment?.parentFragmentManager ?: findFragmentActivity(anchor)?.supportFragmentManager
+        return fragment?.parentFragmentManager ?: ContextUtils.findFragmentActivity(anchor.context)?.supportFragmentManager
     }
 
     fun floorLink(thread: Thread?, pageNum: Int, post: Post): String {
@@ -154,7 +150,7 @@ object PostRenderActions {
         val context = anchor.context
         val link = floorLink(thread, pageNum, post)
         ClipboardUtil.copyText(context, "Post link", link)
-        (findFragmentActivity(anchor) as? CoordinatorLayoutAnchorDelegate)?.showSnackbar(
+        (ContextUtils.findFragmentActivity(anchor.context) as? CoordinatorLayoutAnchorDelegate)?.showSnackbar(
             R.string.post_feedback_link_copied
         )
         val fragmentManager = findFeedbackFragmentManager(anchor, fragment) ?: return
