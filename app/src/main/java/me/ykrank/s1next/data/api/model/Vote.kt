@@ -1,6 +1,7 @@
 package me.ykrank.s1next.data.api.model
 
 import android.graphics.Color
+import android.os.Parcelable
 import androidx.annotation.ColorInt
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonFormat
@@ -19,30 +20,29 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.github.ykrank.androidtools.widget.json.JsonBooleanDeserializer
 import com.github.ykrank.androidtools.widget.json.JsonBooleanSerializer
+import kotlinx.parcelize.Parcelize
 import org.jsoup.nodes.TextNode
-import paperparcel.PaperParcel
-import paperparcel.PaperParcelable
 import java.text.DecimalFormat
 
 /**
  * Created by ykrank on 2017/2/15.
  */
-@PaperParcel
+@Parcelize
 @JsonIgnoreProperties(ignoreUnknown = true)
-class Vote : PaperParcelable {
+class Vote(
     /**
      * 是否拥有投票权限
      */
     @JsonSerialize(using = JsonBooleanSerializer::class)
     @JsonDeserialize(using = JsonBooleanDeserializer::class)
     @JsonProperty("allowvote")
-    var isAllow: Boolean = false
+    var isAllow: Boolean = false,
 
     /**
      * 最多可选项
      */
     @JsonProperty("maxchoices")
-    var maxChoices: Int = 0
+    var maxChoices: Int = 0,
 
     /**
      * 是否允许多选
@@ -50,15 +50,15 @@ class Vote : PaperParcelable {
     @JsonSerialize(using = JsonBooleanSerializer::class)
     @JsonDeserialize(using = JsonBooleanDeserializer::class)
     @JsonProperty("multiple")
-    var isMultiple: Boolean = false
+    var isMultiple: Boolean = false,
 
     @JsonProperty("polloptions")
-    var voteOptions: Map<Int, VoteOption>? = null
+    var voteOptions: Map<Int, VoteOption>? = null,
 
     @JsonSerialize(using = Time.TimeJsonSerializer::class)
     @JsonDeserialize(using = Time.TimeJsonDeserializer::class)
     @JsonProperty("remaintime")
-    var remainTime: Time? = null
+    var remainTime: Time? = null,
 
     /**
      * 投票结果是否可见
@@ -66,10 +66,11 @@ class Vote : PaperParcelable {
     @JsonSerialize(using = JsonBooleanSerializer::class)
     @JsonDeserialize(using = JsonBooleanDeserializer::class)
     @JsonProperty("visiblepoll")
-    var isVisibleVote: Boolean = false
+    var isVisibleVote: Boolean = false,
 
     @JsonProperty("voterscount")
-    var voteCount: Int = 0
+    var voteCount: Int = 0,
+) : Parcelable {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -102,22 +103,12 @@ class Vote : PaperParcelable {
     override fun toString(): String =
         "Vote(isAllow=$isAllow, maxChoices=$maxChoices, isMultiple=$isMultiple, voteOptions=$voteOptions, remainTime=$remainTime, isVisibleVote=$isVisibleVote, voteCount=$voteCount)"
 
-    companion object {
-        @JvmField
-        val CREATOR = PaperParcelVote.CREATOR
-    }
-
-    @PaperParcel
+    @Parcelize
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class Time(var day: Int, var hour: Int, var minute: Int, var second: Int) :
-        PaperParcelable {
+        Parcelable {
         override fun toString(): String =
             "Time(day=$day, hour=$hour, minute=$minute, second=$second)"
-
-        companion object {
-            @JvmField
-            val CREATOR = PaperParcelVote_Time.CREATOR
-        }
 
         class TimeJsonDeserializer : JsonDeserializer<Time>() {
             override fun deserialize(p0: JsonParser, p1: DeserializationContext?): Time {
@@ -146,32 +137,32 @@ class Vote : PaperParcelable {
         }
     }
 
-    @PaperParcel
+    @Parcelize
     @JsonIgnoreProperties(ignoreUnknown = true)
-    class VoteOption @JsonCreator constructor(
-        @JsonProperty("polloption") option: String?,
-    ) : PaperParcelable {
+    class VoteOption(
         @JsonProperty("color")
-        var color: String? = null
+        var color: String? = null,
 
         @JsonProperty("percent")
-        var percent: Float = 0.toFloat()
+        var percent: Float = 0.toFloat(),
 
         @JsonProperty("_option")
-        var option: String? = null
+        var option: String? = null,
 
         @JsonProperty("polloptionid")
-        var optionId: Int = 0
+        var optionId: Int = 0,
 
         @JsonProperty("votes")
-        var votes: Int = 0
+        var votes: Int = 0,
+    ) : Parcelable {
         val percentStr: String
             @JsonIgnore
             get() = DecimalFormat("0.00").format(percent)
 
-        init {
-            this.option = option?.let { TextNode.createFromEncoded(it).text() }
-        }
+        @JsonCreator
+        constructor(
+            @JsonProperty("polloption") option: String?,
+        ) : this(null, 0.toFloat(), option?.let { TextNode.createFromEncoded(it).text() }, 0, 0)
 
         @ColorInt
         fun getColorInt(): Int {
@@ -216,9 +207,5 @@ class Vote : PaperParcelable {
             }
         }
 
-        companion object {
-            @JvmField
-            val CREATOR = PaperParcelVote_VoteOption.CREATOR
-        }
     }
 }

@@ -6,11 +6,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.ykrank.androidtools.ui.adapter.StableIdModel
 import com.github.ykrank.androidtools.ui.adapter.model.DiffSameItem
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import me.ykrank.s1next.data.api.business.PostFilter
 import me.ykrank.s1next.data.db.biz.bizDependencies
 import me.ykrank.s1next.data.db.dbmodel.BlackList
-import paperparcel.PaperParcel
-import paperparcel.PaperParcelable
 
 /**
  * Created by ykrank on 2017/7/22.
@@ -65,49 +65,49 @@ class AppPostsWrapper() : AppListWrapper<AppPost>() {
     }
 }
 
-@PaperParcel
-class AppPost() : PaperParcelable, Cloneable, DiffSameItem, StableIdModel {
+@Parcelize
+class AppPost(
     @JsonProperty("pid")
-    var pid: Int = 0
+    var pid: Int = 0,
     @JsonProperty("fid")
-    var fid: Int = 0
+    var fid: Int = 0,
     @JsonProperty("tid")
-    var tid: Int = 0
+    var tid: Int = 0,
     @JsonProperty("author")
-    var author: String? = null
+    var author: String? = null,
     @JsonProperty("authorid")
-    var authorId: Int = 0
+    var authorId: Int = 0,
     @JsonProperty("dateline")
-    var dateline: Long = 0
+    var dateline: Long = 0,
     @JsonIgnore
-    var message: String? = null
-        @JsonGetter("message")
-        get
+    @get:JsonGetter("message")
+    var message: String? = null,
 
     @JsonProperty("status")
-    var status: Int = 0
+    var status: Int = 0,
     @JsonProperty("position")
-    var position: Int = 0
+    var position: Int = 0,
     @JsonProperty("blocked")
-    var blocked: Boolean = false
+    var blocked: Boolean = false,
     @JsonProperty("e")
-    var e: Int = 0
+    var e: Int = 0,
     @JsonProperty("customstatus")
-    var customStatus: String? = null
+    var customStatus: String? = null,
     @JsonProperty("grouptitle")
-    var groupTitle: String? = null
+    var groupTitle: String? = null,
     @JsonProperty("gorupid")
-    var groupId: Int = 0
+    var groupId: Int = 0,
     @JsonProperty("avatarurl")
-    var avatarUrl: String? = null
+    var avatarUrl: String? = null,
     @JsonIgnore
-    var hide: Boolean = false
+    var hide: Boolean = false,
     @JsonIgnore
-    var remark: String? = null
+    var remark: String? = null,
     @JsonIgnore
-    var trade: Boolean = false
+    var trade: Boolean = false,
     @JsonIgnore
-    var extraHtml: String? = null
+    var extraHtml: String? = null,
+) : Parcelable, Cloneable, DiffSameItem, StableIdModel {
 
     override val stableId: Long
         get() = pid.toLong()
@@ -187,11 +187,6 @@ class AppPost() : PaperParcelable, Cloneable, DiffSameItem, StableIdModel {
         result = 31 * result + trade.hashCode()
         result = 31 * result + (extraHtml?.hashCode() ?: 0)
         return result
-    }
-
-    companion object {
-        @JvmField
-        val CREATOR = PaperParcelAppPost.CREATOR
     }
 
 }

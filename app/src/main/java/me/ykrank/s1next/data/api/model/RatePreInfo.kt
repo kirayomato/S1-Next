@@ -5,27 +5,28 @@ import com.github.ykrank.androidtools.util.L
 import me.ykrank.s1next.data.api.ApiUtil
 import me.ykrank.s1next.data.api.model.wrapper.HtmlDataWrapper
 import org.jsoup.Jsoup
-import paperparcel.PaperParcel
-import paperparcel.PaperParcelable
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.util.*
 
 /**
  * Created by ykrank on 2017/3/19.
  */
-@PaperParcel
-class RatePreInfo : PaperParcelable {
-    var formHash: String? = null
-    var tid: String? = null
-    var pid: String? = null
-    var refer: String? = null
-    var handleKey: String? = null
-    var minScore: Int = 0
-    var maxScore: Int = 0
-    var totalScore: String? = null
-    var reasons: List<String> = arrayListOf()
-    var isChecked: Boolean = false
-    var isDisabled: Boolean = false
-    var scoreChoices: List<String> = arrayListOf()
+@Parcelize
+class RatePreInfo(
+    var formHash: String? = null,
+    var tid: String? = null,
+    var pid: String? = null,
+    var refer: String? = null,
+    var handleKey: String? = null,
+    var minScore: Int = 0,
+    var maxScore: Int = 0,
+    var totalScore: String? = null,
+    var reasons: List<String> = arrayListOf(),
+    var isChecked: Boolean = false,
+    var isDisabled: Boolean = false,
+    var scoreChoices: List<String> = arrayListOf(),
+) : Parcelable {
 
     fun setScoreChoices() {
         val list = ArrayList<String>()
@@ -93,9 +94,6 @@ class RatePreInfo : PaperParcelable {
     }
 
     companion object {
-
-        @JvmField
-        val CREATOR = PaperParcelRatePreInfo.CREATOR
 
         fun fromHtml(html: String): RatePreInfo {
             var html = html

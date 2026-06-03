@@ -1,65 +1,72 @@
 package me.ykrank.s1next.data.api.model
 
+import android.os.Parcelable
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.ykrank.androidtools.ui.adapter.StableIdModel
 import com.github.ykrank.androidtools.ui.adapter.model.DiffSameItem
 import com.github.ykrank.androidtools.util.MathUtil
+import kotlinx.parcelize.Parcelize
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.data.db.dbmodel.History
 import me.ykrank.s1next.util.HtmlUtils
-import paperparcel.PaperParcel
-import paperparcel.PaperParcelable
 
 /**
  * Ambiguity in naming due to [java.lang.Thread].
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-@PaperParcel
-class Thread : PaperParcelable, Cloneable, DiffSameItem, StableIdModel {
+@Parcelize
+class Thread(
     @JsonProperty("tid")
-    var id: String? = null
+    var id: String? = null,
 
-    @JsonProperty("subject")
-    var title: String? = null
-        set(value) {
-            field = HtmlUtils.unescapeHtml(value)
-        }
+    @JsonIgnore
+    private var parcelTitle: String? = null,
 
     /**
      * perhaps '-'
      */
     @JsonProperty("replies")
-    var replies: String? = null
+    var replies: String? = null,
 
     @JsonProperty("readperm")
-    var permission: Int = 0
+    var permission: Int = 0,
 
     @JsonProperty("author")
-    var author: String? = null
+    var author: String? = null,
 
     @JsonProperty("authorId")
-    var authorId: Int = 0
+    var authorId: Int = 0,
 
     @JsonProperty("displayorder")
-    var displayOrder: Int = 0
+    var displayOrder: Int = 0,
 
     @JsonProperty("typeid")
-    var typeId: String? = null
+    var typeId: String? = null,
 
     @JsonProperty("fid")
-    var fid: String? = null
+    var fid: String? = null,
 
     @JsonProperty("_typeName")
-    var typeName: String? = null
+    var typeName: String? = null,
 
     @JsonProperty("_isHide")
-    var isHide = false
+    var isHide: Boolean = false,
     /**
      * reply count when last view
      */
     @JsonProperty("_lastReplyCount")
-    var lastReplyCount: Int = 0
+    var lastReplyCount: Int = 0,
+) : Parcelable, Cloneable, DiffSameItem, StableIdModel {
+
+    @get:JsonProperty("subject")
+    @set:JsonProperty("subject")
+    var title: String?
+        get() = parcelTitle
+        set(value) {
+            parcelTitle = HtmlUtils.unescapeHtml(value)
+        }
 
     val reliesCount: Int
         get() {
@@ -71,12 +78,10 @@ class Thread : PaperParcelable, Cloneable, DiffSameItem, StableIdModel {
             return MathUtil.divide(reliesCount + 1, Api.POSTS_PER_PAGE)
         }
 
-    constructor() {}
-
-    constructor(history: History) {
-        this.id = history.threadId.toString()
-        this.title = history.title
-    }
+    constructor(history: History) : this(
+        id = history.threadId.toString(),
+        parcelTitle = HtmlUtils.unescapeHtml(history.title)
+    )
 
     override val stableId: Long
         get() = id?.toLongOrNull() ?: 0
@@ -164,7 +169,5 @@ class Thread : PaperParcelable, Cloneable, DiffSameItem, StableIdModel {
 
         private val TAG = Thread::class.java.simpleName
 
-        @JvmField
-        val CREATOR = PaperParcelThread.CREATOR
     }
 }

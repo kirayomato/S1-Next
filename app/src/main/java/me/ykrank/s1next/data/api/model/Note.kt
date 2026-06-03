@@ -1,5 +1,6 @@
 package me.ykrank.s1next.data.api.model
 
+import android.os.Parcelable
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
@@ -7,49 +8,40 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSetter
 import com.github.ykrank.androidtools.ui.adapter.StableIdModel
 import com.github.ykrank.androidtools.ui.adapter.model.DiffSameItem
-import paperparcel.PaperParcel
-import paperparcel.PaperParcelable
+import kotlinx.parcelize.Parcelize
 import java.util.regex.Pattern
 
 /**
  * Created by ykrank on 2017/1/5.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-@PaperParcel
-class Note : PaperParcelable, DiffSameItem, StableIdModel {
+@Parcelize
+class Note(
     @JsonProperty("author")
-    var author: String? = null
+    var author: String? = null,
     @JsonProperty("authorid")
-    var authorId: String? = null
+    var authorId: String? = null,
     @JsonProperty("dateline")
-    var dateline: Long = 0
+    var dateline: Long = 0,
     @JsonProperty("id")
-    var id: String? = null
+    var id: String? = null,
     @JsonIgnore
-    private var isNew: Boolean = false
+    private var isNew: Boolean = false,
     @JsonIgnore
-    var note: String? = null
+    var note: String? = null,
     //eg forum.php?mod=redirect&goto=findpost&ptid=1220112&pid=1
     @JsonIgnore
-    var url: String? = null
+    var url: String? = null,
     @JsonIgnore
-    var content: String? = null
+    var content: String? = null,
+) : Parcelable, DiffSameItem, StableIdModel {
 
     @JsonCreator
-    constructor(@JsonProperty("note") note: String) {
-        this.note = note
-        //eg <a href="home.php?mod=space&uid=1">someone</a> 回复了您的帖子 <a href="forum.php?mod=redirect&goto=findpost&ptid=1220112&pid=1" target="_blank">【Android】 s1Next-鹅版-v0.7.2（群522433035）</a> &nbsp; <a href="forum.php?mod=redirect&goto=findpost&pid=34692327&ptid=1220112" target="_blank" class="lit">查看</a>
-        var pattern = Pattern.compile("<a href=\"(forum\\.php\\?mod=redirect&goto=findpost.+?)\"")
-        var matcher = pattern.matcher(note)
-        if (matcher.find()) {
-            url = matcher.group(1)
-        }
-        pattern = Pattern.compile("target=\"_blank\">(.+)</a> &nbsp;")
-        matcher = pattern.matcher(note)
-        if (matcher.find()) {
-            content = matcher.group(1)
-        }
-    }
+    constructor(@JsonProperty("note") note: String) : this(
+        note = note,
+        url = parseUrl(note),
+        content = parseContent(note)
+    )
 
     fun isNew(): Boolean {
         return isNew
@@ -105,9 +97,16 @@ class Note : PaperParcelable, DiffSameItem, StableIdModel {
     }
 
     companion object {
+        private fun parseUrl(note: String): String? {
+            //eg <a href="home.php?mod=space&uid=1">someone</a> 回复了您的帖子 <a href="forum.php?mod=redirect&goto=findpost&ptid=1220112&pid=1" target="_blank">【Android】 s1Next-鹅版-v0.7.2（群522433035）</a> &nbsp; <a href="forum.php?mod=redirect&goto=findpost&pid=34692327&ptid=1220112" target="_blank" class="lit">查看</a>
+            val matcher = Pattern.compile("<a href=\"(forum\\.php\\?mod=redirect&goto=findpost.+?)\"").matcher(note)
+            return if (matcher.find()) matcher.group(1) else null
+        }
 
-        @JvmField
-        val CREATOR = PaperParcelNote.CREATOR
+        private fun parseContent(note: String): String? {
+            val matcher = Pattern.compile("target=\"_blank\">(.+)</a> &nbsp;").matcher(note)
+            return if (matcher.find()) matcher.group(1) else null
+        }
     }
 
 }

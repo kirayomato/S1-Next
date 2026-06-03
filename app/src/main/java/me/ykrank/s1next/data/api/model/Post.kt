@@ -1,6 +1,7 @@
 package me.ykrank.s1next.data.api.model
 
 import android.graphics.Color
+import android.os.Parcelable
 import androidx.annotation.IntDef
 import androidx.annotation.WorkerThread
 import com.fasterxml.jackson.annotation.JsonCreator
@@ -12,90 +13,88 @@ import com.github.ykrank.androidtools.ui.adapter.StableIdModel
 import com.github.ykrank.androidtools.ui.adapter.model.DiffSameItem
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.MathUtil
+import kotlinx.parcelize.Parcelize
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.data.api.business.PostFilter
 import me.ykrank.s1next.util.HtmlUtils
 import me.ykrank.s1next.util.JsonUtil
-import paperparcel.PaperParcel
-import paperparcel.PaperParcelable
 import java.util.Locale
 import java.util.regex.Pattern
 
-@PaperParcel
+@Parcelize
 @JsonIgnoreProperties(ignoreUnknown = true)
-class Post : PaperParcelable, Cloneable, DiffSameItem, StableIdModel {
+class Post(
 
     @JsonProperty("pid")
-    var id: Int = 0
+    var id: Int = 0,
 
     @JsonProperty("author")
-    var authorName: String? = null
+    var authorName: String? = null,
 
     @JsonProperty("authorid")
-    var authorId: String? = null
+    var authorId: String? = null,
 
     @JsonProperty("_reply")
-    var reply: String? = null
+    var reply: String? = null,
 
     @JsonProperty("_isFirst")
-    var isFirst: Boolean = false
+    var isFirst: Boolean = false,
 
     @JsonProperty("number")
-    var number: String? = null
+    var number: String? = null,
 
     @JsonProperty("dbdateline")
-    var dateTime: Long = 0
+    var dateTime: Long = 0,
 
     @JsonProperty("groupid")
-    var groupId: Int = 0
+    var groupId: Int = 0,
 
     /**
      * 只保留非图片附件，图片附件自动插入到帖子中
      */
     @JsonProperty("_attachment")
-    var attachmentMap = mutableMapOf<Int, PostAttachment>()
+    var attachmentMap: MutableMap<Int, PostAttachment> = mutableMapOf(),
 
     /**
      * is in blacklist
      */
     @JsonProperty("_hide")
     @HideFLag
-    var hide: Int = HIDE_NO
+    var hide: Int = HIDE_NO,
 
     @JsonProperty("_remark")
-    var remark: String? = null
+    var remark: String? = null,
 
     @JsonProperty("_isTrade")
-    var isTrade: Boolean = false
+    var isTrade: Boolean = false,
 
     @JsonProperty("_isVote")
-    var isVote: Boolean = false
+    var isVote: Boolean = false,
 
     @JsonProperty("_extraHtml")
-    var extraHtml: String? = null
+    var extraHtml: String? = null,
 
     @JsonProperty("_banned")
-    var banned: Boolean = false
+    var banned: Boolean = false,
 
     /**
      * Null if no rates, empty if not init.
      */
     @JsonProperty("_rates")
-    var rates: List<Rate>? = null
+    var rates: List<Rate>? = null,
 
     /**
      * whether the author of this post is Original Poster
      */
     @JsonProperty("_isOp")
-    var isOpPost: Boolean = false
-
-    constructor()
+    var isOpPost: Boolean = false,
+) : Parcelable, Cloneable, DiffSameItem, StableIdModel {
 
     @JsonCreator
     constructor(
         @JsonProperty("first") first: String?, @JsonProperty("message") reply: String?,
         @JsonProperty("attachments") attachments: JsonNode?
-    ) {
+    ) : this() {
         //if "attachments" is empty, it's array, but map if not empty
         this.isFirst = "1" == first
         var tReply = filterReply(reply)
@@ -271,9 +270,6 @@ class Post : PaperParcelable, Cloneable, DiffSameItem, StableIdModel {
             // https://code.google.com/p/android/issues/detail?id=75953
             COLOR_NAME_MAP.put("white", "#FFFFFF")
         }
-
-        @JvmField
-        val CREATOR = PaperParcelPost.CREATOR
 
         /**
          * [Color] doesn't support all HTML color names.

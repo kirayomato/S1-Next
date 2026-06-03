@@ -1,13 +1,11 @@
 package me.ykrank.s1next.data.api.model
 
-import android.os.Parcelable
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.ykrank.androidtools.util.L
-import kotlinx.parcelize.Parcelize
 import org.jsoup.Jsoup
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -15,9 +13,8 @@ import java.util.Locale
 /**
  * Created by ykrank on 2017/1/8.
  */
-@Parcelize
 @JsonIgnoreProperties(ignoreUnknown = true)
-class Profile() : Account(), Parcelable {
+class Profile() : Account() {
 
     var homeUsername: String? = null
     var homeUid: String? = null

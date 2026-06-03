@@ -161,11 +161,6 @@ dependencies {
     implementation(libs.jackson.kotlin)
     implementation(libs.jackson.databind)
 
-    implementation(libs.paperparcel)
-    implementation(libs.paperparcel.kotlin) // Optional
-    implementation(libs.paperparcel.api)
-    kapt(libs.paperparcel.compiler)
-
     ksp(libs.glide.ksp)
 
     implementation(libs.photoview)

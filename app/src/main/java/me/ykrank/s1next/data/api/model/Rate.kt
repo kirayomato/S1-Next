@@ -14,35 +14,36 @@ import me.ykrank.s1next.data.api.model.link.UserLink
 import me.ykrank.s1next.data.db.biz.BlackListBiz
 import me.ykrank.s1next.data.db.dbmodel.BlackList
 import org.jsoup.Jsoup
-import paperparcel.PaperParcel
-import paperparcel.PaperParcelable
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-@PaperParcel
+@Parcelize
 @JsonIgnoreProperties(ignoreUnknown = true)
-class Rate : PaperParcelable, StableIdModel {
+class Rate(
     @JsonProperty("uid")
-    var uid: String? = null
+    var uid: String? = null,
 
     @JsonProperty("uname")
-    var uname: String? = null
+    var uname: String? = null,
 
     @JsonProperty("content")
-    var content: String? = null
+    var content: String? = null,
 
     @JsonProperty("score")
-    var score: Int? = null
+    var score: Int? = null,
 
     @JsonProperty("time")
-    var time: Long? = null
+    var time: Long? = null,
 
     @JsonProperty("_hide")
     @Post.HideFLag
-    var hide: Int = Post.HIDE_NO
+    var hide: Int = Post.HIDE_NO,
 
     @JsonProperty("_remark")
-    var remark: String? = null
+    var remark: String? = null,
+) : Parcelable, StableIdModel {
 
     val symbolScore: String
         get() {
@@ -99,9 +100,6 @@ class Rate : PaperParcelable, StableIdModel {
     companion object {
         //2018-4-14 22:20
         val df = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.CHINA)
-
-        @JvmField
-        val CREATOR = PaperParcelRate.CREATOR
 
         fun fromHtml(rawHtml: String): List<Rate> {
             val rates = mutableListOf<Rate>()

@@ -1,12 +1,14 @@
 package me.ykrank.s1next.data.api.model.collection
 
 import androidx.annotation.WorkerThread
+import android.os.Parcelable
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonGetter
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.ykrank.androidtools.util.StringUtils
+import kotlinx.parcelize.Parcelize
 import me.ykrank.s1next.data.api.model.Account
 import me.ykrank.s1next.data.api.model.Post
 import me.ykrank.s1next.data.api.model.Thread
@@ -14,8 +16,6 @@ import me.ykrank.s1next.data.api.model.Vote
 import me.ykrank.s1next.data.db.biz.bizDependencies
 import me.ykrank.s1next.data.db.dbmodel.BlackList
 import me.ykrank.s1next.data.db.dbmodel.BlackWord
-import paperparcel.PaperParcel
-import paperparcel.PaperParcelable
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class Posts @JsonCreator constructor(
@@ -112,27 +112,26 @@ class Posts @JsonCreator constructor(
             return result
         }
 
-        @PaperParcel
+        @Parcelize
         @JsonIgnoreProperties(ignoreUnknown = true)
-        class Info : PaperParcelable {
+        class Info(
 
             @JsonIgnore
             @get:JsonGetter
-            var label: String? = null
+            var label: String? = null,
 
             @JsonIgnore
             @get:JsonGetter
-            var value: String? = null
-
-            constructor()
+            var value: String? = null,
+        ) : Parcelable {
 
             @JsonCreator
             constructor(@JsonProperty("title") label: String?,
                         @JsonProperty("value") value: String?,
-                        @JsonProperty("unit") unit: String?) {
-                this.label = label
-                this.value = StringUtils.unescapeNonBreakingSpace(value) + (unit ?: "")
-            }
+                        @JsonProperty("unit") unit: String?) : this(
+                label = label,
+                value = StringUtils.unescapeNonBreakingSpace(value) + (unit ?: "")
+            )
 
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
@@ -152,10 +151,6 @@ class Posts @JsonCreator constructor(
                 return result
             }
 
-            companion object {
-                @JvmField
-                val CREATOR = PaperParcelPosts_ThreadAttachment_Info.CREATOR
-            }
         }
     }
 

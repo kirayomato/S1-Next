@@ -7,26 +7,20 @@ import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.LooperUtil
 import me.ykrank.s1next.data.api.model.wrapper.HtmlDataWrapper
 import org.jsoup.Jsoup
-import paperparcel.PaperParcel
-import paperparcel.PaperParcelable
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 /**
  * Created by ykrank on 2016/7/31 0031.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-@PaperParcel
-class ThreadType : PaperParcelable {
+@Parcelize
+class ThreadType(
     @JsonProperty("typeId")
-    var typeId: String? = null
+    var typeId: String? = null,
     @JsonProperty("typeName")
-    var typeName: String? = null
-
-    constructor()
-
-    constructor(typeId: String, typeName: String) {
-        this.typeId = typeId
-        this.typeName = typeName
-    }
+    var typeName: String? = null,
+) : Parcelable {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -47,9 +41,6 @@ class ThreadType : PaperParcelable {
     }
 
     companion object {
-
-        @JvmField
-        val CREATOR = PaperParcelThreadType.CREATOR
 
         /**
          * Extracts [Quote] from XML string.

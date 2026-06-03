@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinAndroid)
     kotlin("kapt")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -89,8 +90,4 @@ dependencies {
 
     api(libs.largeimageview)
 
-    implementation(libs.paperparcel)
-    implementation(libs.paperparcel.kotlin) // Optional
-    implementation(libs.paperparcel.api)
-    kapt(libs.paperparcel.compiler)
 }

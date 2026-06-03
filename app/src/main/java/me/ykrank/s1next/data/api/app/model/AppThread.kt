@@ -5,16 +5,13 @@ import android.os.Parcelable
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.ykrank.androidtools.ui.adapter.model.DiffSameItem
-import paperparcel.PaperParcel
-import paperparcel.PaperParcelable
 
 /**
  * Created by ykrank on 2017/7/22.
  */
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@PaperParcel
-class AppThread() : PaperParcelable, DiffSameItem {
+class AppThread() : Parcelable, DiffSameItem {
     /**
      * tid : 1355959
      * fid : 4
@@ -87,7 +84,6 @@ class AppThread() : PaperParcelable, DiffSameItem {
     }
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
-        super.writeToParcel(dest, flags)
         dest.writeInt(tid)
         dest.writeInt(fid)
         dest.writeInt(typeId)

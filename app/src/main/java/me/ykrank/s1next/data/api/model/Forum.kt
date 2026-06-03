@@ -1,33 +1,37 @@
 package me.ykrank.s1next.data.api.model
 
+import android.os.Parcelable
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.ykrank.androidtools.ui.adapter.StableIdModel
 import com.github.ykrank.androidtools.ui.adapter.model.DiffSameItem
+import kotlinx.parcelize.Parcelize
 import me.ykrank.s1next.util.HtmlUtils
-import paperparcel.PaperParcel
-import paperparcel.PaperParcelable
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@PaperParcel
-class Forum : PaperParcelable, DiffSameItem, StableIdModel {
-
+@Parcelize
+class Forum(
     @JsonProperty("fid")
-    var id: String? = null
+    var id: String? = null,
 
-    @JsonProperty("name")
-    var name: String? = null
-        set(value) {
-            field = HtmlUtils.unescapeHtml(value)
-        }
+    @JsonIgnore
+    private var parcelName: String? = null,
 
     @JsonProperty("threads")
-    var threads: Int = 0
+    var threads: Int = 0,
 
     @JsonProperty("todayposts")
-    var todayPosts: Int = 0
+    var todayPosts: Int = 0,
+) : Parcelable, DiffSameItem, StableIdModel {
 
-    constructor() {}
+    @get:JsonProperty("name")
+    @set:JsonProperty("name")
+    var name: String?
+        get() = parcelName
+        set(value) {
+            parcelName = HtmlUtils.unescapeHtml(value)
+        }
 
     override val stableId: Long
         get() = id?.toLongOrNull() ?: 0
@@ -76,9 +80,6 @@ class Forum : PaperParcelable, DiffSameItem, StableIdModel {
     }
 
     companion object {
-
-        @JvmField
-        val CREATOR = PaperParcelForum.CREATOR
 
     }
 }

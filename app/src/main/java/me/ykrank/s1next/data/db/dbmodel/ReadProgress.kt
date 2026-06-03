@@ -1,6 +1,5 @@
 package me.ykrank.s1next.data.db.dbmodel
 
-import android.os.Parcel
 import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -9,7 +8,7 @@ import androidx.room.PrimaryKey
 import com.fasterxml.jackson.annotation.JsonAutoDetect
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.google.common.base.Objects
-import paperparcel.PaperParcel
+import kotlinx.parcelize.Parcelize
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -25,73 +24,51 @@ import java.util.Locale
         Index(value = ["ThreadId"], name = "IDX_ReadProgress_ThreadId", unique = true),
     ]
 )
-@PaperParcel
-class ReadProgress : Parcelable {
+@Parcelize
+class ReadProgress(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "_id")
-    var id: Long? = null
+    var id: Long? = null,
 
     /**
      * 帖子ID
      */
     @ColumnInfo(name = "ThreadId")
-    var threadId = 0
+    var threadId: Int = 0,
 
     /**
      * 页数
      */
     @ColumnInfo(name = "Page")
-    var page = 0
+    var page: Int = 0,
 
     /**
      * 位置
      */
     @ColumnInfo(name = "Position")
-    var position = 0
+    var position: Int = 0,
 
     /**
      * Item 对应View和上边界的偏移
      */
     @ColumnInfo(name = "Offset")
-    var offset = 0
+    var offset: Int = 0,
 
     /**
      * 更新时间
      */
     @ColumnInfo(name = "Timestamp")
-    var timestamp: Long
+    var timestamp: Long = System.currentTimeMillis(),
+) : Parcelable {
 
-    constructor() {
-        timestamp = System.currentTimeMillis()
-    }
-
-    constructor(threadId: Int, page: Int, position: Int, offset: Int) : super() {
-        this.threadId = threadId
-        this.page = page
-        this.position = position
-        this.offset = offset
-        timestamp = System.currentTimeMillis()
-    }
-
-    constructor(
-        id: Long?, threadId: Int, page: Int, position: Int, offset: Int,
-        timestamp: Long
-    ) {
-        this.id = id
-        this.threadId = threadId
-        this.page = page
-        this.position = position
-        this.offset = offset
-        this.timestamp = timestamp
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    override fun writeToParcel(dest: Parcel, flags: Int) {
-        PaperParcelReadProgress.writeToParcel(this, dest, flags)
-    }
+    constructor(threadId: Int, page: Int, position: Int, offset: Int) : this(
+        null,
+        threadId,
+        page,
+        position,
+        offset,
+        System.currentTimeMillis()
+    )
 
     val time: String
         get() {
@@ -131,8 +108,6 @@ class ReadProgress : Parcelable {
     }
 
     companion object {
-        @JvmField
-        val CREATOR: Parcelable.Creator<ReadProgress> = PaperParcelReadProgress.CREATOR
         const val TIME_FORMAT = "yyyy-MM-dd HH:mm"
     }
 }
