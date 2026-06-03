@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.github.ykrank.androidtools.ui.internal.LoadingViewModelBindingDelegate
+import com.github.ykrank.androidtools.ui.internal.LoadingViewModelViewBinder
 import com.github.ykrank.androidtools.ui.vm.LoadingViewModel
 import com.github.ykrank.androidtools.util.MathUtil
 import com.github.ykrank.androidtools.widget.EventBus
@@ -107,6 +108,10 @@ class NoteFragment : BaseLoadMoreRecycleViewFragment<BaseDataWrapper<Notes>>() {
 class LoadingViewModelBindingDelegateNoteImpl(
     private val binding: FragmentNoteBinding
 ) : LoadingViewModelBindingDelegate {
+    private val loadingViewModelViewBinder = LoadingViewModelViewBinder(
+        binding.swipeRefreshLayout,
+        binding.recyclerView
+    )
 
     override val rootView: View
         get() = binding.root
@@ -119,6 +124,10 @@ class LoadingViewModelBindingDelegateNoteImpl(
         get() = binding.tvHint
 
     override fun setLoadingViewModel(loadingViewModel: LoadingViewModel) {
-        binding.loadingViewModel = loadingViewModel
+        loadingViewModelViewBinder.setLoadingViewModel(loadingViewModel)
+    }
+
+    override fun clearLoadingViewModel() {
+        loadingViewModelViewBinder.clear()
     }
 }

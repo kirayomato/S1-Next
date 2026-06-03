@@ -8,8 +8,7 @@ import com.github.ykrank.androidtools.ui.vm.LoadingViewModel
 
 /**
  * This class represents a delegate which you can bind
- * [LoadingViewModel] to different [androidx.databinding.ViewDataBinding]s
- * in implementation.
+ * [LoadingViewModel] to different views in implementation.
  */
 interface LoadingViewModelBindingDelegate {
     val rootView: View
@@ -25,4 +24,5 @@ interface LoadingViewModelBindingDelegate {
 
     val hintView: TextView
     fun setLoadingViewModel(loadingViewModel: LoadingViewModel)
+    fun clearLoadingViewModel() = Unit
 }

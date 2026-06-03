@@ -5,12 +5,18 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.github.ykrank.androidtools.ui.internal.LoadingViewModelBindingDelegate
+import com.github.ykrank.androidtools.ui.internal.LoadingViewModelViewBinder
 import com.github.ykrank.androidtools.ui.vm.LoadingViewModel
 import me.ykrank.s1next.databinding.FragmentBaseWithQuickSideBarBinding
 
 class LoadingViewModelBindingDelegateQuickSidebarImpl(
     private val binding: FragmentBaseWithQuickSideBarBinding
 ) : LoadingViewModelBindingDelegate {
+    private val loadingViewModelViewBinder = LoadingViewModelViewBinder(
+        binding.swipeRefreshLayout,
+        binding.recyclerView
+    )
+
     override val rootView: View
         get() = binding.root
     override val swipeRefreshLayout: SwipeRefreshLayout
@@ -21,6 +27,10 @@ class LoadingViewModelBindingDelegateQuickSidebarImpl(
     override val hintView: TextView
         get() = binding.tvHint
     override fun setLoadingViewModel(loadingViewModel: LoadingViewModel) {
-        binding.setLoadingViewModel(loadingViewModel)
+        loadingViewModelViewBinder.setLoadingViewModel(loadingViewModel)
+    }
+
+    override fun clearLoadingViewModel() {
+        loadingViewModelViewBinder.clear()
     }
 }

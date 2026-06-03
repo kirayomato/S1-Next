@@ -129,6 +129,7 @@ abstract class LibBaseRecyclerViewFragment<D> : LibBaseFragment() {
     override fun onDestroy() {
         //remove OnRefreshListener
         mLoadingViewModelBindingDelegate.swipeRefreshLayout.setOnRefreshListener(null)
+        mLoadingViewModelBindingDelegate.clearLoadingViewModel()
         mDisposable?.dispose()
 
         super.onDestroy()

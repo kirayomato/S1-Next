@@ -1,25 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
-
-    <data>
-
-        <import type="android.view.View" />
-
-        <variable
-            name="loadingViewModel"
-            type="com.github.ykrank.androidtools.ui.vm.LoadingViewModel" />
-
-        <variable
-            name="quickSidebarEnable"
-            type="boolean" />
-    </data>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
         <TextView
             android:id="@+id/tv_hint"
@@ -40,10 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_hint"
-            app:colorSchemeColors="@{@intArray/swipe_refresh_layout_color_scheme}"
-            app:enabled="@{loadingViewModel.swipeRefreshLayoutEnabled}"
-            app:refreshing="@{loadingViewModel.swipeRefresh}">
+            app:layout_constraintTop_toBottomOf="@+id/tv_hint">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_view"
@@ -53,8 +35,7 @@
                 android:clipToPadding="false"
                 android:paddingBottom="@dimen/recycler_view_vertical_padding_for_card_view"
                 android:paddingTop="@dimen/recycler_view_vertical_padding_for_card_view"
-                android:scrollbars="none"
-                app:loadingFirstTime="@{loadingViewModel.loadingFirstTime}" />
+                android:scrollbars="none" />
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
@@ -67,9 +48,9 @@
             app:layout_constraintTop_toTopOf="parent"
             app:sidebarTextColor="?android:attr/textColorPrimary"
             app:sidebarTextSize="8sp"
+            android:visibility="gone"
             app:sidebarTextSizeChoose="11sp"
             app:sidebarTextColorChoose="?android:attr/textColorPrimary"
-            app:visibility="@{quickSidebarEnable?View.VISIBLE:View.GONE}"
             tools:visibility="visible" />
 
         <TextView
@@ -88,6 +69,4 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="3000"
             tools:visibility="visible" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</layout>
+</androidx.constraintlayout.widget.ConstraintLayout>

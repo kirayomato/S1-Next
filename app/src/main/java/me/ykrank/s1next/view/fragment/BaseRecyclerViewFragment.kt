@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.*
 import androidx.annotation.CallSuper
-import androidx.databinding.DataBindingUtil
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.github.ykrank.androidtools.data.Resource
 import com.github.ykrank.androidtools.ui.LibBaseRecyclerViewFragment
@@ -93,12 +92,10 @@ abstract class BaseRecyclerViewFragment<D> : LibBaseRecyclerViewFragment<D>() {
                                                         container: ViewGroup?
     ): LoadingViewModelBindingDelegate {
         if (isCardViewContainer) {
-            val binding = DataBindingUtil.inflate<FragmentBaseCardViewContainerBinding>(inflater,
-                    R.layout.fragment_base_card_view_container, container, false)
+            val binding = FragmentBaseCardViewContainerBinding.inflate(inflater, container, false)
             return LoadingViewModelBindingDelegateBaseCardViewContainerImpl(binding)
         } else {
-            val binding = DataBindingUtil.inflate<FragmentBaseBinding>(inflater, R.layout.fragment_base,
-                    container, false)
+            val binding = FragmentBaseBinding.inflate(inflater, container, false)
             return LoadingViewModelBindingDelegateBaseImpl(binding)
         }
     }

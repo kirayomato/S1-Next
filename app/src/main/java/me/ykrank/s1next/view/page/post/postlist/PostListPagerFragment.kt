@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
 import androidx.core.util.Pair
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
@@ -273,13 +272,8 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
         inflater: LayoutInflater,
         container: ViewGroup?
     ): LoadingViewModelBindingDelegate {
-        binding = DataBindingUtil.inflate(
-            inflater,
-            R.layout.fragment_base_with_quick_side_bar,
-            container,
-            false
-        )
-        binding.quickSidebarEnable = false
+        binding = FragmentBaseWithQuickSideBarBinding.inflate(inflater, container, false)
+        binding.quickSideBarView.visibility = View.GONE
         quickSideBarView = binding.quickSideBarView
         quickSideBarTipsView = binding.quickSideBarViewTips
         return LoadingViewModelBindingDelegateQuickSidebarImpl(binding)
@@ -753,7 +747,7 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
 
     internal fun invalidateQuickSidebarVisible(): Boolean {
         val enable = mGeneralPreferencesManager.isQuickSideBarEnable
-        binding.quickSidebarEnable = enable
+        binding.quickSideBarView.visibility = if (enable) View.VISIBLE else View.GONE
 
         if (!isLoading) {
             //Post notify

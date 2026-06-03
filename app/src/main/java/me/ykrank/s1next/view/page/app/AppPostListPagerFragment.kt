@@ -6,7 +6,6 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.bigkoo.quicksidebar.listener.OnQuickSideBarTouchListener
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -152,13 +151,8 @@ class AppPostListPagerFragment : BaseRecyclerViewFragment<AppPostsWrapper>(),
         inflater: LayoutInflater,
         container: ViewGroup?
     ): LoadingViewModelBindingDelegate {
-        binding = DataBindingUtil.inflate(
-            inflater,
-            R.layout.fragment_base_with_quick_side_bar,
-            container,
-            false
-        )
-        binding.quickSidebarEnable = false
+        binding = FragmentBaseWithQuickSideBarBinding.inflate(inflater, container, false)
+        binding.quickSideBarView.visibility = View.GONE
         return LoadingViewModelBindingDelegateQuickSidebarImpl(binding)
     }
 
@@ -315,7 +309,7 @@ class AppPostListPagerFragment : BaseRecyclerViewFragment<AppPostsWrapper>(),
 
     internal fun invalidateQuickSidebarVisible(): Boolean {
         val enable = mGeneralPreferencesManager.isQuickSideBarEnable
-        binding.quickSidebarEnable = enable
+        binding.quickSideBarView.visibility = if (enable) View.VISIBLE else View.GONE
         return enable
     }
 
