@@ -62,8 +62,8 @@ class LoadBlackListFromWebDialogFragment : BaseLoadProgressDialogFragment() {
                     )
                 }
             }
-            binding.max = this.max
-            binding.progress = this.page
+            progressMax = this.max
+            progressValue = this.page
 
             if (this.max > this.page) {
                 loadNextPage(this.page + 1)

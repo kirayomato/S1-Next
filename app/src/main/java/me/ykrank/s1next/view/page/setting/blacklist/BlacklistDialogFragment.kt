@@ -6,7 +6,6 @@ import android.text.TextUtils
 import android.view.WindowManager
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AlertDialog
-import androidx.databinding.DataBindingUtil
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.db.dbmodel.BlackList
 import me.ykrank.s1next.databinding.DialogBlacklistBinding
@@ -24,21 +23,22 @@ class BlacklistDialogFragment : BaseDialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val activity = requireActivity()
-        val binding = DataBindingUtil.inflate<DialogBlacklistBinding>(
-            activity.layoutInflater,
-            R.layout.dialog_blacklist, null, false
-        )
+        val binding = DialogBlacklistBinding.inflate(activity.layoutInflater, null, false)
         mBinding = binding
         val blackDialogViewModel = BlackDialogViewModel()
         blackDialogViewModel.blacklist.clear()
         blackDialogViewModel.blacklist.addAll(mBlacklist)
+        binding.blacklistId.setText(blackDialogViewModel.blackIdList)
+        binding.blacklistName.setText(blackDialogViewModel.blackIdName)
+        binding.blacklistRemark.setText(blackDialogViewModel.blackRemark)
+        binding.blacklistId.isEnabled = blackDialogViewModel.blacklist.size == 0
+        binding.blacklistName.isEnabled = blackDialogViewModel.blacklist.size == 0
+        binding.blacklistRemark.isEnabled = blackDialogViewModel.blacklist.size < 2
 
         if (mBlacklist.size == 1) {
             binding.radioGroupForum.check(forumRadioIdFromFlag(mBlacklist[0]))
             binding.radioGroupPost.check(postRadioIdFromFlag(mBlacklist[0]))
         }
-        binding.blackDialogViewModel = blackDialogViewModel
-
 
         val alertDialog = AlertDialog.Builder(activity)
             .setTitle(if (mBlacklist.size == 0) R.string.menu_blacklist_add else R.string.menu_blacklist_edit)

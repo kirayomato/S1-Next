@@ -19,6 +19,20 @@ open class BaseLoadProgressDialogFragment : BaseDialogFragment() {
 
     lateinit var binding: DialogLoadProgressBinding
 
+    protected var progressValue: Int = 0
+        set(value) {
+            field = value
+            binding.progressBar.progress = value
+            updateProgressText()
+        }
+
+    protected var progressMax: Int = 0
+        set(value) {
+            field = value
+            binding.progressBar.max = value
+            updateProgressText()
+        }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -38,6 +52,10 @@ open class BaseLoadProgressDialogFragment : BaseDialogFragment() {
         }
 
         return binding.root
+    }
+
+    private fun updateProgressText() {
+        binding.progressText.text = "$progressValue/$progressMax"
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

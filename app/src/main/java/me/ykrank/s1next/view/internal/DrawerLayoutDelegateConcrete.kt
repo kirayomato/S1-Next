@@ -1,9 +1,11 @@
 package me.ykrank.s1next.view.internal
 
 import android.annotation.SuppressLint
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
 import android.widget.Toast
@@ -130,6 +132,8 @@ class DrawerLayoutDelegateConcrete(
     private fun setupNavDrawerNotice(navigationView: NavigationView) {
         pmNoticeBinding = ActionViewNoticeCountBinding.inflate(LayoutInflater.from(mFragmentActivity))
         noteNoticeBinding = ActionViewNoticeCountBinding.inflate(LayoutInflater.from(mFragmentActivity))
+        pmNoticeBinding.applyNoticeStyle()
+        noteNoticeBinding.applyNoticeStyle()
         navigationView.menu.findItem(R.id.menu_pms).actionView = pmNoticeBinding.root
         navigationView.menu.findItem(R.id.menu_note).actionView = noteNoticeBinding.root
         refreshNoticeMenuItem()
@@ -144,8 +148,19 @@ class DrawerLayoutDelegateConcrete(
      * refresh label in navigation menu to show whether new pm or notice
      */
     fun refreshNoticeMenuItem() {
-        pmNoticeBinding.msg = if (mDataPreferencesManager.hasNewPm) "new" else null
-        noteNoticeBinding.msg = if (mDataPreferencesManager.hasNewNotice) "new" else null
+        pmNoticeBinding.bindNotice(if (mDataPreferencesManager.hasNewPm) "new" else null)
+        noteNoticeBinding.bindNotice(if (mDataPreferencesManager.hasNewNotice) "new" else null)
+    }
+
+    private fun ActionViewNoticeCountBinding.applyNoticeStyle() {
+        text.backgroundTintList = ColorStateList.valueOf(
+            mFragmentActivity.getColor(com.github.ykrank.androidtools.R.color.red_500)
+        )
+    }
+
+    private fun ActionViewNoticeCountBinding.bindNotice(msg: String?) {
+        root.visibility = if (msg.isNullOrEmpty()) View.GONE else View.VISIBLE
+        text.text = msg
     }
 
     override fun onNavigationItemSelected(menuItem: MenuItem): Boolean {

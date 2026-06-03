@@ -61,9 +61,9 @@ class ThreadPrefetchDialogFragment : BaseLoadProgressDialogFragment() {
 
     private fun updateProgress(page: Int, max: Int) {
         if (max > 0) {
-            binding.max = max
+            progressMax = max
         }
-        binding.progress = page
+        progressValue = page
     }
 
     @MainThread
@@ -90,7 +90,7 @@ class ThreadPrefetchDialogFragment : BaseLoadProgressDialogFragment() {
                 }
                 // 已预加载，而且非最后一页的数据，不用重新拉取
                 loadNextPage(page + 1)
-                updateProgress(page, max(binding.max, thread.pageCount))
+                updateProgress(page, max(progressMax, thread.pageCount))
                 return@launch
             }
             apiCache.getPostsWrapper(
@@ -98,7 +98,7 @@ class ThreadPrefetchDialogFragment : BaseLoadProgressDialogFragment() {
                 page,
                 ignoreCache = true
             ).onCompletion {
-                val max = binding.max
+                val max = progressMax
                 if (max > 0) {
                     if (max > page) {
                         loadNextPage(page + 1)

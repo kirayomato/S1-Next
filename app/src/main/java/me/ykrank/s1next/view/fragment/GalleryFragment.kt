@@ -117,7 +117,7 @@ class GalleryFragment : Fragment() {
         val largeModeMenu = largeModeMenu?.actionView
         if (largeModeMenu != null) {
             largeModeBinding = MenuGalleryLargeImageSwitchBinding.bind(largeModeMenu)
-            largeModeBinding?.check = large
+            largeModeBinding?.switchLarge?.isChecked = large
             largeModeBinding?.switchLarge?.setOnCheckedChangeListener { buttonView, isChecked ->
                 switchLargeImage(isChecked)
             }
@@ -166,7 +166,7 @@ class GalleryFragment : Fragment() {
         }
         this.large = large
         largeModeMenu?.isChecked = large
-        largeModeBinding?.check = large
+        largeModeBinding?.switchLarge?.isChecked = large
 
         binding.large = large
         if (large) {

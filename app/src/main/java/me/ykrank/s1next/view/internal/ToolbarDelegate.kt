@@ -68,7 +68,7 @@ class ToolbarDelegate(private val mAppCompatActivity: AppCompatActivity, val too
 
     private fun onLongClick(anchor: View, title: String): Boolean {
         val binding = PopWindowTitleBinding.inflate(LayoutInflater.from(anchor.context))
-        binding.title = title
+        binding.title.text = title
         binding.root.setOnClickListener { v ->
             ClipboardUtil.copyText(v.context, title, title)
             v.context.toast(R.string.title_copied)

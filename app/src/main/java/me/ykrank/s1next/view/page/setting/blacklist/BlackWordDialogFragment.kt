@@ -9,7 +9,8 @@ import android.text.TextWatcher
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.databinding.DataBindingUtil
+import androidx.core.view.isVisible
+import androidx.databinding.Observable
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.lifecycleScope
 import com.github.ykrank.androidtools.util.ResourceUtil
@@ -55,11 +56,12 @@ class BlackWordDialogFragment : BaseDialogFragment() {
 
         val mBlackWord = arguments?.get(TAG_BLACK_WORD) as BlackWord?
 
-        val binding = DataBindingUtil.inflate<DialogBlackWordBinding>(
-            activity.layoutInflater,
-            R.layout.dialog_black_word, null, false
-        )
+        val binding = DialogBlackWordBinding.inflate(activity.layoutInflater, null, false)
         val model = BlackWordViewModel()
+        if (mBlackWord != null) {
+            model.blackword.set(mBlackWord)
+        }
+        binding.bind(model)
 
         //Check could add
         if (mBlackWord == null) {
@@ -78,10 +80,6 @@ class BlackWordDialogFragment : BaseDialogFragment() {
         val inputWord = binding.inputWord
         val etWord = binding.etWord
         val btnVerify = binding.btnVerify
-
-        if (mBlackWord != null)
-            model.blackword.set(mBlackWord)
-        binding.model = model
 
         //@array/black_list_stat_entry_values
         val stat = model.blackword.get()?.stat
@@ -164,6 +162,24 @@ class BlackWordDialogFragment : BaseDialogFragment() {
         }
 
         return alertDialog
+    }
+
+    private fun DialogBlackWordBinding.bind(model: BlackWordViewModel) {
+        etWord.setText(model.blackword.get()?.word.orEmpty())
+        val callback = object : Observable.OnPropertyChangedCallback() {
+            override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
+                refreshFloatStatus(model)
+            }
+        }
+        model.loading.addOnPropertyChangedCallback(callback)
+        model.message.addOnPropertyChangedCallback(callback)
+        refreshFloatStatus(model)
+    }
+
+    private fun DialogBlackWordBinding.refreshFloatStatus(model: BlackWordViewModel) {
+        floatContainer.isVisible = model.floatVisible.get()
+        loadingProgress.isVisible = model.loading.get()
+        message.text = model.message.get()
     }
 
     companion object {

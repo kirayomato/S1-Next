@@ -1,35 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent">
 
-    <data>
-
-        <import type="android.view.View" />
-
-        <import type="android.text.TextUtils" />
-
-        <variable
-            name="msg"
-            type="String" />
-    </data>
-
-    <FrameLayout
+    <TextView
+        android:id="@+id/text"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:visibility="@{TextUtils.isEmpty(msg)?View.GONE:View.VISIBLE}">
-
-        <TextView
-            android:id="@+id/text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:background="@drawable/shape_round_corners_white"
-            android:gravity="center"
-            android:paddingLeft="@dimen/textview_background_padding"
-            android:paddingRight="@dimen/textview_background_padding"
-            android:text="@{msg}"
-            app:backTintColor="@{@color/red_500}"
-            tools:text="1" />
-    </FrameLayout>
-</layout>
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/shape_round_corners_white"
+        android:gravity="center"
+        android:paddingLeft="@dimen/textview_background_padding"
+        android:paddingRight="@dimen/textview_background_padding"
+        tools:text="1" />
+</FrameLayout>
