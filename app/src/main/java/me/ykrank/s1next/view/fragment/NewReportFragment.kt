@@ -9,7 +9,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.github.ykrank.androidautodispose.AndroidRxDispose
 import com.github.ykrank.androidlifecycle.event.FragmentEvent
@@ -49,7 +48,7 @@ class NewReportFragment : BaseFragment() {
     private lateinit var binding: FragmentNewReportBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_new_report, container, false)
+        binding = FragmentNewReportBinding.inflate(inflater, container, false)
         return binding.root
     }
 

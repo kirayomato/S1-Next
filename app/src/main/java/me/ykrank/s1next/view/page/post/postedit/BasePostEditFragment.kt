@@ -13,7 +13,6 @@ import android.view.ViewGroup
 import android.widget.EditText
 import androidx.annotation.CallSuper
 import androidx.annotation.UiThread
-import androidx.databinding.DataBindingUtil
 import cn.dreamtobe.kpswitch.util.KPSwitchConflictUtil
 import cn.dreamtobe.kpswitch.util.KeyboardUtil
 import cn.dreamtobe.kpswitch.widget.KPSwitchPanelFrameLayout
@@ -119,7 +118,7 @@ abstract class BasePostEditFragment : BaseFragment(),
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        initCreateView(DataBindingUtil.inflate(inflater, R.layout.fragment_post, container, false))
+        initCreateView(FragmentPostBinding.inflate(inflater, container, false))
 
         return mFragmentPostBinding.root
     }

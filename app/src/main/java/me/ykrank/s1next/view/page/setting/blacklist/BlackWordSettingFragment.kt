@@ -10,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AbsListView
 import android.widget.ListView
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.github.ykrank.androidautodispose.AndroidRxDispose
 import com.github.ykrank.androidlifecycle.event.FragmentEvent
@@ -134,10 +133,7 @@ class BlackWordSettingFragment : BaseFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = DataBindingUtil.inflate<FragmentBlackWordBinding>(
-            inflater,
-            R.layout.fragment_black_word, container, false
-        )
+        val binding = FragmentBlackWordBinding.inflate(inflater, container, false)
         mListView = binding.listview
         return binding.root
     }

@@ -10,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AbsListView
 import android.widget.ListView
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.github.ykrank.androidtools.util.L
 import dagger.hilt.android.AndroidEntryPoint
@@ -128,10 +127,7 @@ class BlackListSettingFragment : BaseFragment(), DialogInterface.OnDismissListen
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = DataBindingUtil.inflate<FragmentBlacklistBinding>(
-            inflater,
-            R.layout.fragment_blacklist, container, false
-        )
+        val binding = FragmentBlacklistBinding.inflate(inflater, container, false)
         mListView = binding.listview
         return binding.root
     }

@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Spinner
-import androidx.databinding.DataBindingUtil
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.ykrank.androidautodispose.AndroidRxDispose
@@ -62,8 +61,8 @@ class NewThreadFragment : BasePostEditFragment() {
         get() = parsedForumAttachments
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val newThreadBinding = DataBindingUtil.inflate<FragmentNewThreadBinding>(inflater, R.layout.fragment_new_thread, container, false)
-        initCreateView(newThreadBinding.layoutPost!!)
+        val newThreadBinding = FragmentNewThreadBinding.inflate(inflater, container, false)
+        initCreateView(newThreadBinding.layoutPost)
         titleEditText = newThreadBinding.title
         typeSpinner = newThreadBinding.spinner
         return newThreadBinding.root
