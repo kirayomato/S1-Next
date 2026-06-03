@@ -73,7 +73,10 @@ class EditPostFragment : BasePostEditFragment() {
         mPost = requireArguments().getParcelable(ARG_POST)!!
 
         isHost = mPost.isFirst
-        binding.host = isHost
+        val hostVisibility = if (isHost) View.VISIBLE else View.GONE
+        binding.spinnerType.visibility = hostVisibility
+        binding.spinnerPerm.visibility = hostVisibility
+        binding.title.visibility = hostVisibility
         leavePageMsg(String.format("EditPostFragment##post:%s", mPost))
 
         return binding.root

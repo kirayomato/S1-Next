@@ -3,12 +3,15 @@ package me.ykrank.s1next.view.adapter.delegate
 import android.app.Activity
 import android.graphics.Color
 import android.text.method.LinkMovementMethod
+import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
+import com.github.ykrank.androidtools.binding.LibTextViewBindingAdapter
 import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewHolder
 import com.github.ykrank.androidtools.widget.EventBus
 import me.ykrank.s1next.R
+import me.ykrank.s1next.binding.ImageViewBindingAdapter
+import me.ykrank.s1next.binding.TextViewBindingAdapter
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.app.model.AppPost
 import me.ykrank.s1next.data.api.app.model.AppThread
@@ -22,7 +25,7 @@ class AppPostAdapterDelegate(
     private val quotePid: String?,
     private val mEventBus: EventBus,
     private val mUser: User
-) : BaseAdapterDelegate<AppPost, SimpleRecycleViewHolder<ItemAppPostBinding>>(
+) : BaseAdapterDelegate<AppPost, AppPostViewHolder>(
     activity,
     AppPost::class.java
 ) {
@@ -40,16 +43,25 @@ class AppPostAdapterDelegate(
     }
 
     public override fun onCreateViewHolder(parent: ViewGroup): androidx.recyclerview.widget.RecyclerView.ViewHolder {
-        val binding = DataBindingUtil.inflate<ItemAppPostBinding>(mLayoutInflater,
-                R.layout.item_app_post, parent, false)
-        binding.postViewModel = AppPostViewModel(lifecycleOwner, mEventBus, mUser)
+        val binding = ItemAppPostBinding.inflate(mLayoutInflater, parent, false)
+        val viewModel = AppPostViewModel(lifecycleOwner, mEventBus, mUser)
+        binding.avatar.setOnClickListener(viewModel::onAvatarClick)
+        binding.avatar.setOnLongClickListener(viewModel::onLongClick)
+        binding.tvFloor.setOnClickListener(viewModel::showFloorActionMenu)
+        binding.tvShowTrade.setOnClickListener(viewModel::onTradeHtmlClick)
+        TextViewBindingAdapter.increaseClickingArea(
+            binding.tvFloor,
+            binding.tvFloor.resources.getDimension(
+                com.github.ykrank.androidtools.R.dimen.minimum_touch_target_size
+            )
+        )
 
         setTextSelectable(binding, false)
 
-        return SimpleRecycleViewHolder(binding)
+        return AppPostViewHolder(binding, viewModel)
     }
 
-    override fun onBindViewHolderData(post: AppPost, position: Int, holder: SimpleRecycleViewHolder<ItemAppPostBinding>, payloads: List<Any>) {
+    override fun onBindViewHolderData(post: AppPost, position: Int, holder: AppPostViewHolder, payloads: List<Any>) {
         val binding = holder.binding
 
         val selectable = false
@@ -57,10 +69,14 @@ class AppPostAdapterDelegate(
             setTextSelectable(binding, selectable)
         }
 
-        binding.postViewModel?.let {
-            it.thread.set(threadInfo)
-            it.post.set(post)
-        }
+        holder.viewModel.thread.set(threadInfo)
+        holder.viewModel.post.set(post)
+        binding.authorName.text = post.author
+        LibTextViewBindingAdapter.setRelativeDateTime(binding.tvDatetime, post.dateline * 1000)
+        binding.tvFloor.text = holder.viewModel.floor.get()
+        TextViewBindingAdapter.setReply(binding.tvReply, null, null, lifecycleOwner, post)
+        ImageViewBindingAdapter.loadAvatar(binding.avatar, null, post.authorId.toString())
+        binding.tvShowTrade.visibility = if (post.trade) View.VISIBLE else View.GONE
         val quote = post.pid == quotePid?.toInt()
         if (quote) {
             binding.container.setBackgroundResource(com.github.ykrank.androidtools.R.drawable.shape_stroke_corners_wide)
@@ -88,3 +104,8 @@ class AppPostAdapterDelegate(
         this.threadInfo = threadInfo
     }
 }
+
+class AppPostViewHolder(
+    binding: ItemAppPostBinding,
+    val viewModel: AppPostViewModel
+) : SimpleRecycleViewHolder<ItemAppPostBinding>(binding)
