@@ -18,12 +18,13 @@ import com.github.ykrank.androidtools.R
 import com.github.ykrank.androidtools.util.ContextUtils
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.widget.glide.model.ImageInfo
-import me.ykrank.s1next.App.Companion.preAppComponent
+import dagger.hilt.android.EntryPointAccessors
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.data.api.model.Emoticon
 import me.ykrank.s1next.data.pref.DownloadPreferencesManager
 import me.ykrank.s1next.widget.glide.AvatarFailUrlsCache
+import me.ykrank.s1next.widget.glide.GlideDependenciesEntryPoint
 import me.ykrank.s1next.widget.glide.model.AvatarUrl
 import me.ykrank.s1next.widget.image.ImageBiz
 import me.ykrank.s1next.widget.image.avatar
@@ -87,8 +88,7 @@ object ImageViewBindingAdapter {
             return
         }
         bezelImageView.setTag(R.id.tag_drawable_info, null)
-        val downloadPreferencesManager = preAppComponent
-            .downloadPreferencesManager
+        val downloadPreferencesManager = downloadPreferencesManager(bezelImageView)
         val imageBiz = ImageBiz(downloadPreferencesManager)
         if (user.isLogged) {
             val requestManager = Glide.with(bezelImageView)
@@ -147,8 +147,7 @@ object ImageViewBindingAdapter {
         if (TextUtils.equals(oldUid, newUid)) {
             return
         }
-        val downloadPreferencesManager = preAppComponent
-            .downloadPreferencesManager
+        val downloadPreferencesManager = downloadPreferencesManager(bezelImageView)
         loadAvatar(
             bezelImageView,
             null,
@@ -158,6 +157,13 @@ object ImageViewBindingAdapter {
             newUid,
             null
         )
+    }
+
+    private fun downloadPreferencesManager(imageView: ImageView): DownloadPreferencesManager {
+        return EntryPointAccessors.fromApplication(
+            imageView.context.applicationContext,
+            GlideDependenciesEntryPoint::class.java
+        ).downloadPreferencesManager
     }
 
     @JvmStatic

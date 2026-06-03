@@ -7,25 +7,33 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.ykrank.s1next.App
 import me.ykrank.s1next.data.cache.biz.CacheBiz
 import me.ykrank.s1next.data.db.biz.HistoryBiz
+import me.ykrank.s1next.data.pref.ReadPreferencesManager
 import me.ykrank.s1next.databinding.FragmentBaseBinding
 import me.ykrank.s1next.view.activity.HistoryActivity
 import me.ykrank.s1next.view.adapter.HistoryCursorRecyclerViewAdapter
+import javax.inject.Inject
 
 /**
  * Fragment show post view history list
  */
+@AndroidEntryPoint
 class HistoryListFragment : BaseFragment() {
     private var mRecyclerAdapter: HistoryCursorRecyclerViewAdapter? = null
 
-    private val historyBiz: HistoryBiz by lazy { App.appComponent.historyBiz }
+    @Inject
+    internal lateinit var historyBiz: HistoryBiz
 
-    private val cacheBiz: CacheBiz by lazy { App.appComponent.cacheBiz }
+    @Inject
+    internal lateinit var cacheBiz: CacheBiz
+
+    @Inject
+    internal lateinit var readPreferencesManager: ReadPreferencesManager
 
     private lateinit var binding: FragmentBaseBinding
     private var mode: String = HistoryActivity.MODE_HISTORY
@@ -50,7 +58,7 @@ class HistoryListFragment : BaseFragment() {
         leavePageMsg("HistoryListFragment")
         val activity: Activity = requireActivity()
         binding.recyclerView.setLayoutManager(LinearLayoutManager(activity))
-        mRecyclerAdapter = HistoryCursorRecyclerViewAdapter(activity, viewLifecycleOwner)
+        mRecyclerAdapter = HistoryCursorRecyclerViewAdapter(activity, viewLifecycleOwner, readPreferencesManager)
         binding.recyclerView.setAdapter(mRecyclerAdapter)
     }
 

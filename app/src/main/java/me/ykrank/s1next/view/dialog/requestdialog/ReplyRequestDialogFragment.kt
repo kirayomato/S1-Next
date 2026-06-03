@@ -3,17 +3,19 @@ package me.ykrank.s1next.view.dialog.requestdialog
 import android.os.Bundle
 import android.text.TextUtils
 import com.github.ykrank.androidtools.util.StringUtils
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
-import me.ykrank.s1next.App.Companion.get
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.data.api.model.PostEditor
+import me.ykrank.s1next.widget.track.TrackAgentProvider
 import me.ykrank.s1next.widget.track.event.NewReplyTrackEvent
 import me.ykrank.s1next.widget.uploadimg.ForumAttachmentPostSubmitHelper
 
 /**
  * A dialog requests to reply to post.
  */
+@AndroidEntryPoint
 class ReplyRequestDialogFragment : BaseRequestDialogFragment<PostSubmitResult>() {
     override fun getProgressMessage(): CharSequence? {
         return getText(R.string.dialog_progress_message_reply)
@@ -177,7 +179,7 @@ class ReplyRequestDialogFragment : BaseRequestDialogFragment<PostSubmitResult>()
             formHash: String? = null,
             postTime: Long? = null,
         ): ReplyRequestDialogFragment {
-            get().trackAgent.post(NewReplyTrackEvent(threadId, quotePostId))
+            TrackAgentProvider.get().post(NewReplyTrackEvent(threadId, quotePostId))
             val fragment = ReplyRequestDialogFragment()
             val bundle = Bundle()
             bundle.putString(ARG_THREAD_ID, threadId)

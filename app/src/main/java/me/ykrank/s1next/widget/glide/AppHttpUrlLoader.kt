@@ -8,6 +8,7 @@ import com.bumptech.glide.load.model.ModelLoader
 import com.bumptech.glide.load.model.ModelLoaderFactory
 import com.bumptech.glide.load.model.MultiModelLoaderFactory
 import com.github.ykrank.androidtools.widget.glide.model.ForcePassUrl
+import me.ykrank.s1next.data.pref.DownloadPreferencesManager
 import me.ykrank.s1next.widget.glide.model.AvatarUrl
 import okhttp3.OkHttpClient
 import java.io.InputStream
@@ -20,6 +21,8 @@ import java.io.InputStream
  */
 class AppHttpUrlLoader private constructor(
     private val mOkHttpClient: OkHttpClient,
+    private val downloadPreferencesManager: DownloadPreferencesManager,
+    private val avatarFailUrlsCache: AvatarFailUrlsCache,
 ) :
     ModelLoader<GlideUrl, InputStream> {
     override fun buildLoadData(
@@ -45,11 +48,16 @@ class AppHttpUrlLoader private constructor(
         options: Options
     ): DataFetcher<InputStream> {
         if (model is AvatarUrl) {
-            return AvatarStreamFetcher(mOkHttpClient, model)
+            return AvatarStreamFetcher(
+                mOkHttpClient,
+                model,
+                downloadPreferencesManager,
+                avatarFailUrlsCache
+            )
         } else if (model is ForcePassUrl) {
             return OkHttpStreamFetcher(mOkHttpClient, model)
         }
-        return AppHttpStreamFetcher(mOkHttpClient, model)
+        return AppHttpStreamFetcher(mOkHttpClient, model, downloadPreferencesManager)
     }
 
     /**
@@ -57,10 +65,16 @@ class AppHttpUrlLoader private constructor(
      */
     class Factory(
         private val mOkHttpClient: OkHttpClient,
+        private val downloadPreferencesManager: DownloadPreferencesManager,
+        private val avatarFailUrlsCache: AvatarFailUrlsCache,
     ) :
         ModelLoaderFactory<GlideUrl, InputStream> {
         override fun build(multiFactory: MultiModelLoaderFactory): ModelLoader<GlideUrl, InputStream> {
-            return AppHttpUrlLoader(mOkHttpClient)
+            return AppHttpUrlLoader(
+                mOkHttpClient,
+                downloadPreferencesManager,
+                avatarFailUrlsCache
+            )
         }
 
         override fun teardown() {

@@ -29,11 +29,11 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.binding.ImageViewBindingAdapter
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.data.api.model.Post
+import me.ykrank.s1next.data.pref.DownloadPreferencesManager
 import me.ykrank.s1next.view.page.post.render.PostImageSizeCache
 import me.ykrank.s1next.view.page.post.render.PostRenderItem
 import me.ykrank.s1next.view.page.post.render.PostRenderMapper
@@ -47,11 +47,14 @@ import java.io.FileOutputStream
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-class PostShareCardRenderer(private val context: Context) {
+class PostShareCardRenderer(
+    private val context: Context,
+    downloadPreferencesManager: DownloadPreferencesManager
+) {
 
     private val qrCodeBitmapFactory = QrCodeBitmapFactory()
     private val renderMapper = PostRenderMapper()
-    private val imageBiz = ImageBiz(App.preAppComponent.downloadPreferencesManager)
+    private val imageBiz = ImageBiz(downloadPreferencesManager)
     private val afternoonBackgroundColor = context.getColor(com.github.ykrank.androidtools.R.color.saraba_background)
     private val divideLineColor = context.getColor(com.github.ykrank.androidtools.R.color.black_12p)
     private val textPrimaryColor = context.getColor(com.github.ykrank.androidtools.R.color.black_87p)

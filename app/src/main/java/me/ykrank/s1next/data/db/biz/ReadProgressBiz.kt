@@ -1,7 +1,6 @@
 package me.ykrank.s1next.data.db.biz
 
 import androidx.annotation.WorkerThread
-import me.ykrank.s1next.App
 import me.ykrank.s1next.data.db.AppDatabase
 import me.ykrank.s1next.data.db.AppDatabaseManager
 import me.ykrank.s1next.data.db.dao.ReadProgressDao
@@ -48,6 +47,6 @@ class ReadProgressBiz(private val manager: AppDatabaseManager) {
     companion object {
 
         val instance: ReadProgressBiz
-            get() = App.appComponent.readProgressBiz
+            get() = bizDependencies().readProgressBiz
     }
 }

@@ -7,17 +7,19 @@ import com.github.ykrank.androidautodispose.AndroidRxDispose
 import com.github.ykrank.androidlifecycle.event.FragmentEvent
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.RxJavaUtil
-import me.ykrank.s1next.App
+import dagger.hilt.android.AndroidEntryPoint
 import me.ykrank.s1next.data.api.S1Service
 import me.ykrank.s1next.data.api.model.PostEditor
 import me.ykrank.s1next.util.AppDeviceUtil
 import me.ykrank.s1next.view.dialog.requestdialog.ReplyRequestDialogFragment
 import me.ykrank.s1next.view.event.RequestDialogSuccessEvent
 import me.ykrank.s1next.widget.uploadimg.ForumAttachmentUploadTarget
+import javax.inject.Inject
 
 /**
  * A Fragment shows [EditText] to let the user enter reply.
  */
+@AndroidEntryPoint
 class ReplyFragment : BasePostEditFragment() {
     override var cacheKey: String? = null
         private set
@@ -30,7 +32,8 @@ class ReplyFragment : BasePostEditFragment() {
     private var parsedForumAttachmentUploadInfo: PostEditor.ForumAttachmentUploadInfo? = null
     private var parsedForumAttachments: List<PostEditor.ForumAttachment> = emptyList()
 
-    private val mS1Service: S1Service by lazy { App.appComponent.s1Service }
+    @Inject
+    internal lateinit var mS1Service: S1Service
 
     override val forumAttachmentUploadTarget: ForumAttachmentUploadTarget?
         get() = mThreadId?.let { ForumAttachmentUploadTarget.Reply(it, mForumId, mPageNum) }

@@ -11,15 +11,18 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import me.ykrank.s1next.App
 import me.ykrank.s1next.data.api.model.Forum
 import me.ykrank.s1next.data.api.model.wrapper.ThreadsWrapper
 import me.ykrank.s1next.data.pref.GeneralPreferencesManager
+import me.ykrank.s1next.data.pref.ReadPreferencesManager
+import me.ykrank.s1next.data.pref.ThemeManager
 import me.ykrank.s1next.view.adapter.ThreadRecyclerViewAdapter
 import me.ykrank.s1next.view.event.PostDisableStickyChangeEvent
 import me.ykrank.s1next.view.event.ThreadTypeChangeEvent
 import me.ykrank.s1next.view.fragment.ThreadListPagerFragment.PagerCallback
 import me.ykrank.s1next.view.fragment.ThreadListPagerFragment.SubForumsCallback
+import me.ykrank.s1next.viewmodel.UserViewModel
+import javax.inject.Inject
 
 /**
  * A Fragment representing one of the pages of threads.
@@ -31,8 +34,17 @@ import me.ykrank.s1next.view.fragment.ThreadListPagerFragment.SubForumsCallback
 @AndroidEntryPoint
 class ThreadListPagerFragment : BaseRecyclerViewFragment<ThreadsWrapper>() {
 
-    private val mGeneralPreferencesManager: GeneralPreferencesManager =
-        App.preAppComponent.generalPreferencesManager
+    @Inject
+    internal lateinit var mGeneralPreferencesManager: GeneralPreferencesManager
+
+    @Inject
+    internal lateinit var userViewModel: UserViewModel
+
+    @Inject
+    internal lateinit var themeManager: ThemeManager
+
+    @Inject
+    internal lateinit var readPreferencesManager: ReadPreferencesManager
 
     private var mForumId: String? = null
     private var mTypeId: String? = null
@@ -79,7 +91,14 @@ class ThreadListPagerFragment : BaseRecyclerViewFragment<ThreadsWrapper>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mRecyclerAdapter = ThreadRecyclerViewAdapter(requireActivity(), viewLifecycleOwner, mForumId)
+        mRecyclerAdapter = ThreadRecyclerViewAdapter(
+            requireActivity(),
+            viewLifecycleOwner,
+            mForumId,
+            userViewModel,
+            themeManager,
+            readPreferencesManager
+        )
         val recyclerView = recyclerView
         val activity = requireActivity()
         recyclerView.layoutManager = LinearLayoutManager(activity)

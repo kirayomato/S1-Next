@@ -7,15 +7,18 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.annotation.LayoutRes
-import me.ykrank.s1next.App
 import me.ykrank.s1next.binding.TextViewBindingAdapter
 import me.ykrank.s1next.data.api.model.Forum
 import me.ykrank.s1next.data.pref.ThemeManager
 
-class SubForumArrayAdapter(activity: Activity, @LayoutRes resource: Int, objects: List<Forum>) :
+class SubForumArrayAdapter(
+    activity: Activity,
+    @LayoutRes resource: Int,
+    objects: List<Forum>,
+    themeManager: ThemeManager
+) :
     ArrayAdapter<Forum?>(activity, resource, objects) {
 
-    private val themeManager: ThemeManager = App.preAppComponent.themeManager
     private val mLayoutInflater: LayoutInflater
 
     @LayoutRes

@@ -7,7 +7,7 @@ import androidx.fragment.app.FragmentManager
 import com.github.ykrank.androidtools.util.ClipboardUtil
 import com.github.ykrank.androidtools.ui.internal.CoordinatorLayoutAnchorDelegate
 import com.github.ykrank.androidtools.util.ContextUtils
-import me.ykrank.s1next.App
+import com.github.ykrank.androidtools.widget.EventBus
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.Api
@@ -24,12 +24,19 @@ import me.ykrank.s1next.view.page.post.postlist.PostListActivity
 
 object PostRenderActions {
 
-    fun showPostActionMenu(anchor: View, fragment: Fragment, thread: Thread?, pageNum: Int, post: Post): Boolean {
-        val eventBus = App.preAppComponent.eventBus
+    fun showPostActionMenu(
+        anchor: View,
+        fragment: Fragment,
+        eventBus: EventBus,
+        user: User,
+        thread: Thread?,
+        pageNum: Int,
+        post: Post
+    ): Boolean {
         return showPostActionMenu(
             anchor = anchor,
             fragment = fragment,
-            user = App.appComponent.user,
+            user = user,
             thread = thread,
             pageNum = pageNum,
             post = post,
@@ -58,7 +65,12 @@ object PostRenderActions {
                 if (tid != null) {
                     eventBus.postDefault(ReportEvent(tid, pid, pageNum))
                 }
-            }
+            },
+            onShare = {
+                eventBus.postDefault(
+                    EnterPostShareSelectionEvent(thread?.id, pageNum, post.id)
+                )
+            },
         )
     }
 
@@ -73,6 +85,7 @@ object PostRenderActions {
         onRate: (() -> Unit)?,
         onEdit: (() -> Unit)?,
         onReport: (() -> Unit)?,
+        onShare: () -> Unit,
     ): Boolean {
         val topItems = mutableListOf<PostActionMenuPopup.Item>()
         if (onReply != null) {
@@ -89,9 +102,7 @@ object PostRenderActions {
 
         val listItems = mutableListOf<PostActionMenuPopup.Item>()
         listItems.add(
-            PostActionMenuPopup.Item(R.string.menu_share, R.drawable.ic_share_24dp) {
-                sharePost(anchor, thread, pageNum, post)
-            }
+            PostActionMenuPopup.Item(R.string.menu_share, R.drawable.ic_share_24dp, onShare)
         )
         val authorId = post.authorId
         if (thread != null && !authorId.isNullOrBlank()) {
@@ -137,12 +148,6 @@ object PostRenderActions {
     fun floorLink(thread: Thread?, pageNum: Int, post: Post): String {
         val threadId = thread?.id
         return Api.getPostListUrlForBrowser(threadId, pageNum) + "#pid${post.id}"
-    }
-
-    private fun sharePost(anchor: View, thread: Thread?, pageNum: Int, post: Post) {
-        App.preAppComponent.eventBus.postDefault(
-            EnterPostShareSelectionEvent(thread?.id, pageNum, post.id)
-        )
     }
 
     private fun feedbackPost(anchor: View, fragment: Fragment?, thread: Thread?, pageNum: Int, post: Post) {

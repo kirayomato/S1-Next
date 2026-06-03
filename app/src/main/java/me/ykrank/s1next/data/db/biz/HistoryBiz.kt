@@ -3,7 +3,6 @@ package me.ykrank.s1next.data.db.biz
 import android.database.Cursor
 import androidx.annotation.WorkerThread
 import com.github.ykrank.androidtools.util.L
-import me.ykrank.s1next.App
 import me.ykrank.s1next.data.db.AppDatabase
 import me.ykrank.s1next.data.db.AppDatabaseManager
 import me.ykrank.s1next.data.db.dao.HistoryDao
@@ -65,7 +64,7 @@ class HistoryBiz(private val manager: AppDatabaseManager) {
         const val MAX_SIZE = 300
 
         val instance: HistoryBiz
-            get() = App.appComponent.historyBiz
+            get() = bizDependencies().historyBiz
     }
 
 }

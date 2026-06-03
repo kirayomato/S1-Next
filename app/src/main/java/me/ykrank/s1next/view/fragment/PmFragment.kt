@@ -45,7 +45,7 @@ class PmFragment : BaseLoadMoreRecycleViewFragment<PmsWrapper>() {
 
         val recyclerView = recyclerView
         recyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
-        mRecyclerAdapter = PmRecyclerViewAdapter(requireActivity(), viewLifecycleOwner)
+        mRecyclerAdapter = PmRecyclerViewAdapter(requireActivity(), viewLifecycleOwner, mUser)
         recyclerView.adapter = mRecyclerAdapter
     }
 

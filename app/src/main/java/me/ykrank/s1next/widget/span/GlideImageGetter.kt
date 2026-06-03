@@ -35,10 +35,12 @@ import com.github.ykrank.androidtools.widget.glide.downsamplestrategy.MultiDownS
 import com.github.ykrank.androidtools.widget.glide.downsamplestrategy.SizeDownSampleStrategy
 import com.github.ykrank.androidtools.widget.glide.transformations.FitOutWidthBitmapTransformation
 import com.github.ykrank.androidtools.widget.track.DataTrackAgent
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.Api
+import me.ykrank.s1next.data.pref.DownloadPreferencesManager
+import me.ykrank.s1next.widget.glide.GlideDependenciesEntryPoint
 import me.ykrank.s1next.widget.EmoticonFactory
 import me.ykrank.s1next.widget.track.event.EmoticonNotFoundTrackEvent
 import java.util.TreeSet
@@ -58,10 +60,11 @@ import java.util.WeakHashMap
  */
 class GlideImageGetter protected constructor(
     private val lifecycleOwner: LifecycleOwner,
-    private val mTextView: TextView
+    private val mTextView: TextView,
+    private val trackAgent: DataTrackAgent,
+    private val downloadPreferencesManager: DownloadPreferencesManager,
 ) : Html.ImageGetter, View.OnAttachStateChangeListener, Drawable.Callback {
     private val requestManager: RequestManager
-    private val trackAgent: DataTrackAgent
     private val handler: Handler
     private var lastValidateSpanTime = 0L
 
@@ -106,7 +109,6 @@ class GlideImageGetter protected constructor(
     init {
         LooperUtil.enforceOnMainThread()
         this.requestManager = Glide.with(mTextView)
-        this.trackAgent = App.preAppComponent.dataTrackAgent
 
         // save Drawable.Callback in TextView
         // and get back when finish fetching image
@@ -183,7 +185,7 @@ class GlideImageGetter protected constructor(
             //Scale
             urlDrawable = UrlDrawable(url, density)
             val imageGetterViewTarget = ImageGetterViewTarget(this, mTextView,
-                    urlDrawable, serial)
+                    urlDrawable, serial, downloadPreferencesManager)
 
             val finalUrl = if (URLUtil.isNetworkUrl(url)) url else Api.BASE_URL + url
 
@@ -215,7 +217,7 @@ class GlideImageGetter protected constructor(
         urlDrawable = UrlDrawable(url)
 
         val imageGetterViewTarget = ImageGetterViewTarget(this, mTextView,
-                urlDrawable, serial)
+                urlDrawable, serial, downloadPreferencesManager)
 
         val glideRequestBuilder = requestManager
                 .load(url)
@@ -306,7 +308,16 @@ class GlideImageGetter protected constructor(
         operator fun get(textView: TextView, lifecycleOwner: LifecycleOwner): GlideImageGetter {
             val obj = textView.getTag(com.github.ykrank.androidtools.R.id.tag_drawable_callback)
             return if (obj == null) {
-                GlideImageGetter(lifecycleOwner, textView)
+                val dependencies = EntryPointAccessors.fromApplication(
+                    textView.context.applicationContext,
+                    GlideDependenciesEntryPoint::class.java
+                )
+                GlideImageGetter(
+                    lifecycleOwner,
+                    textView,
+                    dependencies.dataTrackAgent,
+                    dependencies.downloadPreferencesManager
+                )
             } else {
                 obj as GlideImageGetter
             }

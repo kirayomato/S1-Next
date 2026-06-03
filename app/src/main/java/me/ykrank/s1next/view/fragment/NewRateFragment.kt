@@ -15,7 +15,7 @@ import com.github.ykrank.androidlifecycle.event.FragmentEvent
 import com.github.ykrank.androidtools.ui.adapter.simple.BindViewHolderCallback
 import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewAdapter
 import com.github.ykrank.androidtools.util.RxJavaUtil
-import me.ykrank.s1next.App
+import dagger.hilt.android.AndroidEntryPoint
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.S1Service
 import me.ykrank.s1next.data.api.model.RatePreInfo
@@ -24,13 +24,16 @@ import me.ykrank.s1next.databinding.ItemRateReasonBinding
 import me.ykrank.s1next.view.adapter.SimpleSpinnerAdapter
 import me.ykrank.s1next.view.dialog.requestdialog.RateRequestDialogFragment
 import me.ykrank.s1next.viewmodel.NewRateViewModel
+import javax.inject.Inject
 
 /**
  * A Fragment shows [EditText] to let the user enter reply.
  */
+@AndroidEntryPoint
 class NewRateFragment : BaseFragment() {
 
-    private val s1Service: S1Service by lazy { App.appComponent.s1Service }
+    @Inject
+    internal lateinit var s1Service: S1Service
 
     private var threadId: String? = null
     private var postID: String? = null

@@ -7,12 +7,12 @@ import androidx.lifecycle.lifecycleScope
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.ykrank.androidtools.extension.toast
 import com.github.ykrank.androidtools.util.L
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.ykrank.s1next.App
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.ApiCacheProvider
 import me.ykrank.s1next.data.api.model.wrapper.PostsWrapper
@@ -23,19 +23,25 @@ import me.ykrank.s1next.util.ErrorUtil
 import me.ykrank.s1next.view.activity.HistoryActivity
 import me.ykrank.s1next.view.dialog.BaseLoadProgressDialogFragment
 import kotlin.math.max
+import javax.inject.Inject
 
 
 /**
  * A dialog lets user load website blacklist.
  */
+@AndroidEntryPoint
 class ThreadPrefetchDialogFragment : BaseLoadProgressDialogFragment() {
-    private val mUser: User by lazy { App.appComponent.user }
+    @Inject
+    internal lateinit var mUser: User
 
-    private val apiCache: ApiCacheProvider by lazy { App.appComponent.apiCacheProvider }
+    @Inject
+    internal lateinit var apiCache: ApiCacheProvider
 
-    private val cacheBiz: CacheBiz by lazy { App.appComponent.cacheBiz }
+    @Inject
+    internal lateinit var cacheBiz: CacheBiz
 
-    private val jsonMapper: ObjectMapper = App.preAppComponent.jsonMapper
+    @Inject
+    internal lateinit var jsonMapper: ObjectMapper
 
     private lateinit var threadId: String
     private var pageStart: Int = 1

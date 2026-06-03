@@ -16,8 +16,8 @@ import com.github.ykrank.androidlifecycle.event.FragmentEvent
 import com.github.ykrank.androidtools.databinding.ProgressBarMenuBinding
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.RxJavaUtil
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.ApiException
 import me.ykrank.s1next.data.api.S1Service
@@ -25,13 +25,16 @@ import me.ykrank.s1next.data.api.model.AjaxResult
 import me.ykrank.s1next.data.api.model.ReportPreInfo
 import me.ykrank.s1next.databinding.FragmentNewReportBinding
 import me.ykrank.s1next.view.adapter.SimpleSpinnerAdapter
+import javax.inject.Inject
 
 /**
  * A Fragment shows [EditText] to let the user enter reply.
  */
+@AndroidEntryPoint
 class NewReportFragment : BaseFragment() {
 
-    private val s1Service: S1Service by lazy { App.appComponent.s1Service }
+    @Inject
+    internal lateinit var s1Service: S1Service
 
     private var threadId: String? = null
     private var postID: String? = null

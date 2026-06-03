@@ -6,7 +6,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewHolder
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.model.Thread
 import me.ykrank.s1next.data.pref.ReadPreferencesManager
@@ -18,14 +17,12 @@ import me.ykrank.s1next.viewmodel.UserViewModel
 class ThreadAdapterDelegate(
     context: Context,
     private val lifecycleOwner: LifecycleOwner,
-    private val forumId: String?
+    private val forumId: String?,
+    private val mUserViewModel: UserViewModel,
+    private val mThemeManager: ThemeManager,
+    private val mReadPreferencesManager: ReadPreferencesManager
 ) :
         BaseAdapterDelegate<Thread, SimpleRecycleViewHolder<ItemThreadBinding>>(context, Thread::class.java) {
-
-    private val mUserViewModel: UserViewModel by lazy { App.appComponent.userViewModel }
-    private val mThemeManager: ThemeManager = App.preAppComponent.themeManager
-    private val mReadPreferencesManager: ReadPreferencesManager =
-        App.preAppComponent.readProgressPreferencesManager
 
     public override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
         val binding = DataBindingUtil.inflate<ItemThreadBinding>(mLayoutInflater, R.layout.item_thread,
@@ -35,7 +32,7 @@ class ThreadAdapterDelegate(
         binding.userViewModel = mUserViewModel
         binding.themeManager = mThemeManager
         binding.forumId = forumId
-        binding.model = ThreadViewModel(lifecycleOwner)
+        binding.model = ThreadViewModel(lifecycleOwner, mReadPreferencesManager)
 
         val threadPadding = mReadPreferencesManager.threadPadding
         if (threadPadding != null && threadPadding > 0) {

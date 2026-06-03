@@ -11,7 +11,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import me.ykrank.s1next.App
-import me.ykrank.s1next.PreAppComponent
+import me.ykrank.s1next.PreAppGraph
 import me.ykrank.s1next.data.Wifi
 import me.ykrank.s1next.data.pref.AppDataPreferencesManager
 import me.ykrank.s1next.data.pref.DataPreferencesManager
@@ -29,98 +29,98 @@ import javax.inject.Singleton
 object PreAppHiltModule {
     @Provides
     @Singleton
-    fun providePreAppComponent(@ApplicationContext context: Context): PreAppComponent {
+    fun providePreAppGraph(@ApplicationContext context: Context): PreAppGraph {
         check(context.applicationContext is App)
-        return App.preAppComponent
+        return App.preAppGraph
     }
 
     @Provides
     @Singleton
-    fun provideContext(preAppComponent: PreAppComponent): Context {
-        return preAppComponent.context
+    fun provideContext(preAppGraph: PreAppGraph): Context {
+        return preAppGraph.context
     }
 
     @Provides
     @Singleton
-    fun provideWifi(preAppComponent: PreAppComponent): Wifi {
-        return preAppComponent.wifi
+    fun provideWifi(preAppGraph: PreAppGraph): Wifi {
+        return preAppGraph.wifi
     }
 
     @Provides
     @Singleton
-    fun provideJsonMapper(preAppComponent: PreAppComponent): ObjectMapper {
-        return preAppComponent.jsonMapper
+    fun provideJsonMapper(preAppGraph: PreAppGraph): ObjectMapper {
+        return preAppGraph.jsonMapper
     }
 
     @Provides
     @Singleton
-    fun provideCookieManager(preAppComponent: PreAppComponent): CookieManager {
-        return preAppComponent.cookieManager
+    fun provideCookieManager(preAppGraph: PreAppGraph): CookieManager {
+        return preAppGraph.cookieManager
     }
 
     @Provides
     @Singleton
-    fun provideCookieJar(preAppComponent: PreAppComponent): CookieJar {
-        return preAppComponent.cookieJar
+    fun provideCookieJar(preAppGraph: PreAppGraph): CookieJar {
+        return preAppGraph.cookieJar
     }
 
     @Provides
     @Singleton
-    fun provideEventBus(preAppComponent: PreAppComponent): EventBus {
-        return preAppComponent.eventBus
+    fun provideEventBus(preAppGraph: PreAppGraph): EventBus {
+        return preAppGraph.eventBus
     }
 
     @Provides
     @Singleton
-    fun provideDataTrackAgent(preAppComponent: PreAppComponent): DataTrackAgent {
-        return preAppComponent.dataTrackAgent
+    fun provideDataTrackAgent(preAppGraph: PreAppGraph): DataTrackAgent {
+        return preAppGraph.dataTrackAgent
     }
 
     @Provides
     @Singleton
-    fun provideSharedPreferences(preAppComponent: PreAppComponent): SharedPreferences {
-        return preAppComponent.sharedPreferences
+    fun provideSharedPreferences(preAppGraph: PreAppGraph): SharedPreferences {
+        return preAppGraph.sharedPreferences
     }
 
     @Provides
     @Singleton
-    fun provideNetworkPreferencesManager(preAppComponent: PreAppComponent): NetworkPreferencesManager {
-        return preAppComponent.networkPreferencesManager
+    fun provideNetworkPreferencesManager(preAppGraph: PreAppGraph): NetworkPreferencesManager {
+        return preAppGraph.networkPreferencesManager
     }
 
     @Provides
     @Singleton
-    fun provideGeneralPreferencesManager(preAppComponent: PreAppComponent): GeneralPreferencesManager {
-        return preAppComponent.generalPreferencesManager
+    fun provideGeneralPreferencesManager(preAppGraph: PreAppGraph): GeneralPreferencesManager {
+        return preAppGraph.generalPreferencesManager
     }
 
     @Provides
     @Singleton
-    fun provideThemeManager(preAppComponent: PreAppComponent): ThemeManager {
-        return preAppComponent.themeManager
+    fun provideThemeManager(preAppGraph: PreAppGraph): ThemeManager {
+        return preAppGraph.themeManager
     }
 
     @Provides
     @Singleton
-    fun provideDownloadPreferencesManager(preAppComponent: PreAppComponent): DownloadPreferencesManager {
-        return preAppComponent.downloadPreferencesManager
+    fun provideDownloadPreferencesManager(preAppGraph: PreAppGraph): DownloadPreferencesManager {
+        return preAppGraph.downloadPreferencesManager
     }
 
     @Provides
     @Singleton
-    fun provideReadPreferencesManager(preAppComponent: PreAppComponent): ReadPreferencesManager {
-        return preAppComponent.readProgressPreferencesManager
+    fun provideReadPreferencesManager(preAppGraph: PreAppGraph): ReadPreferencesManager {
+        return preAppGraph.readProgressPreferencesManager
     }
 
     @Provides
     @Singleton
-    fun provideDataPreferencesManager(preAppComponent: PreAppComponent): DataPreferencesManager {
-        return preAppComponent.dataPreferencesManager
+    fun provideDataPreferencesManager(preAppGraph: PreAppGraph): DataPreferencesManager {
+        return preAppGraph.dataPreferencesManager
     }
 
     @Provides
     @Singleton
-    fun provideAppDataPreferencesManager(preAppComponent: PreAppComponent): AppDataPreferencesManager {
-        return preAppComponent.appDataPreferencesManager
+    fun provideAppDataPreferencesManager(preAppGraph: PreAppGraph): AppDataPreferencesManager {
+        return preAppGraph.appDataPreferencesManager
     }
 }

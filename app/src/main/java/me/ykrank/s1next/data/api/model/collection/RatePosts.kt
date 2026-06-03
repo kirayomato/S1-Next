@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
-import me.ykrank.s1next.App
 import me.ykrank.s1next.data.api.model.Account
 import me.ykrank.s1next.data.api.model.Post
 import me.ykrank.s1next.util.JsonUtil
@@ -28,7 +27,7 @@ class RatePosts : Account {
     @JsonCreator
     constructor(@JsonProperty("commentcount") commentCount: JsonNode?) {
         if (commentCount != null && commentCount.isObject) {
-            commentCountMap = JsonUtil.readJsonNode(App.preAppComponent.jsonMapper, commentCount, object : TypeReference<Map<Int, Int?>>() {})
+            commentCountMap = JsonUtil.readJsonNode(JsonUtil.jsonMapper, commentCount, object : TypeReference<Map<Int, Int?>>() {})
         }
     }
 

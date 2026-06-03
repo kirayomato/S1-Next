@@ -17,8 +17,8 @@ import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.RxJavaUtil
 import com.github.ykrank.androidtools.widget.net.WifiBroadcastReceiver
 import com.google.android.material.tabs.TabLayout
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.data.api.S1Service
@@ -31,13 +31,16 @@ import me.ykrank.s1next.view.fragment.ThreadListFragment
 import me.ykrank.s1next.view.fragment.ThreadListPagerFragment
 import me.ykrank.s1next.widget.track.event.RandomImageTrackEvent
 import me.ykrank.s1next.widget.track.event.ViewForumTrackEvent
+import javax.inject.Inject
 
 /**
  * An Activity shows the thread lists.
  */
+@AndroidEntryPoint
 class ThreadListActivity : BaseActivity(), ThreadListPagerFragment.SubForumsCallback, WifiBroadcastReceiver.NeedMonitorWifi {
 
-    private val mS1Service: S1Service by lazy { App.appComponent.s1Service }
+    @Inject
+    internal lateinit var mS1Service: S1Service
 
     private var mListPopupWindow: ListPopupWindow? = null
     private var mSubForumArrayAdapter: SubForumArrayAdapter? = null
@@ -143,8 +146,12 @@ class ThreadListActivity : BaseActivity(), ThreadListPagerFragment.SubForumsCall
         if (mListPopupWindow == null) {
             mListPopupWindow = ListPopupWindow(this)
 
-            mSubForumArrayAdapter = SubForumArrayAdapter(this, R.layout.item_popup_menu_dropdown,
-                    forumList)
+            mSubForumArrayAdapter = SubForumArrayAdapter(
+                this,
+                R.layout.item_popup_menu_dropdown,
+                forumList,
+                mThemeManager
+            )
             mListPopupWindow?.setAdapter(mSubForumArrayAdapter)
             mListPopupWindow?.setOnItemClickListener { parent, view, position, id ->
                 // we use the same activity (ThreadListActivity) for sub forum

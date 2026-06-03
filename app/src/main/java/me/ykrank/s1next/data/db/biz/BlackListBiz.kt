@@ -4,7 +4,6 @@ import android.database.Cursor
 import android.text.TextUtils
 import androidx.annotation.WorkerThread
 import androidx.collection.LruCache
-import me.ykrank.s1next.App.Companion.appComponent
 import me.ykrank.s1next.data.db.AppDatabase
 import me.ykrank.s1next.data.db.AppDatabaseManager
 import me.ykrank.s1next.data.db.dao.BlackListDao
@@ -260,7 +259,7 @@ class BlackListBiz(private val manager: AppDatabaseManager) {
 
     companion object {
         fun getInstance(): BlackListBiz {
-            return appComponent.blackListBiz
+            return bizDependencies().blackListBiz
         }
     }
 }

@@ -8,10 +8,10 @@ import android.view.View
 import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import me.ykrank.s1next.App.Companion.get
 import me.ykrank.s1next.R
 import me.ykrank.s1next.view.fragment.HelpFragment
 import me.ykrank.s1next.view.internal.ToolbarDelegate
+import me.ykrank.s1next.widget.track.TrackAgentProvider
 import me.ykrank.s1next.widget.track.event.ViewHelpTrackEvent
 
 /**
@@ -72,7 +72,7 @@ class HelpActivity : AppCompatActivity() {
     companion object {
         private const val ARG_STYLE = "style"
         fun startHelpActivity(context: Context, @StyleRes styleId: Int) {
-            get().trackAgent.post(ViewHelpTrackEvent())
+            TrackAgentProvider.get(context).post(ViewHelpTrackEvent())
             val intent = Intent(context, HelpActivity::class.java)
             intent.putExtra(ARG_STYLE, styleId)
             context.startActivity(intent)

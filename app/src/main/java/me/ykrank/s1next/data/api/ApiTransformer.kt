@@ -6,10 +6,8 @@ import com.github.ykrank.androidtools.util.L
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.SingleTransformer
-import me.ykrank.s1next.App
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.app.model.AppResult
-import me.ykrank.s1next.data.api.model.wrapper.AccountResultWrapper
 import me.ykrank.s1next.data.api.model.wrapper.OriginWrapper
 import me.ykrank.s1next.util.ErrorUtil
 
@@ -134,12 +132,6 @@ object ApiFlatTransformer {
             }
 
         }
-    }
-
-    fun flatMappedWithAuthenticityToken(func: (String) -> Single<AccountResultWrapper>): Single<AccountResultWrapper> {
-        val component = App.appComponent
-        return flatMappedWithAuthenticityToken(component.s1Service, component.userValidator,
-                component.user, func)
     }
 
     private fun <T> createData(t: T): Single<T> {

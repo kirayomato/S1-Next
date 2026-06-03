@@ -4,6 +4,7 @@ import android.os.Build
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import com.github.ykrank.androidtools.extension.toast
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
 import kotlinx.coroutines.launch
 import me.ykrank.s1next.App
@@ -15,6 +16,7 @@ import me.ykrank.s1next.view.page.post.postlist.PostListActivity
 /**
  * A [ProgressDialogFragment] parses post post page for thread.
  */
+@AndroidEntryPoint
 class QuotePostPageParserDialogFragment : ProgressDialogFragment<String>() {
 
     private var threadLink: ThreadLink? = null

@@ -10,7 +10,7 @@ import com.github.ykrank.androidautodispose.AndroidRxDispose
 import com.github.ykrank.androidlifecycle.event.FragmentEvent
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.RxJavaUtil
-import me.ykrank.s1next.App
+import dagger.hilt.android.AndroidEntryPoint
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.S1Service
 import me.ykrank.s1next.data.api.model.Post
@@ -23,13 +23,16 @@ import me.ykrank.s1next.view.dialog.requestdialog.EditPostRequestDialogFragment
 import me.ykrank.s1next.view.event.RequestDialogSuccessEvent
 import me.ykrank.s1next.view.page.post.postedit.BasePostEditFragment
 import me.ykrank.s1next.widget.uploadimg.ForumAttachmentUploadTarget
+import javax.inject.Inject
 
 /**
  * A Fragment shows [EditText] to let the user enter reply.
  */
+@AndroidEntryPoint
 class EditPostFragment : BasePostEditFragment() {
 
-    private val mS1Service: S1Service by lazy { App.appComponent.s1Service }
+    @Inject
+    internal lateinit var mS1Service: S1Service
 
     private lateinit var mThread: Thread
     private lateinit var mPost: Post

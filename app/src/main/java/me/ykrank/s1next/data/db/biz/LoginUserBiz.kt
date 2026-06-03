@@ -1,7 +1,6 @@
 package me.ykrank.s1next.data.db.biz
 
 import androidx.annotation.WorkerThread
-import me.ykrank.s1next.App
 import me.ykrank.s1next.data.db.AppDatabase
 import me.ykrank.s1next.data.db.AppDatabaseManager
 import me.ykrank.s1next.data.db.dbmodel.LoginUser
@@ -92,6 +91,6 @@ class LoginUserBiz(private val manager: AppDatabaseManager, private val encrypti
     companion object {
 
         val instance: LoginUserBiz
-            get() = App.appComponent.loginUserBiz
+            get() = bizDependencies().loginUserBiz
     }
 }

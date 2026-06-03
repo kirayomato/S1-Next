@@ -12,23 +12,26 @@ import android.webkit.WebViewClient
 import android.widget.ProgressBar
 import androidx.databinding.DataBindingUtil
 import com.github.ykrank.androidtools.util.WebViewUtils
-import me.ykrank.s1next.App
+import dagger.hilt.android.AndroidEntryPoint
 import me.ykrank.s1next.R
 import me.ykrank.s1next.databinding.FragmentWebviewBinding
 import me.ykrank.s1next.view.internal.BackPressDelegate
 import me.ykrank.s1next.viewmodel.WebPageViewModel
 import java.net.CookieManager
+import javax.inject.Inject
 
 /**
  * Local WebView for PC web site and sync OkHttp cookie
  * Created by ykrank on 2017/6/8.
  */
+@AndroidEntryPoint
 class WebViewFragment : BaseFragment(), BackPressDelegate {
     private lateinit var url: String
     private var enableJs: Boolean = false
     private var pcAgent: Boolean = false
 
-    private val mCookieManager: CookieManager = App.preAppComponent.cookieManager
+    @Inject
+    internal lateinit var mCookieManager: CookieManager
 
     private lateinit var binding: FragmentWebviewBinding
 

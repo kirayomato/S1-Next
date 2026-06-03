@@ -1,15 +1,17 @@
 package me.ykrank.s1next.view.dialog.requestdialog
 
 import android.os.Bundle
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.model.wrapper.AccountResultWrapper
+import me.ykrank.s1next.widget.track.TrackAgentProvider
 import me.ykrank.s1next.widget.track.event.NewPmTrackEvent
 
 /**
  * A dialog requests to post pm.
  */
+@AndroidEntryPoint
 class PmRequestDialogFragment : BaseRequestDialogFragment<AccountResultWrapper>() {
 
     override fun getProgressMessage(): CharSequence? {
@@ -43,7 +45,7 @@ class PmRequestDialogFragment : BaseRequestDialogFragment<AccountResultWrapper>(
         private val STATUS_PM_SUCCESS = "do_success"
 
         fun newInstance(toUid: String, msg: String): PmRequestDialogFragment {
-            App.get().trackAgent.post(NewPmTrackEvent())
+            TrackAgentProvider.get().post(NewPmTrackEvent())
 
             val fragment = PmRequestDialogFragment()
             val bundle = Bundle()

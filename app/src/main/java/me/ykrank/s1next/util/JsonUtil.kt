@@ -6,14 +6,20 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.reactivex.SingleTransformer
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import me.ykrank.s1next.App
 
 object JsonUtil {
+    val jsonMapper: ObjectMapper
+        get() = EntryPointAccessors.fromApplication(
+            App.get(),
+            JsonDependenciesEntryPoint::class.java
+        ).jsonMapper
 
     fun <D> jsonSingleTransformer(dClass: Class<D>): SingleTransformer<String, D> {
-        return SingleTransformer { upstream -> upstream.map { App.preAppComponent.jsonMapper.readValue<D>(it, dClass) } }
+        return SingleTransformer { upstream -> upstream.map { jsonMapper.readValue<D>(it, dClass) } }
     }
 
     fun <T> readJsonNode(mapper: ObjectMapper, jsonNode: JsonNode, javaType: JavaType): T {
@@ -31,12 +37,12 @@ object JsonUtil {
 
 suspend inline fun <reified T> String.toJson(): T {
     return withContext(Dispatchers.IO) {
-        App.preAppComponent.jsonMapper.readValue(this@toJson)
+        JsonUtil.jsonMapper.readValue(this@toJson)
     }
 }
 
 suspend inline fun <T> String.toJson(cls: Class<T>): T {
     return withContext(Dispatchers.IO) {
-        App.preAppComponent.jsonMapper.readValue(this@toJson, cls)
+        JsonUtil.jsonMapper.readValue(this@toJson, cls)
     }
 }

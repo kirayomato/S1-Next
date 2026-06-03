@@ -27,6 +27,7 @@ import com.github.ykrank.androidtools.util.*
 import com.github.ykrank.androidtools.widget.EventBus
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
@@ -34,7 +35,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.data.api.model.Thread
@@ -63,27 +63,31 @@ import me.ykrank.s1next.view.page.edit.EditPostActivity
 import me.ykrank.s1next.view.page.post.prefetch.ThreadPrefetchDialogFragment
 import me.ykrank.s1next.widget.track.event.ViewThreadTrackEvent
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 
 /**
  * A Fragment includes [android.support.v4.view.ViewPager]
  * to represent each page of post lists.
  */
+@AndroidEntryPoint
 class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCallback,
     View.OnClickListener {
 
-    private val mEventBus: EventBus = App.preAppComponent.eventBus
+    @Inject
+    internal lateinit var mEventBus: EventBus
 
-    private val mGeneralPreferencesManager: GeneralPreferencesManager =
-        App.preAppComponent.generalPreferencesManager
+    @Inject
+    internal lateinit var mGeneralPreferencesManager: GeneralPreferencesManager
 
-    private val mReadPrefManager: ReadPreferencesManager =
-        App.preAppComponent.readProgressPreferencesManager
+    @Inject
+    internal lateinit var mReadPrefManager: ReadPreferencesManager
 
-    private val mDownloadPrefManager: DownloadPreferencesManager =
-        App.preAppComponent.downloadPreferencesManager
+    @Inject
+    internal lateinit var mDownloadPrefManager: DownloadPreferencesManager
 
-    private val historyBiz: HistoryBiz by lazy { App.appComponent.historyBiz }
+    @Inject
+    internal lateinit var historyBiz: HistoryBiz
 
     private lateinit var mThreadId: String
     private var mThreadTitle: String? = null

@@ -13,10 +13,10 @@ import androidx.lifecycle.lifecycleScope
 import com.github.ykrank.androidtools.util.AudioManagerUtils
 import com.github.ykrank.androidtools.util.OnceClickUtil
 import com.github.ykrank.androidtools.widget.net.WifiBroadcastReceiver
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.model.Thread
 import me.ykrank.s1next.data.api.model.link.ThreadLink
@@ -25,15 +25,17 @@ import me.ykrank.s1next.data.db.dbmodel.ReadProgress
 import me.ykrank.s1next.data.pref.ReadPreferencesManager
 import me.ykrank.s1next.view.activity.BaseActivity
 import me.ykrank.s1next.view.activity.ForumActivity
+import javax.inject.Inject
 
 /**
  * An Activity which includes [android.support.v4.view.ViewPager]
  * to represent each page of post lists.
  */
+@AndroidEntryPoint
 class PostListActivity : BaseActivity(), WifiBroadcastReceiver.NeedMonitorWifi {
 
-    private val mReadPreferences: ReadPreferencesManager =
-        App.preAppComponent.readProgressPreferencesManager
+    @Inject
+    internal lateinit var mReadPreferences: ReadPreferencesManager
 
 
     var fragment: PostListFragment? = null
@@ -170,10 +172,10 @@ class PostListActivity : BaseActivity(), WifiBroadcastReceiver.NeedMonitorWifi {
         fun bindClickStartForView(
             view: View,
             lifecycleOwner: LifecycleOwner,
+            preferencesManager: ReadPreferencesManager,
             threadProvider: () -> Thread?
         ) {
             OnceClickUtil.setClickLister(view, {
-                val preferencesManager = App.preAppComponent.readProgressPreferencesManager
                 if (preferencesManager.isLoadAuto) {
                     lifecycleOwner.lifecycleScope.launch {
                         val thread = threadProvider()

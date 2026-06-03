@@ -1,7 +1,6 @@
 package me.ykrank.s1next.data.db.biz
 
 import androidx.annotation.WorkerThread
-import me.ykrank.s1next.App
 import me.ykrank.s1next.data.db.AppDatabase
 import me.ykrank.s1next.data.db.AppDatabaseManager
 import me.ykrank.s1next.data.db.dbmodel.DbThread
@@ -41,6 +40,6 @@ class ThreadBiz(private val manager: AppDatabaseManager) {
     companion object {
 
         val instance: ThreadBiz
-            get() = App.appComponent.threadBiz
+            get() = bizDependencies().threadBiz
     }
 }

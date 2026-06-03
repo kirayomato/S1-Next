@@ -5,15 +5,19 @@ import androidx.databinding.ObservableField
 import androidx.lifecycle.LifecycleOwner
 import me.ykrank.s1next.data.api.model.Thread
 import me.ykrank.s1next.data.db.dbmodel.History
+import me.ykrank.s1next.data.pref.ReadPreferencesManager
 import me.ykrank.s1next.view.page.post.postlist.PostListActivity.Companion.bindClickStartForView
 
-class HistoryViewModel(private val lifecycleOwner: LifecycleOwner) {
+class HistoryViewModel(
+    private val lifecycleOwner: LifecycleOwner,
+    private val readPreferencesManager: ReadPreferencesManager
+) {
     val history = ObservableField<History>()
 
     fun onBind(): Function1<View, Any> {
         return { v: View ->
             bindClickStartForView(
-                v, lifecycleOwner
+                v, lifecycleOwner, readPreferencesManager
             ) {
                 history.get()?.let {
                     Thread(it)

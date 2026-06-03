@@ -2,7 +2,6 @@ package me.ykrank.s1next.data.db.biz
 
 import android.database.Cursor
 import androidx.annotation.WorkerThread
-import me.ykrank.s1next.App
 import me.ykrank.s1next.data.db.AppDatabase
 import me.ykrank.s1next.data.db.AppDatabaseManager
 import me.ykrank.s1next.data.db.dao.BlackWordDao
@@ -90,6 +89,6 @@ class BlackWordBiz(private val manager: AppDatabaseManager) {
     companion object {
 
         val instance: BlackWordBiz
-            get() = App.appComponent.blackWordBiz
+            get() = bizDependencies().blackWordBiz
     }
 }

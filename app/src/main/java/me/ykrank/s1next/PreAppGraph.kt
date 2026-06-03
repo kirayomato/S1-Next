@@ -39,12 +39,12 @@ import java.net.CookiePolicy
 class PreAppGraph(
     app: App,
     private val prefContext: Context,
-) : PreAppComponent {
-    override val context: Context = app
+) {
+    val context: Context = app
 
-    override val wifi: Wifi by lazy { Wifi() }
+    val wifi: Wifi by lazy { Wifi() }
 
-    override val jsonMapper: ObjectMapper by lazy {
+    val jsonMapper: ObjectMapper by lazy {
         ObjectMapper()
             .configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true)
             .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
@@ -52,19 +52,19 @@ class PreAppGraph(
             .configure(JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION, BuildConfig.DEBUG)
     }
 
-    override val cookieManager: CookieManager by lazy {
+    val cookieManager: CookieManager by lazy {
         CookieManager(PersistentHttpCookieStore(context), CookiePolicy.ACCEPT_ALL)
     }
 
-    override val cookieJar: CookieJar by lazy {
+    val cookieJar: CookieJar by lazy {
         JavaNetCookieJar(cookieManager)
     }
 
-    override val eventBus: EventBus by lazy { EventBus() }
+    val eventBus: EventBus by lazy { EventBus() }
 
-    override val dataTrackAgent: DataTrackAgent by lazy { DataTrackAgent() }
+    val dataTrackAgent: DataTrackAgent by lazy { DataTrackAgent() }
 
-    override val sharedPreferences: SharedPreferences by lazy {
+    val sharedPreferences: SharedPreferences by lazy {
         PreferenceManager.getDefaultSharedPreferences(prefContext)
     }
 
@@ -72,7 +72,7 @@ class PreAppGraph(
         NetworkPreferencesImpl(prefContext, sharedPreferences)
     }
 
-    override val networkPreferencesManager: NetworkPreferencesManager by lazy {
+    val networkPreferencesManager: NetworkPreferencesManager by lazy {
         NetworkPreferencesManager(networkPreferences)
     }
 
@@ -80,11 +80,11 @@ class PreAppGraph(
         GeneralPreferencesImpl(prefContext, sharedPreferences)
     }
 
-    override val generalPreferencesManager: GeneralPreferencesManager by lazy {
+    val generalPreferencesManager: GeneralPreferencesManager by lazy {
         GeneralPreferencesManager(generalPreferences)
     }
 
-    override val themeManager: ThemeManager by lazy {
+    val themeManager: ThemeManager by lazy {
         ThemeManager(prefContext, generalPreferences)
     }
 
@@ -92,7 +92,7 @@ class PreAppGraph(
         DownloadPreferencesImpl(prefContext, sharedPreferences)
     }
 
-    override val downloadPreferencesManager: DownloadPreferencesManager by lazy {
+    val downloadPreferencesManager: DownloadPreferencesManager by lazy {
         DownloadPreferencesManager(downloadPreferences, wifi)
     }
 
@@ -100,7 +100,7 @@ class PreAppGraph(
         ReadPreferencesImpl(prefContext, sharedPreferences, jsonMapper)
     }
 
-    override val readProgressPreferencesManager: ReadPreferencesManager by lazy {
+    val readProgressPreferencesManager: ReadPreferencesManager by lazy {
         ReadPreferencesManager(readPreferences)
     }
 
@@ -108,7 +108,7 @@ class PreAppGraph(
         DataPreferencesImpl(prefContext, sharedPreferences)
     }
 
-    override val dataPreferencesManager: DataPreferencesManager by lazy {
+    val dataPreferencesManager: DataPreferencesManager by lazy {
         DataPreferencesManager(dataPreferences)
     }
 
@@ -116,7 +116,7 @@ class PreAppGraph(
         AppDataPreferencesImpl(prefContext, sharedPreferences)
     }
 
-    override val appDataPreferencesManager: AppDataPreferencesManager by lazy {
+    val appDataPreferencesManager: AppDataPreferencesManager by lazy {
         AppDataPreferencesManager(appDataPreferences)
     }
 }

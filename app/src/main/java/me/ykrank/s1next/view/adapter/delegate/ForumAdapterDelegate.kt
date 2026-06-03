@@ -5,15 +5,16 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import android.view.ViewGroup
 import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewHolder
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.model.Forum
 import me.ykrank.s1next.data.pref.ThemeManager
 import me.ykrank.s1next.databinding.ItemForumBinding
 import me.ykrank.s1next.viewmodel.ForumViewModel
 
-class ForumAdapterDelegate(context: Context) : BaseAdapterDelegate<Forum, SimpleRecycleViewHolder<ItemForumBinding>>(context, Forum::class.java) {
-    private val themeManager: ThemeManager = App.preAppComponent.themeManager
+class ForumAdapterDelegate(
+    context: Context,
+    private val themeManager: ThemeManager
+) : BaseAdapterDelegate<Forum, SimpleRecycleViewHolder<ItemForumBinding>>(context, Forum::class.java) {
 
     public override fun onCreateViewHolder(parent: ViewGroup): androidx.recyclerview.widget.RecyclerView.ViewHolder {
         val binding = DataBindingUtil.inflate<ItemForumBinding>(mLayoutInflater,

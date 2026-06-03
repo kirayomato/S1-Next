@@ -13,6 +13,7 @@ import com.github.ykrank.androidtools.extension.toast
 import com.github.ykrank.androidtools.util.FileUtil
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.RxJavaUtil
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -26,20 +27,24 @@ import me.ykrank.s1next.data.pref.DownloadPreferencesManager
 import me.ykrank.s1next.util.AppFileUtil
 import me.ykrank.s1next.view.page.test.ImageCacheViewFragment
 import java.text.DecimalFormat
+import javax.inject.Inject
 
 /**
  * An Activity includes download settings that allow users
  * to modify download features and behaviors such as cache
  * size and avatars/images download strategy.
  */
+@AndroidEntryPoint
 class DownloadPreferenceFragment : BasePreferenceFragment(), Preference.OnPreferenceClickListener {
 
-    private val mDownloadPreferencesManager: DownloadPreferencesManager =
-        App.preAppComponent.downloadPreferencesManager
+    @Inject
+    internal lateinit var mDownloadPreferencesManager: DownloadPreferencesManager
 
-    private val mCacheBiz: CacheBiz by lazy { App.appComponent.cacheBiz }
+    @Inject
+    internal lateinit var mCacheBiz: CacheBiz
 
-    private val mUser: User by lazy { App.appComponent.user }
+    @Inject
+    internal lateinit var mUser: User
 
     private var disposable: Disposable? = null
 

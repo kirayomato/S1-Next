@@ -8,27 +8,31 @@ import android.view.MenuItem
 import android.view.View
 import com.github.ykrank.androidtools.util.MathUtil
 import com.github.ykrank.androidtools.widget.EventBus
-import me.ykrank.s1next.App
+import dagger.hilt.android.AndroidEntryPoint
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.data.api.model.Forum
 import me.ykrank.s1next.data.pref.GeneralPreferencesManager
 import me.ykrank.s1next.util.IntentUtil
 import me.ykrank.s1next.view.event.PostDisableStickyChangeEvent
+import javax.inject.Inject
 
 /**
  * A Fragment includes [android.support.v4.view.ViewPager]
  * to represent each page of thread lists.
  */
+@AndroidEntryPoint
 class ThreadListFragment : BaseViewPagerFragment(), ThreadListPagerFragment.PagerCallback {
 
     private var mForumName: String? = null
     private var mTypeId: String = "0"
     private lateinit var mForumId: String
 
-    private val mEventBus: EventBus = App.preAppComponent.eventBus
-    private val mGeneralPreferencesManager: GeneralPreferencesManager =
-        App.preAppComponent.generalPreferencesManager
+    @Inject
+    internal lateinit var mEventBus: EventBus
+
+    @Inject
+    internal lateinit var mGeneralPreferencesManager: GeneralPreferencesManager
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

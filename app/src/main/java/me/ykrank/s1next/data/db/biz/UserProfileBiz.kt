@@ -4,7 +4,6 @@ import androidx.annotation.WorkerThread
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.ykrank.androidtools.util.L
-import me.ykrank.s1next.App
 import me.ykrank.s1next.data.api.model.Profile
 import me.ykrank.s1next.data.db.AppDatabase
 import me.ykrank.s1next.data.db.AppDatabaseManager
@@ -161,6 +160,6 @@ class UserProfileBiz(
         private val MANAGER_TYPE = object : TypeReference<List<String>>() {}
 
         val instance: UserProfileBiz
-            get() = App.appComponent.userProfileBiz
+            get() = bizDependencies().userProfileBiz
     }
 }

@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentManager
 import com.github.ykrank.androidtools.util.ContextUtils
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.LooperUtil
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -21,9 +22,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.util.AppFileUtil
+import me.ykrank.s1next.widget.glide.GlideDependenciesEntryPoint
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.Request
 import okhttp3.coroutines.executeAsync
@@ -111,7 +112,10 @@ class AttachmentSpan {
                             onError(e)
                         }
                     ) {
-                        val okHttpClient = App.appComponent.imageOkHttpClient
+                        val okHttpClient = EntryPointAccessors.fromApplication(
+                            context.applicationContext,
+                            GlideDependenciesEntryPoint::class.java
+                        ).imageOkHttpClient
                         val call = okHttpClient.newCall(Request(httpUrl))
                         call.executeAsync().use { resp ->
                             if (!resp.isSuccessful) {

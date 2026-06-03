@@ -4,6 +4,7 @@ import android.content.Context
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.ykrank.androidtools.widget.EditorDiskCache
 import com.github.ykrank.androidtools.widget.EventBus
+import com.github.ykrank.androidtools.widget.track.DataTrackAgent
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -203,8 +204,12 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun providerUserValidator(user: User, autoSignTask: AutoSignTask): UserValidator {
-        return UserValidator(user, autoSignTask)
+    fun providerUserValidator(
+        user: User,
+        autoSignTask: AutoSignTask,
+        dataTrackAgent: DataTrackAgent,
+    ): UserValidator {
+        return UserValidator(user, autoSignTask, dataTrackAgent)
     }
 
     @Provides

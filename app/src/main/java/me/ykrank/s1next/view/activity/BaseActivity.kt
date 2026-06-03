@@ -23,6 +23,7 @@ import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.common.base.Optional
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import me.ykrank.s1next.App
@@ -41,6 +42,9 @@ import me.ykrank.s1next.view.internal.CoordinatorLayoutAnchorDelegateImpl
 import me.ykrank.s1next.view.internal.DrawerLayoutDelegateConcrete
 import me.ykrank.s1next.view.internal.RequestCode
 import me.ykrank.s1next.view.internal.ToolbarDelegate
+import me.ykrank.s1next.task.AutoSignTask
+import me.ykrank.s1next.viewmodel.UserViewModel
+import javax.inject.Inject
 
 /**
  * A base Activity which includes the Toolbar
@@ -51,27 +55,34 @@ import me.ykrank.s1next.view.internal.ToolbarDelegate
 abstract class BaseActivity : LibBaseActivity() {
 
     @JvmField
-    protected val mEventBus: EventBus = App.preAppComponent.eventBus
+    protected val mEventBus: EventBus = baseActivityDependencies().eventBus
 
-    protected val mUser: User by lazy { App.appComponent.user }
+    @Inject
+    internal lateinit var mUser: User
 
     @JvmField
     protected val mGeneralPreferencesManager: GeneralPreferencesManager =
-        App.preAppComponent.generalPreferencesManager
+        baseActivityDependencies().generalPreferencesManager
 
     @JvmField
     protected val mDownloadPreferencesManager: DownloadPreferencesManager =
-        App.preAppComponent.downloadPreferencesManager
+        baseActivityDependencies().downloadPreferencesManager
 
     @JvmField
     protected val mDataPreferencesManager: DataPreferencesManager =
-        App.preAppComponent.dataPreferencesManager
+        baseActivityDependencies().dataPreferencesManager
 
     @JvmField
-    protected val mThemeManager: ThemeManager = App.preAppComponent.themeManager
+    protected val mThemeManager: ThemeManager = baseActivityDependencies().themeManager
 
     @JvmField
-    protected val trackAgent: DataTrackAgent = App.preAppComponent.dataTrackAgent
+    protected val trackAgent: DataTrackAgent = baseActivityDependencies().dataTrackAgent
+
+    @Inject
+    internal lateinit var userViewModel: UserViewModel
+
+    @Inject
+    internal lateinit var autoSignTask: AutoSignTask
 
     private var mToolbarDelegate: ToolbarDelegate? = null
     private var drawerLayoutDelegate: DrawerLayoutDelegateConcrete? = null
@@ -164,7 +175,16 @@ abstract class BaseActivity : LibBaseActivity() {
         val drawerLayout: androidx.drawerlayout.widget.DrawerLayout? = findViewById(R.id.drawer_layout)
         if (drawerLayout != null) {
             val navigationView: NavigationView = findViewById(R.id.navigation_view)
-            drawerLayoutDelegate = DrawerLayoutDelegateConcrete(this, drawerLayout, navigationView)
+            drawerLayoutDelegate = DrawerLayoutDelegateConcrete(
+                this,
+                drawerLayout,
+                navigationView,
+                userViewModel,
+                trackAgent,
+                mThemeManager,
+                mDataPreferencesManager,
+                autoSignTask
+            )
         } else {
             drawerLayoutDelegate = null
         }
@@ -326,4 +346,11 @@ abstract class BaseActivity : LibBaseActivity() {
             activity.setResult(Activity.RESULT_OK, intent)
         }
     }
+}
+
+private fun baseActivityDependencies(): BaseActivityDependenciesEntryPoint {
+    return EntryPointAccessors.fromApplication(
+        App.get(),
+        BaseActivityDependenciesEntryPoint::class.java
+    )
 }

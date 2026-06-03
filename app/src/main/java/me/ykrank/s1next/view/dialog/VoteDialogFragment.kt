@@ -10,10 +10,10 @@ import androidx.lifecycle.lifecycleScope
 import com.github.ykrank.androidtools.extension.toast
 import com.github.ykrank.androidtools.ui.adapter.simple.BindViewHolderCallback
 import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewAdapter
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.S1Service
@@ -25,17 +25,22 @@ import me.ykrank.s1next.databinding.ItemVoteBinding
 import me.ykrank.s1next.databinding.LayoutVoteBinding
 import me.ykrank.s1next.viewmodel.ItemVoteViewModel
 import me.ykrank.s1next.viewmodel.VoteViewModel
+import javax.inject.Inject
 
 
 /**
  * A dialog lets the user vote thread.
  */
+@AndroidEntryPoint
 class VoteDialogFragment : BaseDialogFragment(), VoteViewModel.VoteVmAction {
-    private val appService: AppService by lazy { App.appComponent.appService }
+    @Inject
+    internal lateinit var appService: AppService
 
-    private val s1Service: S1Service by lazy { App.appComponent.s1Service }
+    @Inject
+    internal lateinit var s1Service: S1Service
 
-    private val mUser: User by lazy { App.appComponent.user }
+    @Inject
+    internal lateinit var mUser: User
 
     private lateinit var tid: String
     private lateinit var mVote: Vote

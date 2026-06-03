@@ -19,7 +19,6 @@ import com.github.ykrank.androidtools.widget.AlipayDonate
 import com.github.ykrank.androidtools.widget.track.DataTrackAgent
 import com.github.ykrank.androidtools.widget.track.event.ThemeChangeTrackEvent
 import com.google.android.material.navigation.NavigationView
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.pref.DataPreferencesManager
@@ -49,25 +48,19 @@ import me.ykrank.s1next.viewmodel.UserViewModel
 class DrawerLayoutDelegateConcrete(
     val activity: androidx.fragment.app.FragmentActivity,
     drawerLayout: DrawerLayout,
-    navigationView: NavigationView
+    navigationView: NavigationView,
+    private val mUserViewModel: UserViewModel,
+    private val trackAgent: DataTrackAgent,
+    private val mThemeManager: ThemeManager,
+    private val mDataPreferencesManager: DataPreferencesManager,
+    private val mAutoSignTask: AutoSignTask
 ) : DrawerLayoutDelegate(activity, drawerLayout, navigationView), NavigationView.OnNavigationItemSelectedListener {
 
-    private val mUser: User
-
-    private val mUserViewModel: UserViewModel by lazy { App.appComponent.userViewModel }
-    private val trackAgent: DataTrackAgent = App.preAppComponent.dataTrackAgent
-    private val mThemeManager: ThemeManager = App.preAppComponent.themeManager
-    private val mDataPreferencesManager: DataPreferencesManager =
-        App.preAppComponent.dataPreferencesManager
-    private val mAutoSignTask: AutoSignTask by lazy { App.appComponent.autoSignTask }
+    private val mUser: User = mUserViewModel.user
 
     private lateinit var pmNoticeBinding: ActionViewNoticeCountBinding
     private lateinit var noteNoticeBinding: ActionViewNoticeCountBinding
     private lateinit var binding: NavigationViewHeaderBinding
-
-    init {
-        mUser = mUserViewModel.user
-    }
 
     override fun setupNavDrawerItem(drawerLayout: DrawerLayout, navigationView: NavigationView) {
         setupNavDrawerHeader(drawerLayout, navigationView)
@@ -128,7 +121,7 @@ class DrawerLayoutDelegateConcrete(
                     .to(AndroidRxDispose.withSingle(activity, ActivityEvent.DESTROY))
                     .subscribe({ d ->
                         mUser.isSigned = d.signed
-                        App.get().toast(d.msg, Toast.LENGTH_SHORT)
+                        activity.toast(d.msg, Toast.LENGTH_SHORT)
                     }, { L.report(it) })
             }
         }

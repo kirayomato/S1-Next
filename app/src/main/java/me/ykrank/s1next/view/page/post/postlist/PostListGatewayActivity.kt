@@ -6,7 +6,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
-import me.ykrank.s1next.App
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.EntryPointAccessors
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.model.link.ThreadLink
 import me.ykrank.s1next.data.pref.ThemeManager
@@ -20,11 +21,16 @@ import me.ykrank.s1next.view.dialog.ThreadLinkInvalidPromptDialogFragment
  *
  * This Activity is only used for Intent filter.
  */
+@AndroidEntryPoint
 class PostListGatewayActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // default theme for this Activity is light theme
-        if (App.preAppComponent.themeManager.isDarkTheme) {
+        val themeManager = EntryPointAccessors.fromApplication(
+            applicationContext,
+            PostListGatewayEntryPoint::class.java
+        ).themeManager
+        if (themeManager.isDarkTheme) {
             setTheme(ThemeManager.TRANSLUCENT_THEME_DARK)
         }
 

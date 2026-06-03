@@ -22,10 +22,11 @@ import com.github.ykrank.androidtools.util.RxJavaUtil
 import com.github.ykrank.androidtools.widget.AppBarOffsetChangedListener
 import com.github.ykrank.androidtools.widget.glide.model.ImageInfo
 import com.google.android.material.appbar.AppBarLayout
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.data.api.ProfileProvider
@@ -38,14 +39,17 @@ import me.ykrank.s1next.view.internal.BlacklistMenuAction
 import me.ykrank.s1next.widget.glide.AvatarFailUrlsCache
 import me.ykrank.s1next.widget.image.ImageBiz
 import me.ykrank.s1next.widget.track.event.ViewHomeTrackEvent
+import javax.inject.Inject
 
 /**
  * Created by ykrank on 2017/1/8.
  */
 
+@AndroidEntryPoint
 class UserHomeActivity : BaseActivity() {
 
-    private val profileProvider: ProfileProvider by lazy { App.appComponent.profileProvider }
+    @Inject
+    internal lateinit var profileProvider: ProfileProvider
 
     private lateinit var binding: ActivityHomeBinding
     private var uid: String? = null
@@ -285,9 +289,13 @@ class UserHomeActivity : BaseActivity() {
             uid: String,
             userName: String?
         ) {
+            val user = EntryPointAccessors.fromApplication(
+                activity.applicationContext,
+                UserHomeLauncherEntryPoint::class.java
+            ).user
             if (LoginPromptDialogFragment.showLoginPromptDialogIfNeeded(
                     activity.supportFragmentManager,
-                    App.appComponent.user
+                    user
                 )
             ) {
                 return
@@ -307,9 +315,13 @@ class UserHomeActivity : BaseActivity() {
         ) {
             //Clear avatar false cache
             AvatarFailUrlsCache.removeFailUserAvatarCache(uid)
+            val user = EntryPointAccessors.fromApplication(
+                activity.applicationContext,
+                UserHomeLauncherEntryPoint::class.java
+            ).user
             if (LoginPromptDialogFragment.showLoginPromptDialogIfNeeded(
                     activity.supportFragmentManager,
-                    App.appComponent.user
+                    user
                 )
             ) {
                 return

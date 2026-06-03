@@ -1,17 +1,19 @@
 package me.ykrank.s1next.view.dialog.requestdialog
 
 import android.os.Bundle
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.model.AjaxResult
 import me.ykrank.s1next.data.api.model.RatePreInfo
 import me.ykrank.s1next.view.dialog.ProgressDialogFragment
+import me.ykrank.s1next.widget.track.TrackAgentProvider
 import me.ykrank.s1next.widget.track.event.NewRateTrackEvent
 
 /**
  * A dialog requests to reply to post.
  */
+@AndroidEntryPoint
 class RateRequestDialogFragment : ProgressDialogFragment<AjaxResult>() {
 
     override fun getProgressMessage(): CharSequence? {
@@ -48,7 +50,7 @@ class RateRequestDialogFragment : ProgressDialogFragment<AjaxResult>() {
         private const val ARG_REASON = "reason"
 
         fun newInstance(ratePreInfo: RatePreInfo, score: String, reason: String): RateRequestDialogFragment {
-            App.get().trackAgent.post(NewRateTrackEvent(ratePreInfo.tid, ratePreInfo.pid, score, reason))
+            TrackAgentProvider.get().post(NewRateTrackEvent(ratePreInfo.tid, ratePreInfo.pid, score, reason))
 
             val fragment = RateRequestDialogFragment()
             val bundle = Bundle()

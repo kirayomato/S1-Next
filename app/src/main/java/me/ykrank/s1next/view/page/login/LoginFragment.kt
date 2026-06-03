@@ -1,9 +1,12 @@
 package me.ykrank.s1next.view.page.login
 
+import dagger.hilt.android.AndroidEntryPoint
+
 
 /**
  * A Fragment offers login via username and password.
  */
+@AndroidEntryPoint
 class LoginFragment : BaseLoginFragment() {
     override fun showLoginDialog(
         username: String,

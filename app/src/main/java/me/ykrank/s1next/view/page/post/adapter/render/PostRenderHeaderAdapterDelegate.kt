@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewHolder
 import com.github.ykrank.androidtools.widget.EventBus
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.binding.TextViewBindingAdapter
 import me.ykrank.s1next.data.User
@@ -25,17 +24,15 @@ import me.ykrank.s1next.view.page.post.viewmodel.PostViewModel
 class PostRenderHeaderAdapterDelegate(
     private val fragment: Fragment,
     context: Context,
-    private val postShareSelectionOwner: PostShareSelectionOwner? = null
+    private val postShareSelectionOwner: PostShareSelectionOwner? = null,
+    private val eventBus: EventBus,
+    private val user: User,
+    private val generalPreferencesManager: GeneralPreferencesManager
 ) :
     BaseAdapterDelegate<PostRenderItem.Header, SimpleRecycleViewHolder<ItemPostRenderHeaderBinding>>(
         context,
         PostRenderItem.Header::class.java
     ) {
-    private val eventBus: EventBus = App.preAppComponent.eventBus
-    private val user: User by lazy { App.appComponent.user }
-    private val generalPreferencesManager: GeneralPreferencesManager =
-        App.preAppComponent.generalPreferencesManager
-
     private var threadInfo: Thread? = null
     private var pageNum: Int = 1
     private val authorProfiles = mutableMapOf<String, Profile>()

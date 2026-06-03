@@ -4,19 +4,26 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import me.ykrank.s1next.App
+import com.github.ykrank.androidtools.widget.EventBus
+import dagger.hilt.android.AndroidEntryPoint
 import me.ykrank.s1next.databinding.FragmentEmotionBinding
 import me.ykrank.s1next.view.fragment.BaseFragment
 import me.ykrank.s1next.view.page.post.postedit.toolstab.emoticon.adapter.EmoticonPagerAdapter
 import me.ykrank.s1next.widget.EmoticonFactory
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class EmotionFragment : BaseFragment() {
 
     private lateinit var binding: FragmentEmotionBinding
 
     protected lateinit var mEmoticonKeyboard: View
 
-    private val mEmoticonFactory: EmoticonFactory by lazy { App.appComponent.emoticonFactory }
+    @Inject
+    internal lateinit var mEmoticonFactory: EmoticonFactory
+
+    @Inject
+    internal lateinit var mEventBus: EventBus
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentEmotionBinding.inflate(inflater, container, false)
@@ -31,7 +38,7 @@ class EmotionFragment : BaseFragment() {
         val viewPager = binding.emoticonKeyboardPager
         viewPager.adapter =
             EmoticonPagerAdapter(
-                requireActivity(), mEmoticonFactory
+                requireActivity(), mEmoticonFactory, mEventBus
             )
 
         val tabLayout = binding.emoticonKeyboardTabLayout

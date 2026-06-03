@@ -6,8 +6,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
+import com.github.ykrank.androidtools.widget.EventBus
 import me.ykrank.s1next.R
 import me.ykrank.s1next.binding.TextViewBindingAdapter
+import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.model.Thread
 import me.ykrank.s1next.view.adapter.delegate.BaseAdapterDelegate
 import me.ykrank.s1next.view.page.post.render.PostActionMenuPopup
@@ -21,7 +23,9 @@ import me.ykrank.s1next.widget.span.PostMovementMethod
 class PostRenderFallbackAdapterDelegate(
     private val fragment: Fragment,
     context: Context,
-    private val postShareSelectionOwner: PostShareSelectionOwner? = null
+    private val postShareSelectionOwner: PostShareSelectionOwner? = null,
+    private val eventBus: EventBus,
+    private val user: User
 ) :
     BaseAdapterDelegate<PostRenderItem.FallbackHtmlBlock, PostRenderFallbackAdapterDelegate.ViewHolder>(
         context,
@@ -73,7 +77,7 @@ class PostRenderFallbackAdapterDelegate(
             holder.text.setOnLongClickListener(null)
         } else {
             val longClickListener = View.OnLongClickListener {
-                PostRenderActions.showPostActionMenu(it, fragment, threadInfo, pageNum, t.post)
+                PostRenderActions.showPostActionMenu(it, fragment, eventBus, user, threadInfo, pageNum, t.post)
             }
             val touchListener = View.OnTouchListener { view, event ->
                 PostActionMenuPopup.recordTouchPoint(view, event)

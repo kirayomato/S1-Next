@@ -5,6 +5,8 @@ import androidx.lifecycle.LifecycleOwner
 
 import com.github.ykrank.androidtools.ui.adapter.delegate.FooterProgressAdapterDelegate
 
+import com.github.ykrank.androidtools.widget.EventBus
+import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.app.model.AppThread
 import me.ykrank.s1next.view.adapter.delegate.AppPostAdapterDelegate
 
@@ -16,10 +18,13 @@ import me.ykrank.s1next.view.adapter.delegate.AppPostAdapterDelegate
 class AppPostListRecyclerViewAdapter(
     activity: Activity,
     lifecycleOwner: LifecycleOwner,
-    quotePid: String?
+    quotePid: String?,
+    eventBus: EventBus,
+    user: User
 ) : BaseRecyclerViewAdapter(activity, true) {
 
-    private val postAdapterDelegate: AppPostAdapterDelegate = AppPostAdapterDelegate(activity, lifecycleOwner, quotePid)
+    private val postAdapterDelegate: AppPostAdapterDelegate =
+        AppPostAdapterDelegate(activity, lifecycleOwner, quotePid, eventBus, user)
 
     init {
         addAdapterDelegate(postAdapterDelegate)

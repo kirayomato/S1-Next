@@ -4,10 +4,10 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.lifecycleScope
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.ykrank.s1next.App
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.S1Service
 import me.ykrank.s1next.data.api.model.WebBlackListInfo
@@ -15,17 +15,22 @@ import me.ykrank.s1next.data.api.runApiCatching
 import me.ykrank.s1next.data.api.toastError
 import me.ykrank.s1next.data.db.biz.BlackListBiz
 import me.ykrank.s1next.data.db.dbmodel.BlackList
+import javax.inject.Inject
 
 
 /**
  * A dialog lets user load website blacklist.
  */
+@AndroidEntryPoint
 class LoadBlackListFromWebDialogFragment : BaseLoadProgressDialogFragment() {
-    private val s1Service: S1Service by lazy { App.appComponent.s1Service }
+    @Inject
+    internal lateinit var s1Service: S1Service
 
-    private val mUser: User by lazy { App.appComponent.user }
+    @Inject
+    internal lateinit var mUser: User
 
-    private val blackListBiz: BlackListBiz by lazy { App.appComponent.blackListBiz }
+    @Inject
+    internal lateinit var blackListBiz: BlackListBiz
 
     private var callBack: (() -> Unit)? = null
 

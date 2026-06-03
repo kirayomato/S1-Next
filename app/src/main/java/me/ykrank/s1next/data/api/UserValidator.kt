@@ -2,7 +2,7 @@ package me.ykrank.s1next.data.api
 
 import android.text.TextUtils
 import com.github.ykrank.androidtools.util.L
-import me.ykrank.s1next.App.Companion.get
+import com.github.ykrank.androidtools.widget.track.DataTrackAgent
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.app.model.AppLoginResult
 import me.ykrank.s1next.data.api.app.model.AppUserInfo
@@ -11,7 +11,11 @@ import me.ykrank.s1next.data.api.model.wrapper.BaseDataWrapper
 import me.ykrank.s1next.data.api.model.wrapper.BaseResultWrapper
 import me.ykrank.s1next.task.AutoSignTask
 
-class UserValidator(private val mUser: User, private val mAutoSignTask: AutoSignTask) {
+class UserValidator(
+    private val mUser: User,
+    private val mAutoSignTask: AutoSignTask,
+    private val dataTrackAgent: DataTrackAgent,
+) {
     /**
      * Intercepts the data in order to check whether current user's login status
      * has changed and update user's status if needed.
@@ -62,7 +66,7 @@ class UserValidator(private val mUser: User, private val mAutoSignTask: AutoSign
                 mAutoSignTask.silentCheck()
             }
         }
-        get().trackAgent.setUser(mUser)
+        dataTrackAgent.setUser(mUser)
     }
 
     /**

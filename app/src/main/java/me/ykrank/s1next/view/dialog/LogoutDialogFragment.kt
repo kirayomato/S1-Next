@@ -7,24 +7,30 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.FragmentActivity
 import com.github.ykrank.androidtools.util.WebViewUtils.clearWebViewCookies
 import com.github.ykrank.androidtools.widget.EventBus
+import dagger.hilt.android.AndroidEntryPoint
 import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.view.event.LoginEvent
 import me.ykrank.s1next.viewmodel.UserViewModel
 import java.net.CookieManager
+import javax.inject.Inject
 
 /**
  * A dialog shows logout prompt.
  * Logs out if user clicks the logout button.
  */
+@AndroidEntryPoint
 class LogoutDialogFragment : BaseDialogFragment() {
 
-    private val mCookieManager: CookieManager = App.preAppComponent.cookieManager
+    @Inject
+    internal lateinit var mCookieManager: CookieManager
 
-    private val mUser: UserViewModel by lazy { App.appComponent.userViewModel }
+    @Inject
+    internal lateinit var mUser: UserViewModel
 
-    private val mEventBus: EventBus = App.preAppComponent.eventBus
+    @Inject
+    internal lateinit var mEventBus: EventBus
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return AlertDialog.Builder(requireContext())

@@ -6,16 +6,17 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
 import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewHolder
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.model.Pm
 import me.ykrank.s1next.databinding.ItemPmRightBinding
 import me.ykrank.s1next.viewmodel.PmViewModel
 
-class PmRightAdapterDelegate(context: Context, private val lifecycleOwner: LifecycleOwner) : BaseAdapterDelegate<Pm, SimpleRecycleViewHolder<ItemPmRightBinding>>(context, Pm::class.java) {
-
-    private val user: User by lazy { App.appComponent.user }
+class PmRightAdapterDelegate(
+    context: Context,
+    private val lifecycleOwner: LifecycleOwner,
+    private val user: User
+) : BaseAdapterDelegate<Pm, SimpleRecycleViewHolder<ItemPmRightBinding>>(context, Pm::class.java) {
 
     override fun isForViewType(items: MutableList<Any>, position: Int): Boolean {
         val item = items[position]

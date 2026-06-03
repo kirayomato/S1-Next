@@ -12,12 +12,12 @@ import com.github.ykrank.androidtools.util.RxJavaUtil
 import com.github.ykrank.androidtools.widget.EventBus
 import com.github.ykrank.androidtools.widget.track.DataTrackAgent
 import com.github.ykrank.androidtools.widget.track.event.ThemeChangeTrackEvent
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
 import io.reactivex.functions.Consumer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.pref.GeneralPreferencesManager
 import me.ykrank.s1next.data.pref.ThemeManager
@@ -29,22 +29,27 @@ import me.ykrank.s1next.view.event.ThemeChangeEvent
 import me.ykrank.s1next.view.page.setting.SettingsActivity
 import me.ykrank.s1next.widget.span.HtmlCompat
 import me.ykrank.s1next.widget.span.HtmlCompat.FROM_HTML_MODE_LEGACY
+import javax.inject.Inject
 
 /**
  * An Activity includes general settings that allow users
  * to modify general features and behaviors such as theme
  * and font size.
  */
+@AndroidEntryPoint
 class GeneralPreferenceFragment : BasePreferenceFragment(), Preference.OnPreferenceClickListener {
 
-    private val mEventBus: EventBus = App.preAppComponent.eventBus
+    @Inject
+    internal lateinit var mEventBus: EventBus
 
-    private val mGeneralPreferencesManager: GeneralPreferencesManager =
-        App.preAppComponent.generalPreferencesManager
+    @Inject
+    internal lateinit var mGeneralPreferencesManager: GeneralPreferencesManager
 
-    private val mThemeManager: ThemeManager = App.preAppComponent.themeManager
+    @Inject
+    internal lateinit var mThemeManager: ThemeManager
 
-    private val trackAgent: DataTrackAgent = App.preAppComponent.dataTrackAgent
+    @Inject
+    internal lateinit var trackAgent: DataTrackAgent
 
     override fun onCreatePreferences(bundle: Bundle?, s: String?) {
         addPreferencesFromResource(R.xml.preference_general)

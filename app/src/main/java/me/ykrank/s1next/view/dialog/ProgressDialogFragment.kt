@@ -2,8 +2,6 @@ package me.ykrank.s1next.view.dialog
 
 import android.app.Activity
 import android.app.ProgressDialog
-import android.os.Bundle
-import androidx.annotation.CallSuper
 import com.google.android.material.snackbar.Snackbar
 import androidx.fragment.app.DialogFragment
 import android.widget.Toast
@@ -16,6 +14,7 @@ import me.ykrank.s1next.data.api.S1Service
 import me.ykrank.s1next.data.api.UserValidator
 import me.ykrank.s1next.view.activity.BaseActivity
 import me.ykrank.s1next.view.fragment.BaseRecyclerViewFragment
+import javax.inject.Inject
 
 /**
  * A dialog shows [ProgressDialog].
@@ -28,20 +27,14 @@ import me.ykrank.s1next.view.fragment.BaseRecyclerViewFragment
  * @param <D> The data we want to request.
 </D> */
 abstract class ProgressDialogFragment<D> : LibProgressDialogFragment<D>() {
+    @Inject
     internal lateinit var mS1Service: S1Service
+
+    @Inject
     internal lateinit var mUserValidator: UserValidator
+
+    @Inject
     internal lateinit var mUser: User
-
-    private var dialogNotCancelableOnTouchOutside: Boolean = false
-
-    @CallSuper
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val appComponent = App.appComponent
-        mS1Service = appComponent.s1Service
-        mUser = appComponent.user
-        mUserValidator = appComponent.userValidator
-    }
 
     /**
      * @see BaseRecyclerViewFragment.getSourceObservable

@@ -18,17 +18,18 @@ import android.widget.ImageButton
 import android.widget.SearchView
 import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
+import com.fasterxml.jackson.databind.ObjectMapper
 import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.ykrank.androidtools.util.ImeUtils
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.model.Post
 import me.ykrank.s1next.data.api.model.Thread
@@ -42,8 +43,16 @@ import me.ykrank.s1next.widget.CollapsibleInfoBar
 import org.jsoup.Jsoup
 import kotlin.math.max
 import kotlin.math.min
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class PostPageSearchActivity : BaseActivity() {
+
+    @Inject
+    internal lateinit var cacheBiz: CacheBiz
+
+    @Inject
+    internal lateinit var objectMapper: ObjectMapper
 
     private lateinit var searchView: SearchView
     private lateinit var recyclerView: RecyclerView
@@ -227,7 +236,6 @@ class PostPageSearchActivity : BaseActivity() {
 
         val threadId = payload.threadId ?: payload.thread?.id ?: return SearchPages(listOf(currentPage), 1)
         val totalPages = max(payload.totalPages, payload.currentPageNum).coerceAtLeast(1)
-        val cacheBiz = App.appComponent.cacheBiz
         val pages = linkedMapOf(payload.currentPageNum to currentPage)
         payload.memoryPages.forEach { snapshot ->
             if (snapshot.posts.isNotEmpty()) {
@@ -266,14 +274,14 @@ class PostPageSearchActivity : BaseActivity() {
         )
         val keyedCache = groupedCache ?: cacheBiz.getTextZipByKey(
             ApiCacheFlow.getKey(
-                App.appComponent.user.uid,
+                mUser.uid,
                 ApiCacheConstants.CacheType.Posts,
                 listOf(threadId, pageNum)
             )
         )
         val json = keyedCache?.decodeZipString ?: return null
         return runCatching {
-            App.preAppComponent.jsonMapper.readValue(json, PostsWrapper::class.java)
+            objectMapper.readValue(json, PostsWrapper::class.java)
         }.getOrNull()
     }
 

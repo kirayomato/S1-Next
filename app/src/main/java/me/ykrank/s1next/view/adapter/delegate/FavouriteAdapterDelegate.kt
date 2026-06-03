@@ -7,27 +7,27 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewHolder
 import com.github.ykrank.androidtools.widget.EventBus
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.model.Favourite
+import me.ykrank.s1next.data.pref.ReadPreferencesManager
 import me.ykrank.s1next.databinding.ItemFavouriteBinding
 import me.ykrank.s1next.viewmodel.FavouriteViewModel
 
 class FavouriteAdapterDelegate(
     context: Context,
-    private val lifecycleOwner: LifecycleOwner
+    private val lifecycleOwner: LifecycleOwner,
+    private val mEventBus: EventBus,
+    private val readPreferencesManager: ReadPreferencesManager
 ) :
     BaseAdapterDelegate<Favourite, SimpleRecycleViewHolder<ItemFavouriteBinding>>(
         context,
         Favourite::class.java
     ) {
 
-    private val mEventBus: EventBus = App.preAppComponent.eventBus
-
     public override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
         val binding = DataBindingUtil.inflate<ItemFavouriteBinding>(mLayoutInflater,
                 R.layout.item_favourite, parent, false)
-        binding.model = FavouriteViewModel(lifecycleOwner)
+        binding.model = FavouriteViewModel(lifecycleOwner, readPreferencesManager)
         binding.rxBus = mEventBus
         return SimpleRecycleViewHolder(binding)
     }

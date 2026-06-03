@@ -2,11 +2,16 @@ package me.ykrank.s1next.view.page.post.adapter.render
 
 import android.content.Context
 import androidx.fragment.app.Fragment
+import com.github.ykrank.androidtools.widget.EventBus
+import me.ykrank.s1next.data.User
+import me.ykrank.s1next.data.api.ApiCacheProvider
 import me.ykrank.s1next.data.api.model.Post
 import me.ykrank.s1next.data.api.model.Profile
 import me.ykrank.s1next.data.api.model.Rate
 import me.ykrank.s1next.data.api.model.Thread
 import me.ykrank.s1next.data.api.model.Vote
+import me.ykrank.s1next.data.pref.DownloadPreferencesManager
+import me.ykrank.s1next.data.pref.GeneralPreferencesManager
 import me.ykrank.s1next.view.adapter.BaseRecyclerViewAdapter
 import me.ykrank.s1next.view.page.post.adapter.PostBlackAdapterDelegate
 import me.ykrank.s1next.view.page.post.render.PostRenderIndex
@@ -20,14 +25,23 @@ class HybridPostListRecyclerViewAdapter(
     fragment: Fragment,
     context: Context,
     postShareSelectionOwner: PostShareSelectionOwner? = null,
+    eventBus: EventBus,
+    user: User,
+    apiCacheProvider: ApiCacheProvider,
+    generalPreferencesManager: GeneralPreferencesManager,
+    downloadPreferencesManager: DownloadPreferencesManager,
 ) : BaseRecyclerViewAdapter(context, true) {
     private val mapper = PostRenderMapper()
-    private val headerDelegate = PostRenderHeaderAdapterDelegate(fragment, context, postShareSelectionOwner)
-    private val textDelegate = PostRenderTextAdapterDelegate(fragment, context, postShareSelectionOwner)
-    private val imageDelegate = PostRenderImageAdapterDelegate(fragment, context, postShareSelectionOwner) { imageUrls }
-    private val fallbackDelegate = PostRenderFallbackAdapterDelegate(fragment, context, postShareSelectionOwner)
-    private val footerDelegate = PostRenderFooterAdapterDelegate(fragment, context, postShareSelectionOwner)
-    private val postBlackAdapterDelegate = PostBlackAdapterDelegate(fragment, context)
+    private val headerDelegate =
+        PostRenderHeaderAdapterDelegate(fragment, context, postShareSelectionOwner, eventBus, user, generalPreferencesManager)
+    private val textDelegate = PostRenderTextAdapterDelegate(fragment, context, postShareSelectionOwner, eventBus, user)
+    private val imageDelegate =
+        PostRenderImageAdapterDelegate(fragment, context, postShareSelectionOwner, { imageUrls }, downloadPreferencesManager, eventBus, user)
+    private val fallbackDelegate = PostRenderFallbackAdapterDelegate(fragment, context, postShareSelectionOwner, eventBus, user)
+    private val footerDelegate =
+        PostRenderFooterAdapterDelegate(fragment, context, postShareSelectionOwner, eventBus, user, apiCacheProvider, generalPreferencesManager)
+    private val postBlackAdapterDelegate =
+        PostBlackAdapterDelegate(fragment, context, eventBus, generalPreferencesManager)
 
     var renderIndex: PostRenderIndex = PostRenderIndex.EMPTY
         private set

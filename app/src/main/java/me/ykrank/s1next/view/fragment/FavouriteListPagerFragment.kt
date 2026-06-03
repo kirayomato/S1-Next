@@ -9,7 +9,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
 import me.ykrank.s1next.data.api.model.collection.Favourites
 import me.ykrank.s1next.data.api.model.wrapper.BaseResultWrapper
+import me.ykrank.s1next.data.pref.ReadPreferencesManager
 import me.ykrank.s1next.view.adapter.FavouriteRecyclerViewAdapter
+import javax.inject.Inject
 
 /**
  * A Fragment representing one of the pages of favourites.
@@ -23,6 +25,9 @@ class FavouriteListPagerFragment : BaseRecyclerViewFragment<BaseResultWrapper<Fa
     private var mPageNum: Int = 0
 
     private lateinit var mRecyclerAdapter: FavouriteRecyclerViewAdapter
+
+    @Inject
+    internal lateinit var readPreferencesManager: ReadPreferencesManager
 
     private var mPagerCallback: PagerCallback? = null
 
@@ -39,7 +44,12 @@ class FavouriteListPagerFragment : BaseRecyclerViewFragment<BaseResultWrapper<Fa
 
         val recyclerView = recyclerView
         recyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
-        mRecyclerAdapter = FavouriteRecyclerViewAdapter(requireActivity(), viewLifecycleOwner)
+        mRecyclerAdapter = FavouriteRecyclerViewAdapter(
+            requireActivity(),
+            viewLifecycleOwner,
+            mEventBus,
+            readPreferencesManager
+        )
         recyclerView.adapter = mRecyclerAdapter
     }
 

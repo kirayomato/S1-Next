@@ -16,11 +16,18 @@ import android.view.WindowManager
 import android.widget.FrameLayout
 import androidx.lifecycle.lifecycleScope
 import com.github.ykrank.androidtools.util.L
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import me.ykrank.s1next.R
+import me.ykrank.s1next.data.pref.DownloadPreferencesManager
 import me.ykrank.s1next.view.dialog.BaseDialogFragment
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class PostSharePreviewDialogFragment : BaseDialogFragment() {
+
+    @Inject
+    internal lateinit var downloadPreferencesManager: DownloadPreferencesManager
 
     private var request: PostShareRequest? = null
     private var shareCardView: View? = null
@@ -29,7 +36,7 @@ class PostSharePreviewDialogFragment : BaseDialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val context = requireContext()
-        renderer = PostShareCardRenderer(context)
+        renderer = PostShareCardRenderer(context, downloadPreferencesManager)
         val request = readRequest()
         this.request = request
         val root = layoutInflater.inflate(R.layout.dialog_post_share_preview, null, false)

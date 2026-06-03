@@ -17,11 +17,13 @@ import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.data.api.model.collection.ForumGroups
 import me.ykrank.s1next.data.api.model.wrapper.ForumGroupsWrapper
+import me.ykrank.s1next.data.pref.ThemeManager
 import me.ykrank.s1next.util.IntentUtil
 import me.ykrank.s1next.view.activity.SearchActivity
 import me.ykrank.s1next.view.adapter.ForumRecyclerViewAdapter
 import me.ykrank.s1next.view.event.LoginEvent
 import me.ykrank.s1next.view.internal.ToolbarDropDownInterface
+import javax.inject.Inject
 
 /**
  * A Fragment represents forum list.
@@ -31,6 +33,9 @@ class ForumFragment : BaseRecyclerViewFragment<ForumGroupsWrapper>(),
     ToolbarDropDownInterface.OnItemSelectedListener {
     private lateinit var mRecyclerAdapter: ForumRecyclerViewAdapter
     private var mForumGroups: ForumGroups? = null
+
+    @Inject
+    internal lateinit var themeManager: ThemeManager
 
     private var mToolbarCallback: ToolbarDropDownInterface.Callback? = null
 
@@ -48,7 +53,7 @@ class ForumFragment : BaseRecyclerViewFragment<ForumGroupsWrapper>(),
 
         val recyclerView = recyclerView
         recyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
-        mRecyclerAdapter = ForumRecyclerViewAdapter(activity)
+        mRecyclerAdapter = ForumRecyclerViewAdapter(requireActivity(), themeManager)
         recyclerView.adapter = mRecyclerAdapter
 
         lifecycleScope.launch {
@@ -79,7 +84,7 @@ class ForumFragment : BaseRecyclerViewFragment<ForumGroupsWrapper>(),
 
             R.id.app_bar_search -> {
                 val activity = requireActivity()
-                SearchActivity.start(activity, activity.findViewById(R.id.app_bar_search))
+                SearchActivity.start(activity, activity.findViewById(R.id.app_bar_search), mUser)
                 true
             }
 

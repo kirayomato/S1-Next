@@ -14,7 +14,6 @@ import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewHolder
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.widget.EventBus
 import kotlinx.coroutines.launch
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.ApiCacheProvider
@@ -34,18 +33,16 @@ import me.ykrank.s1next.view.page.post.viewmodel.PostViewModel
 class PostRenderFooterAdapterDelegate(
     private val fragment: Fragment,
     context: Context,
-    private val postShareSelectionOwner: PostShareSelectionOwner? = null
+    private val postShareSelectionOwner: PostShareSelectionOwner? = null,
+    private val eventBus: EventBus,
+    private val user: User,
+    private val apiCache: ApiCacheProvider,
+    private val generalPreferencesManager: GeneralPreferencesManager
 ) :
     BaseAdapterDelegate<PostRenderItem.Footer, SimpleRecycleViewHolder<ItemPostRenderFooterBinding>>(
         context,
         PostRenderItem.Footer::class.java
     ) {
-    private val eventBus: EventBus = App.preAppComponent.eventBus
-    private val user: User by lazy { App.appComponent.user }
-    private val apiCache: ApiCacheProvider by lazy { App.appComponent.apiCacheProvider }
-    private val generalPreferencesManager: GeneralPreferencesManager =
-        App.preAppComponent.generalPreferencesManager
-
     private var threadInfo: Thread? = null
     private var voteInfo: Vote? = null
     private var pageNum: Int = 1

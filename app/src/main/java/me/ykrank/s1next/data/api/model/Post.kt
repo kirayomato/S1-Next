@@ -12,7 +12,6 @@ import com.github.ykrank.androidtools.ui.adapter.StableIdModel
 import com.github.ykrank.androidtools.ui.adapter.model.DiffSameItem
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.MathUtil
-import me.ykrank.s1next.App
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.data.api.business.PostFilter
 import me.ykrank.s1next.util.HtmlUtils
@@ -101,7 +100,7 @@ class Post : PaperParcelable, Cloneable, DiffSameItem, StableIdModel {
         this.isFirst = "1" == first
         var tReply = filterReply(reply)
         if (attachments != null && attachments.isObject) {
-            val attachmentMap = App.preAppComponent.jsonMapper.let {
+            val attachmentMap = JsonUtil.jsonMapper.let {
                 JsonUtil.readJsonNode(
                     it,
                     attachments,

@@ -8,21 +8,26 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.github.ykrank.androidtools.widget.EventBus;
 
-import me.ykrank.s1next.App;
+import dagger.hilt.android.AndroidEntryPoint;
 import me.ykrank.s1next.R;
 import me.ykrank.s1next.data.pref.ThemeManager;
 import me.ykrank.s1next.view.event.ThemeChangeEvent;
 
+import javax.inject.Inject;
+
 /**
  * A dialog which used to change theme.
  */
+@AndroidEntryPoint
 public final class ThemeChangeDialogFragment extends BaseDialogFragment {
 
     private static final String TAG = ThemeChangeDialogFragment.class.getName();
 
-    private final EventBus mEventBus = App.Companion.getPreAppComponent().getEventBus();
+    @Inject
+    EventBus mEventBus;
 
-    private final ThemeManager mThemeManager = App.Companion.getPreAppComponent().getThemeManager();
+    @Inject
+    ThemeManager mThemeManager;
 
     public static void showThemeChangeDialog(FragmentActivity fragmentActivity) {
         new ThemeChangeDialogFragment().show(fragmentActivity.getSupportFragmentManager(),

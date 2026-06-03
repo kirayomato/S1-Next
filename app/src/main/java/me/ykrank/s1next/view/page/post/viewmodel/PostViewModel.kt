@@ -21,6 +21,7 @@ import me.ykrank.s1next.data.api.model.Vote
 import me.ykrank.s1next.view.activity.UserHomeActivity
 import me.ykrank.s1next.view.activity.WebViewActivity
 import me.ykrank.s1next.view.event.EditPostEvent
+import me.ykrank.s1next.view.event.EnterPostShareSelectionEvent
 import me.ykrank.s1next.view.event.QuoteEvent
 import me.ykrank.s1next.view.event.RateEvent
 import me.ykrank.s1next.view.event.ReportEvent
@@ -119,6 +120,12 @@ class PostViewModel(
             onRate = { onRateClick(v) },
             onEdit = { onEditClick(v) },
             onReport = { onReportClick(v) },
+            onShare = {
+                val threadData = thread.get()
+                eventBus.postDefault(
+                    EnterPostShareSelectionEvent(threadData?.id, pageNum.get(), postData.id)
+                )
+            },
         )
     }
 

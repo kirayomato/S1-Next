@@ -1,6 +1,7 @@
 package me.ykrank.s1next.view.dialog.requestdialog
 
 import android.os.Bundle
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
 import me.ykrank.s1next.BuildConfig
 import me.ykrank.s1next.R
@@ -11,6 +12,7 @@ import me.ykrank.s1next.widget.uploadimg.ForumAttachmentPostSubmitHelper
 /**
  * A dialog requests to reply to post.
  */
+@AndroidEntryPoint
 class EditPostRequestDialogFragment : BaseRequestDialogFragment<PostSubmitResult>() {
 
     override fun getProgressMessage(): CharSequence? {

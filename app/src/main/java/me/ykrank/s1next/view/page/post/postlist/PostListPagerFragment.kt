@@ -34,7 +34,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.ProfileProvider
 import me.ykrank.s1next.data.api.model.Post
@@ -44,6 +43,7 @@ import me.ykrank.s1next.data.api.model.collection.Posts
 import me.ykrank.s1next.data.api.model.wrapper.PostsWrapper
 import me.ykrank.s1next.data.db.biz.ReadProgressBiz
 import me.ykrank.s1next.data.db.dbmodel.ReadProgress
+import me.ykrank.s1next.data.pref.DownloadPreferencesManager
 import me.ykrank.s1next.data.pref.GeneralPreferencesManager
 import me.ykrank.s1next.data.pref.ReadPreferencesManager
 import me.ykrank.s1next.databinding.FragmentBaseWithQuickSideBarBinding
@@ -63,6 +63,7 @@ import me.ykrank.s1next.view.page.post.share.PostShareSelectionPayload
 import me.ykrank.s1next.view.page.post.share.PostShareSelectionOwner
 import me.ykrank.s1next.view.page.post.share.PostShareSelectionState
 import java.util.*
+import javax.inject.Inject
 
 /**
  * A Fragment representing one of the pages of posts.
@@ -75,15 +76,20 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
     OnQuickSideBarTouchListener,
     PostShareSelectionOwner {
 
-    private val mGeneralPreferencesManager: GeneralPreferencesManager =
-        App.preAppComponent.generalPreferencesManager
+    @Inject
+    internal lateinit var mGeneralPreferencesManager: GeneralPreferencesManager
 
-    private val mReadPreferencesManager: ReadPreferencesManager =
-        App.preAppComponent.readProgressPreferencesManager
+    @Inject
+    internal lateinit var mReadPreferencesManager: ReadPreferencesManager
 
-    private val objectMapper: ObjectMapper = App.preAppComponent.jsonMapper
+    @Inject
+    internal lateinit var objectMapper: ObjectMapper
 
-    private val profileProvider: ProfileProvider by lazy { App.appComponent.profileProvider }
+    @Inject
+    internal lateinit var profileProvider: ProfileProvider
+
+    @Inject
+    internal lateinit var downloadPreferencesManager: DownloadPreferencesManager
 
     private var mThreadId: String? = null
     private var mPageNum: Int = 0
@@ -174,9 +180,26 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
         )
         mRecyclerView.addItemDecoration(searchHighlightDecoration)
         mRecyclerAdapter = if (mReadPreferencesManager.hybridPostRender) {
-            HybridPostListRecyclerViewAdapter(this, requireContext(), this)
+            HybridPostListRecyclerViewAdapter(
+                this,
+                requireContext(),
+                this,
+                mEventBus,
+                mUser,
+                apiCacheProvider,
+                mGeneralPreferencesManager,
+                downloadPreferencesManager
+            )
         } else {
-            PostListRecyclerViewAdapter(this, requireContext(), this)
+            PostListRecyclerViewAdapter(
+                this,
+                requireContext(),
+                this,
+                mEventBus,
+                mUser,
+                apiCacheProvider,
+                mGeneralPreferencesManager
+            )
         }
         mRecyclerView.adapter = mRecyclerAdapter
 

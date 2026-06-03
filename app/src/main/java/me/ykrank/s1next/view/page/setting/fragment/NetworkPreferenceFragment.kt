@@ -9,19 +9,24 @@ import androidx.preference.Preference
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.widget.hostcheck.BaseDns
 import com.github.ykrank.androidtools.widget.hostcheck.BaseHostUrl
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.data.pref.NetworkPreferencesManager
 import me.ykrank.s1next.widget.hostcheck.AppHostUrl
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class NetworkPreferenceFragment : BasePreferenceFragment() {
 
-    private val mPreferencesManager: NetworkPreferencesManager = App.preAppComponent.networkPreferencesManager
-    private val baseHostUrl: AppHostUrl by lazy { App.appComponent.baseHostUrl }
+    @Inject
+    internal lateinit var mPreferencesManager: NetworkPreferencesManager
+
+    @Inject
+    internal lateinit var baseHostUrl: AppHostUrl
 
     override fun onCreatePreferences(bundle: Bundle?, s: String?) {
         addPreferencesFromResource(R.xml.preference_network)

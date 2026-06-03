@@ -14,8 +14,8 @@ import com.github.ykrank.androidtools.ui.internal.CoordinatorLayoutAnchorDelegat
 import com.github.ykrank.androidtools.util.ClipboardUtil
 import com.github.ykrank.androidtools.util.StringUtils
 import com.github.ykrank.androidtools.widget.EventBus
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.data.api.app.model.AppThread
@@ -32,21 +32,24 @@ import me.ykrank.s1next.view.event.*
 import me.ykrank.s1next.view.fragment.BaseViewPagerFragment
 import me.ykrank.s1next.view.internal.PagerScrollState
 import me.ykrank.s1next.view.page.edit.EditPostActivity
+import javax.inject.Inject
 
 
 /**
  * A Fragment includes [android.support.v4.view.ViewPager]
  * to represent each page of post lists.
  */
+@AndroidEntryPoint
 class AppPostListFragment : BaseViewPagerFragment(), AppPostListPagerFragment.PagerCallback, View.OnClickListener {
 
-    private val mEventBus: EventBus = App.preAppComponent.eventBus
+    @Inject
+    internal lateinit var mEventBus: EventBus
 
-    private val mGeneralPreferencesManager: GeneralPreferencesManager =
-        App.preAppComponent.generalPreferencesManager
+    @Inject
+    internal lateinit var mGeneralPreferencesManager: GeneralPreferencesManager
 
-    private val mDownloadPrefManager: DownloadPreferencesManager =
-        App.preAppComponent.downloadPreferencesManager
+    @Inject
+    internal lateinit var mDownloadPrefManager: DownloadPreferencesManager
 
     private lateinit var mThreadId: String
     private var mThreadTitle: String? = null

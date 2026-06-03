@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
-import me.ykrank.s1next.App
 import me.ykrank.s1next.util.JsonUtil
 
 class DarkRoomWrapper {
@@ -32,7 +31,7 @@ class DarkRoomWrapper {
         if (data != null) {
             val rooms = mutableListOf<DarkRoom>()
             data.elements().forEach {
-                rooms.add(JsonUtil.readJsonNode(App.preAppComponent.jsonMapper, it, DarkRoom::class.java))
+                rooms.add(JsonUtil.readJsonNode(JsonUtil.jsonMapper, it, DarkRoom::class.java))
             }
             darkRooms = rooms
         }

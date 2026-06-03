@@ -33,9 +33,10 @@ import com.github.ykrank.androidtools.util.ImeUtils
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.RxJavaUtil
 import com.github.ykrank.androidtools.util.TransitionUtils
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
+import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.ApiFlatTransformer
 import me.ykrank.s1next.data.api.S1Service
 import me.ykrank.s1next.data.api.UserValidator
@@ -50,17 +51,21 @@ import me.ykrank.s1next.view.dialog.LoginPromptDialogFragment
 import me.ykrank.s1next.view.transition.CircularReveal
 import me.ykrank.s1next.view.transition.TransitionCompatCreator
 import me.ykrank.s1next.widget.track.event.SearchTrackEvent
+import javax.inject.Inject
 
 /**
  * Created by ykrank on 2016/9/28 0028.
  *
  * TODO Remove debug message for track error
  */
+@AndroidEntryPoint
 class SearchActivity : BaseActivity() {
 
-    private val mUserValidator: UserValidator by lazy { App.appComponent.userValidator }
+    @Inject
+    internal lateinit var mUserValidator: UserValidator
 
-    private val s1Service: S1Service by lazy { App.appComponent.s1Service }
+    @Inject
+    internal lateinit var s1Service: S1Service
 
     private lateinit var binding: ActivitySearchBinding
 
@@ -312,10 +317,10 @@ class SearchActivity : BaseActivity() {
     companion object {
         val TAG = BaseActivity::class.java.simpleName
 
-        fun start(activity: FragmentActivity, searchIconView: View) {
+        fun start(activity: FragmentActivity, searchIconView: View, user: User) {
             if (LoginPromptDialogFragment.showLoginPromptDialogIfNeeded(
                     activity.supportFragmentManager,
-                    App.appComponent.user
+                    user
                 )
             ) {
                 return

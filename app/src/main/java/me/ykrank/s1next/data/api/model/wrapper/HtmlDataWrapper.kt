@@ -1,6 +1,7 @@
 package me.ykrank.s1next.data.api.model.wrapper
 
 import com.github.ykrank.androidtools.util.L
+import dagger.hilt.android.EntryPointAccessors
 import me.ykrank.s1next.App
 import me.ykrank.s1next.data.api.ApiException
 import me.ykrank.s1next.view.event.NoticeRefreshEvent
@@ -36,7 +37,10 @@ class HtmlDataWrapper {
 
         fun notifyData(data: HtmlDataWrapper) {
             if (data.notice != null) {
-                App.preAppComponent.eventBus.post(NoticeRefreshEvent::class.java, NoticeRefreshEvent(null, (data.notice?:0) > 0))
+                EntryPointAccessors.fromApplication(
+                    App.get(),
+                    HtmlDataWrapperEntryPoint::class.java
+                ).eventBus.post(NoticeRefreshEvent::class.java, NoticeRefreshEvent(null, (data.notice?:0) > 0))
             }
         }
 

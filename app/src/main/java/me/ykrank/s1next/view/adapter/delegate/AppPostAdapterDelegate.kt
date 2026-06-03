@@ -8,7 +8,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
 import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewHolder
 import com.github.ykrank.androidtools.widget.EventBus
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.app.model.AppPost
@@ -20,14 +19,13 @@ import me.ykrank.s1next.widget.span.PostMovementMethod
 class AppPostAdapterDelegate(
     activity: Activity,
     private val lifecycleOwner: LifecycleOwner,
-    private val quotePid: String?
+    private val quotePid: String?,
+    private val mEventBus: EventBus,
+    private val mUser: User
 ) : BaseAdapterDelegate<AppPost, SimpleRecycleViewHolder<ItemAppPostBinding>>(
     activity,
     AppPost::class.java
 ) {
-
-    private val mEventBus: EventBus = App.preAppComponent.eventBus
-    private val mUser: User by lazy { App.appComponent.user }
 
     private var threadInfo: AppThread? = null
 

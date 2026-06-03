@@ -12,21 +12,24 @@ import com.github.ykrank.androidtools.widget.BackupDelegate.AfterBackup
 import com.github.ykrank.androidtools.widget.BackupDelegate.AfterRestore
 import com.github.ykrank.androidtools.widget.BackupDelegate.BackupResult
 import com.google.android.material.snackbar.Snackbar
-import me.ykrank.s1next.App
+import dagger.hilt.android.AndroidEntryPoint
 import me.ykrank.s1next.BuildConfig
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.db.AppDatabaseBackupMerger
 import me.ykrank.s1next.data.db.AppDatabaseManager
+import javax.inject.Inject
 
 /**
  * An Activity includes download settings that allow users
  * to modify download features and behaviors such as cache
  * size and avatars/images download strategy.
  */
+@AndroidEntryPoint
 class BackupPreferenceFragment : BasePreferenceFragment(), Preference.OnPreferenceClickListener {
     private var backupAgent: BackupDelegate? = null
 
-    private val databaseManager: AppDatabaseManager by lazy { App.appComponent.appDatabaseManager }
+    @Inject
+    internal lateinit var databaseManager: AppDatabaseManager
 
     override fun onCreatePreferences(bundle: Bundle?, s: String?) {
         addPreferencesFromResource(R.xml.preference_backup)

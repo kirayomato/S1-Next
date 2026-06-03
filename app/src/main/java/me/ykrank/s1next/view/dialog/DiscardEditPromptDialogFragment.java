@@ -7,13 +7,16 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.github.ykrank.androidtools.widget.EditorDiskCache;
 
-import me.ykrank.s1next.App;
+import dagger.hilt.android.AndroidEntryPoint;
 import me.ykrank.s1next.R;
+
+import javax.inject.Inject;
 
 /**
  * A dialog shows prompt if user's reply is not empty and want
  * to finish current Activity.
  */
+@AndroidEntryPoint
 public final class DiscardEditPromptDialogFragment extends BaseDialogFragment {
 
     public static final String TAG = DiscardEditPromptDialogFragment.class.getName();
@@ -21,6 +24,9 @@ public final class DiscardEditPromptDialogFragment extends BaseDialogFragment {
     private static final String ARG_KEY = "key";
     private static final String ARG_CONTENT = "content";
     private static final String ARG_MESSAGE = "message";
+
+    @Inject
+    EditorDiskCache editorDiskCache;
 
     /**
      * show dialog when discard edit
@@ -42,7 +48,6 @@ public final class DiscardEditPromptDialogFragment extends BaseDialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final EditorDiskCache editorDiskCache = App.Companion.getAppComponent().getEditorDiskCache();
         String msg = getArguments().getString(ARG_MESSAGE);
         if (msg == null) msg = getString(R.string.dialog_message_reply_discard_prompt);
         final String key = getArguments().getString(ARG_KEY);

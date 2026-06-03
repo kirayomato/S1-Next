@@ -11,18 +11,20 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import com.github.ykrank.androidtools.util.L
-import me.ykrank.s1next.App
+import dagger.hilt.android.AndroidEntryPoint
 import me.ykrank.s1next.data.pref.DownloadPreferencesManager
+import javax.inject.Inject
 
 
 /**
  * Created by Cintory on 2024/6/7 16:11
  * Email：Cintory@gmail.com
  */
+@AndroidEntryPoint
 class SAFFragment : Fragment() {
 
-    private val mDownloadPreferencesManager: DownloadPreferencesManager
-        get() = App.preAppComponent.downloadPreferencesManager
+    @Inject
+    internal lateinit var mDownloadPreferencesManager: DownloadPreferencesManager
 
     private var getDictionaryCallback: ((DocumentFile) -> Unit)? = null
 

@@ -12,8 +12,9 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import me.ykrank.s1next.App
+import com.github.ykrank.androidtools.widget.EventBus
 import me.ykrank.s1next.R
+import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.model.Thread
 import me.ykrank.s1next.data.pref.DownloadPreferencesManager
 import me.ykrank.s1next.view.activity.GalleryActivity
@@ -33,13 +34,13 @@ class PostRenderImageAdapterDelegate(
     context: Context,
     private val postShareSelectionOwner: PostShareSelectionOwner? = null,
     private val imageUrlsProvider: () -> List<String>,
+    private val downloadPreferencesManager: DownloadPreferencesManager,
+    private val eventBus: EventBus,
+    private val user: User,
 ) : BaseAdapterDelegate<PostRenderItem.ImageBlock, PostRenderImageAdapterDelegate.ViewHolder>(
     context,
     PostRenderItem.ImageBlock::class.java
 ) {
-    private val downloadPreferencesManager: DownloadPreferencesManager =
-        App.preAppComponent.downloadPreferencesManager
-
     private var threadInfo: Thread? = null
     private var pageNum: Int = 1
 
@@ -127,7 +128,7 @@ class PostRenderImageAdapterDelegate(
             }
             holder.itemView.setOnClickListener(null)
             val longClickListener = View.OnLongClickListener {
-                PostRenderActions.showPostActionMenu(it, fragment, threadInfo, pageNum, t.post)
+                PostRenderActions.showPostActionMenu(it, fragment, eventBus, user, threadInfo, pageNum, t.post)
             }
             val touchListener = View.OnTouchListener { view, event ->
                 PostActionMenuPopup.recordTouchPoint(view, event)

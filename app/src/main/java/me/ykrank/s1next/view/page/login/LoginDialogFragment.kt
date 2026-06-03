@@ -1,21 +1,27 @@
 package me.ykrank.s1next.view.page.login
 
 import android.os.Bundle
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import me.ykrank.s1next.App
 import me.ykrank.s1next.data.api.model.wrapper.AccountResultWrapper
+import me.ykrank.s1next.data.db.biz.LoginUserBiz
 import me.ykrank.s1next.data.db.exmodel.RealLoginUser
 import me.ykrank.s1next.view.dialog.ProgressDialogFragment
 import me.ykrank.s1next.view.event.LoginEvent
+import javax.inject.Inject
 
 /**
  * A [ProgressDialogFragment] posts a request to login to server.
  */
+@AndroidEntryPoint
 class LoginDialogFragment : BaseLoginDialogFragment<AccountResultWrapper>() {
+
+    @Inject
+    internal lateinit var loginUserBiz: LoginUserBiz
 
     override fun getSourceObservable(): Single<AccountResultWrapper> {
         return mS1Service.login(username, password, questionId, answer).map { resultWrapper ->
@@ -52,7 +58,7 @@ class LoginDialogFragment : BaseLoginDialogFragment<AccountResultWrapper>() {
             )
         }
 
-        mEventBus?.postDefault(LoginEvent())
+        mEventBus.postDefault(LoginEvent())
     }
 
     @OptIn(DelicateCoroutinesApi::class)
@@ -69,7 +75,7 @@ class LoginDialogFragment : BaseLoginDialogFragment<AccountResultWrapper>() {
                 loginTime = time,
                 timestamp = time,
             )
-            App.appComponent.loginUserBiz.saveUser(user)
+            loginUserBiz.saveUser(user)
         }
     }
 

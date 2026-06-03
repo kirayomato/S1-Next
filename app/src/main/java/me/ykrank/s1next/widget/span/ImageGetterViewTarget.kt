@@ -10,7 +10,6 @@ import com.bumptech.glide.request.Request
 import com.bumptech.glide.request.transition.Transition
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.widget.glide.viewtarget.CustomViewTarget
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.pref.DownloadPreferencesManager
 import java.util.*
@@ -19,10 +18,9 @@ internal class ImageGetterViewTarget constructor(
     private val mGlideImageGetter: GlideImageGetter,
     view: TextView,
     val mDrawable: UrlDrawable,
-    val serial: Int
+    val serial: Int,
+    private val mDownloadPreferencesManager: DownloadPreferencesManager,
 ) : CustomViewTarget<TextView, Drawable>(view) {
-
-    private val mDownloadPreferencesManager: DownloadPreferencesManager = App.preAppComponent.downloadPreferencesManager
 
     private var mRequest: Request? = null
 

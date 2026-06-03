@@ -12,7 +12,7 @@ import com.github.ykrank.androidtools.widget.EventBus
 import com.github.ykrank.androidtools.widget.uploadimg.ImageUploadManager
 import com.github.ykrank.androidtools.widget.uploadimg.LibImageUploadFragment
 import com.github.ykrank.androidtools.widget.uploadimg.ModelImageUpload
-import me.ykrank.s1next.App
+import dagger.hilt.android.AndroidEntryPoint
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.S1Service
@@ -26,17 +26,25 @@ import me.ykrank.s1next.widget.uploadimg.ForumAttachmentUploadTargetProvider
 import me.ykrank.s1next.widget.uploadimg.RIPImageUploadManager
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.ykrank.s1next.widget.net.Image
 import okhttp3.OkHttpClient
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ImageUploadFragment : LibImageUploadFragment() {
 
-    private val mEventBus: EventBus = App.preAppComponent.eventBus
+    @Inject
+    internal lateinit var mEventBus: EventBus
 
-    private val mUser: User by lazy { App.appComponent.user }
+    @Inject
+    internal lateinit var mUser: User
 
-    private val mS1Service: S1Service by lazy { App.appComponent.s1Service }
+    @Inject
+    internal lateinit var mS1Service: S1Service
 
-    private val mOkHttpClient: OkHttpClient by lazy { App.appComponent.imageOkHttpClient }
+    @Inject
+    @field:Image
+    internal lateinit var mOkHttpClient: OkHttpClient
 
     private var useForumAttachment = true
     private var useOriginalResolution = false

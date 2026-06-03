@@ -39,23 +39,21 @@ class App : MultiDexApplication() {
 
     private lateinit var mGeneralPreferencesManager: GeneralPreferencesManager
 
-    private lateinit var mAppComponent: AppComponent
-
-    private lateinit var mPreAppComponent: PreAppComponent
+    private lateinit var mPreAppGraph: PreAppGraph
 
     private lateinit var mAppActivityLifecycleCallbacks: AppActivityLifecycleCallbacks
 
     var resourceContext: Context? = null
 
     val trackAgent: DataTrackAgent
-        get() = mPreAppComponent.dataTrackAgent
+        get() = mPreAppGraph.dataTrackAgent
 
     val isAppVisible: Boolean
         get() = mAppActivityLifecycleCallbacks.isAppVisible
 
     override fun attachBaseContext(base: Context) {
-        mPreAppComponent = PreAppGraph(this, base)
-        mGeneralPreferencesManager = mPreAppComponent.generalPreferencesManager
+        mPreAppGraph = PreAppGraph(this, base)
+        mGeneralPreferencesManager = mPreAppGraph.generalPreferencesManager
         super.attachBaseContext(ResourceUtil.setScaledDensity(base, mGeneralPreferencesManager.fontScale))
     }
 
@@ -78,7 +76,7 @@ class App : MultiDexApplication() {
             )
         }
 
-        mPreAppComponent.dataTrackAgent.init(this)
+        mPreAppGraph.dataTrackAgent.init(this)
         GlobalData.init(object : DefaultAppDataProvider() {
             override val errorParser: ErrorParser?
                 get() = ErrorUtil
@@ -94,16 +92,17 @@ class App : MultiDexApplication() {
         L.init(this)
         BuglyUtils.init(this)
 
-        mAppComponent = EntryPointAccessors.fromApplication(this, AppComponent::class.java)
+        val appComponent = EntryPointAccessors.fromApplication(this, AppComponent::class.java)
 
-        mAppActivityLifecycleCallbacks = AppActivityLifecycleCallbacks(mAppComponent.noticeCheckTask)
+        mAppActivityLifecycleCallbacks =
+            AppActivityLifecycleCallbacks(appComponent.noticeCheckTask, mPreAppGraph.wifi)
         registerActivityLifecycleCallbacks(mAppActivityLifecycleCallbacks)
 
         UiGlobalData.init(object : UiDataProvider {
             override val actLifeCallback: WifiActivityLifecycleCallbacks
                 get() = mAppActivityLifecycleCallbacks
             override val trackAgent: DataTrackAgent
-                get() = mPreAppComponent.dataTrackAgent
+                get() = mPreAppGraph.dataTrackAgent
         }, object : RProvider {
 
         }, this::toast)
@@ -147,10 +146,7 @@ class App : MultiDexApplication() {
             return sApp
         }
 
-        val appComponent: AppComponent
-            get() = sApp.mAppComponent
-
-        val preAppComponent: PreAppComponent
-            get() = sApp.mPreAppComponent
+        val preAppGraph: PreAppGraph
+            get() = sApp.mPreAppGraph
     }
 }

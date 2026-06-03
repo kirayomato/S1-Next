@@ -10,16 +10,20 @@ import com.github.ykrank.androidtools.widget.EventBus
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.model.Favourite
 import me.ykrank.s1next.data.api.model.Thread
+import me.ykrank.s1next.data.pref.ReadPreferencesManager
 import me.ykrank.s1next.view.event.FavoriteRemoveEvent
 import me.ykrank.s1next.view.page.post.postlist.PostListActivity.Companion.bindClickStartForView
 
-class FavouriteViewModel(private val lifecycleOwner: LifecycleOwner) {
+class FavouriteViewModel(
+    private val lifecycleOwner: LifecycleOwner,
+    private val readPreferencesManager: ReadPreferencesManager
+) {
     val favourite = ObservableField<Favourite>()
 
     fun onBind(): Function1<View, Any> {
         return { v: View ->
             bindClickStartForView(
-                v, lifecycleOwner
+                v, lifecycleOwner, readPreferencesManager
             ) {
                 favourite.get()?.let {
                     val thread = Thread()

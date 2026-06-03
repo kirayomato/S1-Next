@@ -27,7 +27,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.app.AppApiUtil
 import me.ykrank.s1next.data.api.app.AppService
@@ -50,6 +49,7 @@ import me.ykrank.s1next.view.fragment.BaseRecyclerViewFragment
 import me.ykrank.s1next.view.internal.LoadingViewModelBindingDelegateQuickSidebarImpl
 import me.ykrank.s1next.view.page.app.AppPostListPagerFragment.PagerCallback
 import me.ykrank.s1next.view.page.login.AppLoginDialogFragment
+import javax.inject.Inject
 
 /**
  * A Fragment representing one of the pages of posts.
@@ -61,14 +61,17 @@ import me.ykrank.s1next.view.page.login.AppLoginDialogFragment
 class AppPostListPagerFragment : BaseRecyclerViewFragment<AppPostsWrapper>(),
     OnQuickSideBarTouchListener {
 
-    private val mGeneralPreferencesManager: GeneralPreferencesManager =
-        App.preAppComponent.generalPreferencesManager
+    @Inject
+    internal lateinit var mGeneralPreferencesManager: GeneralPreferencesManager
 
-    private val objectMapper: ObjectMapper = App.preAppComponent.jsonMapper
+    @Inject
+    internal lateinit var objectMapper: ObjectMapper
 
-    private val appService: AppService by lazy { App.appComponent.appService }
+    @Inject
+    internal lateinit var appService: AppService
 
-    private val loginUserBiz: LoginUserBiz by lazy { App.appComponent.loginUserBiz }
+    @Inject
+    internal lateinit var loginUserBiz: LoginUserBiz
 
     private var mThreadId: String? = null
     private var mPageNum: Int = 0
@@ -100,7 +103,7 @@ class AppPostListPagerFragment : BaseRecyclerViewFragment<AppPostsWrapper>(),
         super.onViewCreated(view, savedInstanceState)
 
         mRecyclerAdapter =
-            AppPostListRecyclerViewAdapter(requireActivity(), viewLifecycleOwner, mQuotePid)
+            AppPostListRecyclerViewAdapter(requireActivity(), viewLifecycleOwner, mQuotePid, mEventBus, mUser)
         recyclerView.layoutManager = mLayoutManager
         recyclerView.adapter = mRecyclerAdapter
 

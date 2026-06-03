@@ -1,21 +1,24 @@
 package me.ykrank.s1next.view.page.login
 
 import android.os.Bundle
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.app.AppService
 import me.ykrank.s1next.data.api.app.model.AppDataWrapper
 import me.ykrank.s1next.data.api.app.model.AppLoginResult
 import me.ykrank.s1next.view.dialog.ProgressDialogFragment
 import me.ykrank.s1next.view.event.AppLoginEvent
+import javax.inject.Inject
 
 /**
  * A [ProgressDialogFragment] posts a request to login to server.
  */
+@AndroidEntryPoint
 class AppLoginDialogFragment : BaseLoginDialogFragment<AppDataWrapper<AppLoginResult>>() {
 
-    private val mAppService: AppService by lazy { App.appComponent.appService }
+    @Inject
+    internal lateinit var mAppService: AppService
 
     override fun getSourceObservable(): Single<AppDataWrapper<AppLoginResult>> {
         return mAppService.login(username, password, questionId, answer)
@@ -35,7 +38,7 @@ class AppLoginDialogFragment : BaseLoginDialogFragment<AppDataWrapper<AppLoginRe
 
     override fun onSuccess(data: AppDataWrapper<AppLoginResult>, result: Result) {
         super.onSuccess(data, result)
-        mEventBus?.postDefault(AppLoginEvent())
+        mEventBus.postDefault(AppLoginEvent())
     }
 
     companion object {

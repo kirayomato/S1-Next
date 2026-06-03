@@ -27,7 +27,6 @@ import com.github.ykrank.androidtools.widget.uploadimg.ModelImageUpload
 import com.google.android.material.tabs.TabLayout
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.model.PostEditor
 import me.ykrank.s1next.data.pref.GeneralPreferencesManager
@@ -42,6 +41,7 @@ import me.ykrank.s1next.view.page.post.postedit.toolstab.emoticon.EmotionFragmen
 import me.ykrank.s1next.widget.uploadimg.FORUM_ATTACHMENT_REMOTE_PREFIX
 import me.ykrank.s1next.widget.uploadimg.ForumAttachmentUploadTarget
 import me.ykrank.s1next.widget.uploadimg.ForumAttachmentUploadTargetProvider
+import javax.inject.Inject
 
 /**
  * Created by ykrank on 2016/7/31 0031.
@@ -57,10 +57,15 @@ abstract class BasePostEditFragment : BaseFragment(),
      * `mMenuSend` is null when configuration changes.
      */
     protected var mMenuSend: MenuItem? = null
-    internal val mEventBus: EventBus = App.preAppComponent.eventBus
-    internal val mGeneralPreferencesManager: GeneralPreferencesManager =
-        App.preAppComponent.generalPreferencesManager
-    internal val editorDiskCache: EditorDiskCache by lazy { App.appComponent.editorDiskCache }
+
+    @Inject
+    internal lateinit var mEventBus: EventBus
+
+    @Inject
+    internal lateinit var mGeneralPreferencesManager: GeneralPreferencesManager
+
+    @Inject
+    internal lateinit var editorDiskCache: EditorDiskCache
     private var mCacheDisposable: Disposable? = null
     private var requestDialogDisposable: Disposable? = null
     /**

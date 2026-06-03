@@ -35,7 +35,7 @@ class PmGroupsFragment : BaseLoadMoreRecycleViewFragment<BaseDataWrapper<PmGroup
 
         val recyclerView = recyclerView
         recyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(context)
-        mRecyclerAdapter = PmGroupsRecyclerViewAdapter(activity)
+        mRecyclerAdapter = PmGroupsRecyclerViewAdapter(requireActivity(), mEventBus, mUser)
         recyclerView.adapter = mRecyclerAdapter
     }
 

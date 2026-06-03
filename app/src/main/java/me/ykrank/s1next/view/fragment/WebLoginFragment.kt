@@ -13,7 +13,7 @@ import android.widget.ProgressBar
 import androidx.databinding.DataBindingUtil
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.WebViewUtils
-import me.ykrank.s1next.App
+import dagger.hilt.android.AndroidEntryPoint
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.databinding.FragmentWebviewBinding
@@ -23,14 +23,19 @@ import me.ykrank.s1next.widget.hostcheck.AppHostUrl
 import java.net.URI
 import java.util.Arrays
 import java.util.regex.Pattern
+import javax.inject.Inject
 
 /**
  * A Fragment to login in WebView.
  */
+@AndroidEntryPoint
 class WebLoginFragment : BaseFragment() {
 
-    private val cookieManger: java.net.CookieManager = App.preAppComponent.cookieManager
-    private val baseHostUrl: AppHostUrl by lazy { App.appComponent.baseHostUrl }
+    @Inject
+    internal lateinit var cookieManger: java.net.CookieManager
+
+    @Inject
+    internal lateinit var baseHostUrl: AppHostUrl
 
     private lateinit var mFragmentHelpBinding: FragmentWebviewBinding
     private var webView: WebView? = null

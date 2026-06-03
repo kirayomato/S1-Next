@@ -14,8 +14,8 @@ import com.github.ykrank.androidlifecycle.event.ActivityEvent
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.RxJavaUtil
 import com.google.common.base.Optional
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.pref.ReadPreferencesManager
 import me.ykrank.s1next.databinding.ToolbarSpinnerBinding
@@ -24,6 +24,7 @@ import me.ykrank.s1next.view.fragment.ForumFragment
 import me.ykrank.s1next.view.internal.ToolbarDropDownInterface
 import me.ykrank.s1next.view.page.post.postlist.PostListActivity
 import me.ykrank.s1next.viewmodel.DropDownItemListViewModel
+import javax.inject.Inject
 
 /**
  * An Activity shows the forum groups.
@@ -31,10 +32,11 @@ import me.ykrank.s1next.viewmodel.DropDownItemListViewModel
  *
  * This Activity has Spinner in Toolbar to switch between different forum groups.
  */
+@AndroidEntryPoint
 class ForumActivity : BaseActivity(), ToolbarDropDownInterface.Callback, AdapterView.OnItemSelectedListener {
 
-    private val mReadPrefManager: ReadPreferencesManager =
-        App.preAppComponent.readProgressPreferencesManager
+    @Inject
+    internal lateinit var mReadPrefManager: ReadPreferencesManager
 
     private var mToolbarSpinnerBinding: ToolbarSpinnerBinding? = null
 

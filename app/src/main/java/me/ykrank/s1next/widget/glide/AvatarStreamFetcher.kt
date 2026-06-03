@@ -5,7 +5,6 @@ import com.bumptech.glide.integration.okhttp3.OkHttpStreamFetcher
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.data.DataFetcher
 import com.bumptech.glide.util.ContentLengthInputStream
-import me.ykrank.s1next.App
 import me.ykrank.s1next.data.pref.DownloadPreferencesManager
 import me.ykrank.s1next.widget.glide.model.AvatarUrl
 import me.ykrank.s1next.widget.image.ImageBiz
@@ -24,16 +23,13 @@ import java.io.InputStream
 class AvatarStreamFetcher(
     private val client: Call.Factory,
     private val url: AvatarUrl,
+    private val mDownloadPreferencesManager: DownloadPreferencesManager,
+    private val avatarFailUrlsCache: AvatarFailUrlsCache,
 ) : DataFetcher<InputStream> {
     private var stream: InputStream? = null
     private var responseBody: ResponseBody? = null
     @Volatile
     private var call: Call? = null
-
-    private val mDownloadPreferencesManager: DownloadPreferencesManager =
-        App.preAppComponent.downloadPreferencesManager
-    private val avatarFailUrlsCache: AvatarFailUrlsCache =
-        App.appComponent.avatarFailUrlsCache
 
     private val imageBiz by lazy {
         ImageBiz(mDownloadPreferencesManager)

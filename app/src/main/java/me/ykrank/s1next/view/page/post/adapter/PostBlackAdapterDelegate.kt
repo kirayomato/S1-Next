@@ -7,7 +7,6 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewHolder
 import com.github.ykrank.androidtools.widget.EventBus
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.model.Post
 import me.ykrank.s1next.data.api.model.Thread
@@ -19,15 +18,17 @@ import me.ykrank.s1next.view.page.post.viewmodel.PostBlackViewModel
 import me.ykrank.s1next.widget.span.FixedSpannableFactory
 import me.ykrank.s1next.widget.span.PostMovementMethod
 
-class PostBlackAdapterDelegate(private val fragment: Fragment, context: Context) :
+class PostBlackAdapterDelegate(
+    private val fragment: Fragment,
+    context: Context,
+    private val mEventBus: EventBus,
+    private val mGeneralPreferencesManager: GeneralPreferencesManager
+) :
     BaseAdapterDelegate<Post, SimpleRecycleViewHolder<ItemPostBlackBinding>>(
         context,
         Post::class.java
     ) {
 
-    private val mEventBus: EventBus = App.preAppComponent.eventBus
-    private val mGeneralPreferencesManager: GeneralPreferencesManager =
-        App.preAppComponent.generalPreferencesManager
     private var threadInfo: Thread? = null
     private var voteInfo: Vote? = null
     private var pageNum: Int = 1

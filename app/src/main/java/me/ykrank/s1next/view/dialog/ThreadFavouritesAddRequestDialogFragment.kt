@@ -1,15 +1,17 @@
 package me.ykrank.s1next.view.dialog
 
 import android.os.Bundle
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.model.wrapper.AccountResultWrapper
+import me.ykrank.s1next.widget.track.TrackAgentProvider
 import me.ykrank.s1next.widget.track.event.AddFavoriteTrackEvent
 
 /**
  * A dialog requests to add thread to user's favourites.
  */
+@AndroidEntryPoint
 class ThreadFavouritesAddRequestDialogFragment : ProgressDialogFragment<AccountResultWrapper>() {
 
     override fun getSourceObservable(): Single<AccountResultWrapper> {
@@ -51,7 +53,7 @@ class ThreadFavouritesAddRequestDialogFragment : ProgressDialogFragment<AccountR
             remark: String,
             threadTitle: String?
         ): ThreadFavouritesAddRequestDialogFragment {
-            App.get().trackAgent.post(AddFavoriteTrackEvent(threadId, threadTitle))
+            TrackAgentProvider.get().post(AddFavoriteTrackEvent(threadId, threadTitle))
 
             val fragment = ThreadFavouritesAddRequestDialogFragment()
             val bundle = Bundle()

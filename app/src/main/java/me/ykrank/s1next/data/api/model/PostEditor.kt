@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.LooperUtil
-import me.ykrank.s1next.App
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.data.api.model.wrapper.HtmlDataWrapper
+import me.ykrank.s1next.util.JsonUtil
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -431,7 +431,7 @@ class PostEditor {
         }
 
         private val jsObjectMapper: ObjectMapper by lazy {
-            App.preAppComponent.jsonMapper.copy()
+            JsonUtil.jsonMapper.copy()
                 .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
                 .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
         }

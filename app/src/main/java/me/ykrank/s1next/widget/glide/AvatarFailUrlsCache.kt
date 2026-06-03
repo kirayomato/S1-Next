@@ -5,12 +5,11 @@ import com.bumptech.glide.disklrucache.DiskLruCache
 import com.bumptech.glide.load.Key
 import com.bumptech.glide.util.Util
 import com.github.ykrank.androidtools.util.L
-import me.ykrank.s1next.App.Companion.appComponent
 import me.ykrank.s1next.App.Companion.get
-import me.ykrank.s1next.App.Companion.preAppComponent
 import me.ykrank.s1next.BuildConfig
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.widget.image.ImageBiz
+import dagger.hilt.android.EntryPointAccessors
 import java.io.File
 import java.io.IOException
 import java.security.MessageDigest
@@ -146,11 +145,15 @@ class AvatarFailUrlsCache {
 
         @JvmStatic
         fun removeFailUserAvatarCache(uid: String?) {
-            val avatarFailUrlsCache = appComponent.avatarFailUrlsCache
+            val dependencies = EntryPointAccessors.fromApplication(
+                get(),
+                GlideDependenciesEntryPoint::class.java
+            )
+            val avatarFailUrlsCache = dependencies.avatarFailUrlsCache
 
             //clear avatar img error cache
             val avatarUrls = Api.getAvatarUrls(uid)
-            val manager = preAppComponent.downloadPreferencesManager
+            val manager = dependencies.downloadPreferencesManager
             val imageBiz = ImageBiz(manager)
             avatarUrls.forEach {
                 avatarFailUrlsCache.remove(imageBiz.avatarCacheKey(it))

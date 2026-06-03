@@ -2,16 +2,17 @@ package me.ykrank.s1next.view.page.login
 
 import android.os.Bundle
 import com.github.ykrank.androidtools.widget.EventBus
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.view.dialog.ProgressDialogFragment
+import javax.inject.Inject
 
 /**
  * A [ProgressDialogFragment] posts a request to login to server.
  */
 abstract class BaseLoginDialogFragment<T> : ProgressDialogFragment<T>() {
 
-    protected var mEventBus: EventBus? = null
+    @Inject
+    internal lateinit var mEventBus: EventBus
 
     protected var username: String? = null
     protected var password: String? = null
@@ -20,7 +21,6 @@ abstract class BaseLoginDialogFragment<T> : ProgressDialogFragment<T>() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        mEventBus = App.appComponent.preAppComponent.eventBus
         super.onCreate(savedInstanceState)
 
         username = arguments?.getString(ARG_USERNAME)

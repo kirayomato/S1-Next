@@ -2,14 +2,14 @@ package me.ykrank.s1next.widget
 
 import android.app.Activity
 import com.github.ykrank.androidtools.widget.net.WifiActivityLifecycleCallbacks
-import me.ykrank.s1next.App
 import me.ykrank.s1next.data.Wifi
 import me.ykrank.s1next.widget.hostcheck.NoticeCheckTask
 
-class AppActivityLifecycleCallbacks(private val noticeCheckTask: NoticeCheckTask) :
+class AppActivityLifecycleCallbacks(
+    private val noticeCheckTask: NoticeCheckTask,
+    private val wifi: Wifi
+) :
     WifiActivityLifecycleCallbacks() {
-
-    private val wifi: Wifi = App.preAppComponent.wifi
 
     override val wifiStateChangedCallback: ((Boolean) -> Unit)?
         get() = { wifi.isWifiEnabled = it }

@@ -5,17 +5,17 @@ import androidx.databinding.DataBindingUtil
 import android.view.ViewGroup
 import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewHolder
 import com.github.ykrank.androidtools.widget.EventBus
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.model.PmGroup
 import me.ykrank.s1next.databinding.ItemPmGroupBinding
 import me.ykrank.s1next.viewmodel.PmGroupViewModel
 
-class PmGroupsAdapterDelegate(context: Context) : BaseAdapterDelegate<PmGroup, SimpleRecycleViewHolder<ItemPmGroupBinding>>(context, PmGroup::class.java) {
-
-    private val mEventBus: EventBus = App.preAppComponent.eventBus
-    private val mUser: User by lazy { App.appComponent.user }
+class PmGroupsAdapterDelegate(
+    context: Context,
+    private val mEventBus: EventBus,
+    private val mUser: User
+) : BaseAdapterDelegate<PmGroup, SimpleRecycleViewHolder<ItemPmGroupBinding>>(context, PmGroup::class.java) {
 
     public override fun onCreateViewHolder(parent: ViewGroup): androidx.recyclerview.widget.RecyclerView.ViewHolder {
         val binding = DataBindingUtil.inflate<ItemPmGroupBinding>(mLayoutInflater,

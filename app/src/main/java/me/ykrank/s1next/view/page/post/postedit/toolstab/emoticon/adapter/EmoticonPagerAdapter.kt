@@ -7,12 +7,14 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.PagerAdapter
 import com.github.ykrank.androidtools.R
 import com.github.ykrank.androidtools.widget.GridAutofitLayoutManager
+import com.github.ykrank.androidtools.widget.EventBus
 import me.ykrank.s1next.view.page.post.postedit.toolstab.emoticon.adapter.EmoticonGridRecyclerAdapter.BindingViewHolder
 import me.ykrank.s1next.widget.EmoticonFactory
 
 class EmoticonPagerAdapter(
     private val mActivity: Activity,
-    private val mEmoticonFactory: EmoticonFactory
+    private val mEmoticonFactory: EmoticonFactory,
+    private val mEventBus: EventBus
 ) : PagerAdapter() {
     private val mEmoticonWidth: Float
     private val mEmoticonGridPadding: Int
@@ -45,7 +47,8 @@ class EmoticonPagerAdapter(
         val recyclerAdapter: RecyclerView.Adapter<BindingViewHolder> =
             EmoticonGridRecyclerAdapter(
                 mActivity,
-                mEmoticonFactory.getEmoticonsByIndex(position)
+                mEmoticonFactory.getEmoticonsByIndex(position),
+                mEventBus
             )
         recyclerView.adapter = recyclerAdapter
 

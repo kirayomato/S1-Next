@@ -11,22 +11,27 @@ import androidx.lifecycle.lifecycleScope
 import com.github.ykrank.androidtools.ui.LibBaseViewPagerFragment
 import com.github.ykrank.androidtools.widget.EventBus
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.data.api.ApiFlatTransformer
 import me.ykrank.s1next.data.api.S1Service
 import me.ykrank.s1next.util.IntentUtil
 import me.ykrank.s1next.view.event.FavoriteRemoveEvent
+import javax.inject.Inject
 
 /**
  * A Fragment includes [android.support.v4.view.ViewPager]
  * to represent each page of favourite lists.
  */
+@AndroidEntryPoint
 class FavouriteListFragment : BaseViewPagerFragment() {
-    private val mEventBus: EventBus = App.preAppComponent.eventBus
-    private val s1Service: S1Service by lazy { App.appComponent.s1Service }
+    @Inject
+    internal lateinit var mEventBus: EventBus
+
+    @Inject
+    internal lateinit var s1Service: S1Service
 
     private var mTitle: CharSequence? = null
 

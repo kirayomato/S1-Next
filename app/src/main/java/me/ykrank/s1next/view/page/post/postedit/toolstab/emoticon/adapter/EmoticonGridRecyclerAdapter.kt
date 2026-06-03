@@ -9,18 +9,19 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.github.ykrank.androidtools.widget.EventBus
 
-import me.ykrank.s1next.App
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.model.Emoticon
 import me.ykrank.s1next.databinding.ItemEmoticonBinding
 import me.ykrank.s1next.viewmodel.EmoticonViewModel
 
-class EmoticonGridRecyclerAdapter(activity: Activity, private val mEmoticons: List<Emoticon>) : androidx.recyclerview.widget.RecyclerView.Adapter<EmoticonGridRecyclerAdapter.BindingViewHolder>() {
+class EmoticonGridRecyclerAdapter(
+    activity: Activity,
+    private val mEmoticons: List<Emoticon>,
+    private val mEventBus: EventBus
+) : androidx.recyclerview.widget.RecyclerView.Adapter<EmoticonGridRecyclerAdapter.BindingViewHolder>() {
 
     private val mLayoutInflater: LayoutInflater = activity.layoutInflater
     private val mEmoticonRequestBuilder: RequestManager = Glide.with(activity)
-
-    private val mEventBus: EventBus = App.preAppComponent.eventBus
 
     init {
         setHasStableIds(true)
