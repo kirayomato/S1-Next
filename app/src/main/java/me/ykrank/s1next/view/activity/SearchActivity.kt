@@ -23,7 +23,6 @@ import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.view.ViewCompat
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.transition.TransitionManager
@@ -81,7 +80,8 @@ class SearchActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_search)
+        binding = ActivitySearchBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         appBar = binding.appBar
         searchView = appBar.searchView
@@ -239,7 +239,7 @@ class SearchActivity : BaseActivity() {
     private fun setNoResultsVisibility(visibility: Int, errorMsg: String?) {
         if (visibility == View.VISIBLE) {
             if (noResults == null) {
-                noResults = binding.stubNoSearchResults.viewStub?.inflate() as TextView?
+                noResults = binding.stubNoSearchResults.inflate() as TextView?
                 noResults?.setOnClickListener {
                     searchView.setQuery("", false)
                     searchView.requestFocus()
