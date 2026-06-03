@@ -6,7 +6,6 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.ViewUtil
@@ -36,9 +35,10 @@ class BlackListRemarkDialogFragment : BaseDialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val activity: Activity = requireActivity()
-        val binding = DataBindingUtil.inflate<DialogBlacklistRemarkBinding>(
+        val binding = DialogBlacklistRemarkBinding.inflate(
             activity.layoutInflater,
-            R.layout.dialog_blacklist_remark, null, false
+            null,
+            false
         )
 
         val arguments = requireArguments()

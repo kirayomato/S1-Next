@@ -4,7 +4,6 @@ import android.app.Activity
 import android.app.Dialog
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
-import androidx.databinding.DataBindingUtil
 import com.github.ykrank.androidtools.extension.toast
 import com.github.ykrank.androidtools.util.ClipboardUtil
 import com.github.ykrank.androidtools.widget.AlipayDonate
@@ -19,9 +18,10 @@ class AlipayDialogFragment : BaseDialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val activity = activity as Activity
-        val binding = DataBindingUtil.inflate<DialogAlipayBinding>(
+        val binding = DialogAlipayBinding.inflate(
             activity.layoutInflater,
-            R.layout.dialog_alipay, null, false
+            null,
+            false
         )
 
         val title = arguments?.getString(ARG_TITLE)

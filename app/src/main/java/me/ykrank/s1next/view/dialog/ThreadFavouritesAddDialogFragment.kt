@@ -5,7 +5,6 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
-import androidx.databinding.DataBindingUtil
 import com.github.ykrank.androidtools.util.ViewUtil
 import me.ykrank.s1next.R
 import me.ykrank.s1next.databinding.DialogFavouritesAddBinding
@@ -19,8 +18,7 @@ class ThreadFavouritesAddDialogFragment : BaseDialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val activity = activity!!
 
-        val binding = DataBindingUtil.inflate<DialogFavouritesAddBinding>(activity.layoutInflater,
-                R.layout.dialog_favourites_add, null, false)
+        val binding = DialogFavouritesAddBinding.inflate(activity.layoutInflater, null, false)
 
         val alertDialog = AlertDialog.Builder(activity)
                 .setTitle(R.string.menu_favourites_add)

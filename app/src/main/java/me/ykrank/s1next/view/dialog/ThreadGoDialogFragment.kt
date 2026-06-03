@@ -8,7 +8,6 @@ import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
-import androidx.databinding.DataBindingUtil
 import com.github.ykrank.androidtools.util.ViewUtil
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.model.link.ThreadLink
@@ -24,8 +23,7 @@ class ThreadGoDialogFragment : BaseDialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val activity = requireActivity()
-        val binding = DataBindingUtil.inflate<DialogThreadGoBinding>(activity.layoutInflater,
-                R.layout.dialog_thread_go, null, false)
+        val binding = DialogThreadGoBinding.inflate(activity.layoutInflater, null, false)
         val threadLinkOrIdWrapperView = binding.threadLinkOrIdWrapper
         val threadLinkOrIdView = binding.threadLinkOrId
 

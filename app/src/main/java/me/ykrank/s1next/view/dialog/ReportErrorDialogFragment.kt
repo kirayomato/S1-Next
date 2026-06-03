@@ -2,7 +2,6 @@ package me.ykrank.s1next.view.dialog
 
 import android.app.Dialog
 import android.content.DialogInterface
-import androidx.databinding.DataBindingUtil
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import android.text.Editable
@@ -20,8 +19,7 @@ import me.ykrank.s1next.databinding.DialogReportErrorBinding
 class ReportErrorDialogFragment : BaseDialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val binding = DataBindingUtil.inflate<DialogReportErrorBinding>(activity!!.layoutInflater,
-                R.layout.dialog_report_error, null, false)
+        val binding = DialogReportErrorBinding.inflate(activity!!.layoutInflater, null, false)
         binding.etErrorMsg.setText(arguments?.getString(ARG_MESSAGE).orEmpty())
         val alertDialog = AlertDialog.Builder(activity!!)
                 .setTitle(R.string.menu_send_report)

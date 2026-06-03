@@ -1,32 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/item_padding">
 
-    <LinearLayout
+    <CheckBox
+        android:id="@+id/text_only"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:text="@string/post_copy_text_only" />
+
+    <me.ykrank.s1next.widget.MaxHeightScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/item_padding">
+        android:fillViewport="true"
+        android:maxHeight="360dp">
 
-        <CheckBox
-            android:id="@+id/text_only"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="@string/post_copy_text_only" />
-
-        <me.ykrank.s1next.widget.MaxHeightScrollView
+        <TextView
+            android:id="@+id/post_copy_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxHeight="360dp"
-            android:fillViewport="true">
-
-            <TextView
-                android:id="@+id/post_copy_content"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:lineSpacingExtra="@dimen/text_line_spacing_extra"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:textIsSelectable="true" />
-        </me.ykrank.s1next.widget.MaxHeightScrollView>
-    </LinearLayout>
-</layout>
+            android:lineSpacingExtra="@dimen/text_line_spacing_extra"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textIsSelectable="true" />
+    </me.ykrank.s1next.widget.MaxHeightScrollView>
+</LinearLayout>

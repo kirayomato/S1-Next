@@ -4,7 +4,6 @@ import android.app.Dialog
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import androidx.appcompat.app.AlertDialog
-import androidx.databinding.DataBindingUtil
 import me.ykrank.s1next.R
 import me.ykrank.s1next.databinding.DialogPostCopyBinding
 import me.ykrank.s1next.widget.span.HtmlCompat
@@ -19,9 +18,8 @@ class PostCopyDialogFragment : BaseDialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val activity = requireActivity()
-        binding = DataBindingUtil.inflate(
+        binding = DialogPostCopyBinding.inflate(
             activity.layoutInflater,
-            R.layout.dialog_post_copy,
             null,
             false
         )
