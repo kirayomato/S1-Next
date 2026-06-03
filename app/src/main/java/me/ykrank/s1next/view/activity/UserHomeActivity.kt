@@ -15,7 +15,6 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import com.github.ykrank.androidautodispose.AndroidRxDispose
 import com.github.ykrank.androidlifecycle.event.ActivityEvent
-import com.github.ykrank.androidtools.ui.adapter.simple.SimpleRecycleViewAdapter
 import com.github.ykrank.androidtools.util.AnimUtils
 import com.github.ykrank.androidtools.util.ContextUtils
 import com.github.ykrank.androidtools.util.L
@@ -34,6 +33,7 @@ import me.ykrank.s1next.data.api.ProfileProvider
 import me.ykrank.s1next.data.api.model.Profile
 import me.ykrank.s1next.data.db.biz.BlackListBiz
 import me.ykrank.s1next.databinding.ActivityHomeBinding
+import me.ykrank.s1next.view.adapter.HomeStatAdapter
 import me.ykrank.s1next.view.dialog.LoginPromptDialogFragment
 import me.ykrank.s1next.view.event.BlackListChangeEvent
 import me.ykrank.s1next.view.internal.BlacklistMenuAction
@@ -60,7 +60,7 @@ class UserHomeActivity : BaseActivity() {
     private var name: String? = null
     private var isInBlacklist: Boolean = false
     private var blacklistMenu: MenuItem? = null
-    private lateinit var adapter: SimpleRecycleViewAdapter
+    private lateinit var adapter: HomeStatAdapter
 
     private val imageBiz by lazy {
         ImageBiz(mDownloadPreferencesManager)
@@ -223,7 +223,7 @@ class UserHomeActivity : BaseActivity() {
 
         binding.recyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         binding.recyclerView.isNestedScrollingEnabled = false
-        adapter = SimpleRecycleViewAdapter(this, R.layout.item_home_stat, false)
+        adapter = HomeStatAdapter(this)
         binding.recyclerView.adapter = adapter
     }
 
