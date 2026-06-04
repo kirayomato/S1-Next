@@ -9,10 +9,12 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import com.github.ykrank.androidautodispose.AndroidRxDispose
-import com.github.ykrank.androidlifecycle.event.FragmentEvent
+import androidx.lifecycle.lifecycleScope
+import com.github.ykrank.androidtools.extension.await
 import com.github.ykrank.androidtools.util.RxJavaUtil
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.S1Service
 import me.ykrank.s1next.data.api.model.RatePreInfo
@@ -93,20 +95,22 @@ class NewRateFragment : BaseFragment() {
     private fun refreshData() {
         reasonAdapter.setHasProgress(true)
 
-        s1Service.getRatePreInfo(threadId, postID, System.currentTimeMillis())
+        lifecycleScope.launch {
+            try {
+                val info = s1Service.getRatePreInfo(threadId, postID, System.currentTimeMillis())
                 .map<RatePreInfo> { RatePreInfo.fromHtml(it) }
                 .compose(RxJavaUtil.iOSingleTransformer())
-                .to(AndroidRxDispose.withSingle(this, FragmentEvent.DESTROY))
-                .subscribe({ info ->
-                    ratePreInfo = info
-                    binding.bindInfo(info)
-                    setSpinner(info.scoreChoices)
-                    setReasonRecycleView(info.reasons)
-                }, { e ->
-                    reasonAdapter.setHasProgress(false)
-                    showRetrySnackbar(e, View.OnClickListener { v -> refreshData() })
-                }
-                )
+                    .await()
+                ratePreInfo = info
+                binding.bindInfo(info)
+                setSpinner(info.scoreChoices)
+                setReasonRecycleView(info.reasons)
+            } catch (throwable: Throwable) {
+                if (throwable is CancellationException) return@launch
+                reasonAdapter.setHasProgress(false)
+                showRetrySnackbar(throwable, View.OnClickListener { refreshData() })
+            }
+        }
     }
 
     private fun setSpinner(choices: List<String>) {

@@ -3,11 +3,13 @@ package me.ykrank.s1next.view.page.post.postedit
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
-import com.github.ykrank.androidautodispose.AndroidRxDispose
-import com.github.ykrank.androidlifecycle.event.FragmentEvent
+import androidx.lifecycle.lifecycleScope
+import com.github.ykrank.androidtools.extension.await
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.RxJavaUtil
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 import me.ykrank.s1next.data.api.S1Service
 import me.ykrank.s1next.data.api.model.PostEditor
 import me.ykrank.s1next.util.AppDeviceUtil
@@ -93,19 +95,22 @@ class ReplyFragment : BasePostEditFragment() {
 
     private fun loadReplyEditorInfo() {
         val threadId = mThreadId ?: return
-        mS1Service.getReplyEditorInfo(threadId, mQuotePostId)
-            .map<PostEditor> { PostEditor.fromHtml(it) }
-            .compose(RxJavaUtil.iOSingleTransformer())
-            .to(AndroidRxDispose.withSingle(this, FragmentEvent.DESTROY))
-            .subscribe({ postEditor ->
+        lifecycleScope.launch {
+            try {
+                val postEditor = mS1Service.getReplyEditorInfo(threadId, mQuotePostId)
+                    .map<PostEditor> { PostEditor.fromHtml(it) }
+                    .compose(RxJavaUtil.iOSingleTransformer())
+                    .await()
                 parsedReplyEditor = postEditor
                 parsedForumAttachmentUploadInfo = postEditor.forumAttachmentUploadInfo
                 parsedForumAttachments = postEditor.forumAttachments
                 notifyForumAttachmentsChanged()
-            }, { e ->
-                L.report(e)
-                showRetrySnackbar(e, View.OnClickListener { loadReplyEditorInfo() })
-            })
+            } catch (throwable: Throwable) {
+                if (throwable is CancellationException) return@launch
+                L.report(throwable)
+                showRetrySnackbar(throwable, View.OnClickListener { loadReplyEditorInfo() })
+            }
+        }
     }
 
     companion object {

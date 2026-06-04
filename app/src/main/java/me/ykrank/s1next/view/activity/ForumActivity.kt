@@ -8,13 +8,15 @@ import android.widget.AdapterView
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NavUtils
 import androidx.core.app.TaskStackBuilder
-import com.github.ykrank.androidautodispose.AndroidRxDispose
-import com.github.ykrank.androidlifecycle.event.ActivityEvent
+import androidx.lifecycle.lifecycleScope
+import com.github.ykrank.androidtools.extension.await
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.RxJavaUtil
 import com.google.common.base.Optional
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 import me.ykrank.s1next.R
 import me.ykrank.s1next.binding.SpinnerBindingAdapter
 import me.ykrank.s1next.data.pref.ReadPreferencesManager
@@ -113,16 +115,22 @@ class ForumActivity : BaseActivity(), ToolbarDropDownInterface.Callback, Adapter
     }
 
     private fun restoreFromInterrupt() {
-        Single.just(0)
-            .map { Optional.fromNullable(mReadPrefManager.lastReadProgress) }
-            .compose(RxJavaUtil.iOSingleTransformer())
-            .doFinally { mReadPrefManager.saveLastReadProgress(null) }
-            .to(AndroidRxDispose.withSingle(this, ActivityEvent.DESTROY))
-            .subscribe({ readProgress ->
+        lifecycleScope.launch {
+            try {
+                val readProgress = Single.just(0)
+                    .map { Optional.fromNullable(mReadPrefManager.lastReadProgress) }
+                    .compose(RxJavaUtil.iOSingleTransformer())
+                    .await()
                 if (readProgress.isPresent()) {
                     PostListActivity.start(this@ForumActivity, readProgress.get())
                 }
-            }, { L.report(it) })
+            } catch (throwable: Throwable) {
+                if (throwable is CancellationException) return@launch
+                L.report(throwable)
+            } finally {
+                mReadPrefManager.saveLastReadProgress(null)
+            }
+        }
     }
 
     companion object {

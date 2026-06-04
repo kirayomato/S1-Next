@@ -3,12 +3,14 @@ package com.github.ykrank.androidtools.ui
 import android.os.Bundle
 import android.view.View
 import androidx.annotation.CallSuper
-import com.github.ykrank.androidautodispose.AndroidRxDispose
-import com.github.ykrank.androidlifecycle.event.FragmentEvent
+import androidx.lifecycle.lifecycleScope
+import com.github.ykrank.androidtools.extension.await
 import com.github.ykrank.androidtools.ui.adapter.LibBaseRecyclerViewAdapter
 import com.github.ykrank.androidtools.ui.vm.LoadingViewModel
 import com.github.ykrank.androidtools.util.RxJavaUtil
 import io.reactivex.Single
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 
 /**
  * Created by ykrank on 2016/11/12 0012.
@@ -67,12 +69,20 @@ abstract class LibBaseLoadMoreRecycleViewFragment<D> : LibBaseRecyclerViewFragme
         // dismiss Snackbar in order to let user see the ProgressBar
         // when we start to loadViewPager new data
         mCoordinatorLayoutAnchorDelegate?.dismissSnackbarIfExist()
-        getLibPageSourceObservable(pageNum)
-                .map { d -> appendNewData(mBaseRecycleViewModel.data, d) }
-                .compose(RxJavaUtil.iOSingleTransformer())
-                .doAfterTerminate({ this.finallyDo() })
-                .to(AndroidRxDispose.withSingle(this, FragmentEvent.DESTROY))
-                .subscribe({ this.onLoadMoreNext(it) }, { this.onError(it) })
+        lifecycleScope.launch {
+            try {
+                val data = getLibPageSourceObservable(pageNum)
+                    .map { d -> appendNewData(mBaseRecycleViewModel.data, d) }
+                    .compose(RxJavaUtil.iOSingleTransformer())
+                    .await()
+                onLoadMoreNext(data)
+            } catch (throwable: Throwable) {
+                if (throwable is CancellationException) return@launch
+                onError(throwable)
+            } finally {
+                finallyDo()
+            }
+        }
     }
 
     /**

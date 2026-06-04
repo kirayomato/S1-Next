@@ -26,13 +26,13 @@ import androidx.core.view.ViewCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.transition.TransitionManager
-import com.github.ykrank.androidautodispose.AndroidRxDispose
-import com.github.ykrank.androidlifecycle.event.ActivityEvent
+import com.github.ykrank.androidtools.extension.await
 import com.github.ykrank.androidtools.util.ImeUtils
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.RxJavaUtil
 import com.github.ykrank.androidtools.util.TransitionUtils
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.User
@@ -278,33 +278,39 @@ class SearchActivity : BaseActivity() {
 
         val selected = appBar.spinner.selectedItem as String
         if (TextUtils.equals(getString(R.string.search_type_entry_user), selected)) {
-            ApiFlatTransformer.flatMappedWithAuthenticityToken(
-                s1Service,
-                mUserValidator,
-                mUser
-            ) { token -> s1Service.searchUser(token, query) }
-                .map { UserSearchWrapper.fromSource(it) }
-                .compose(RxJavaUtil.iOSingleTransformer())
-                .to(AndroidRxDispose.withSingle(this, ActivityEvent.DESTROY))
-                .subscribe({ setResults(it.userSearchResults, it.errorMsg) }, {
-                    lifecycleScope.launch {
-                        setResults(null, ErrorUtil.parse(this@SearchActivity, it))
-                    }
-                })
+            lifecycleScope.launch {
+                try {
+                    val result = ApiFlatTransformer.flatMappedWithAuthenticityToken(
+                        s1Service,
+                        mUserValidator,
+                        mUser
+                    ) { token -> s1Service.searchUser(token, query) }
+                        .map { UserSearchWrapper.fromSource(it) }
+                        .compose(RxJavaUtil.iOSingleTransformer())
+                        .await()
+                    setResults(result.userSearchResults, result.errorMsg)
+                } catch (throwable: Throwable) {
+                    if (throwable is CancellationException) return@launch
+                    setResults(null, ErrorUtil.parse(this@SearchActivity, throwable))
+                }
+            }
         } else {
-            ApiFlatTransformer.flatMappedWithAuthenticityToken(
-                s1Service,
-                mUserValidator,
-                mUser
-            ) { token -> s1Service.searchForum(token, query) }
-                .map { ForumSearchWrapper.fromSource(it) }
-                .compose(RxJavaUtil.iOSingleTransformer())
-                .to(AndroidRxDispose.withSingle(this, ActivityEvent.DESTROY))
-                .subscribe({ setResults(it.forumSearchResults, null) }, {
-                    lifecycleScope.launch {
-                        setResults(null, ErrorUtil.parse(this@SearchActivity, it))
-                    }
-                })
+            lifecycleScope.launch {
+                try {
+                    val result = ApiFlatTransformer.flatMappedWithAuthenticityToken(
+                        s1Service,
+                        mUserValidator,
+                        mUser
+                    ) { token -> s1Service.searchForum(token, query) }
+                        .map { ForumSearchWrapper.fromSource(it) }
+                        .compose(RxJavaUtil.iOSingleTransformer())
+                        .await()
+                    setResults(result.forumSearchResults, null)
+                } catch (throwable: Throwable) {
+                    if (throwable is CancellationException) return@launch
+                    setResults(null, ErrorUtil.parse(this@SearchActivity, throwable))
+                }
+            }
         }
     }
 

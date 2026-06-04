@@ -10,12 +10,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import androidx.lifecycle.lifecycleScope
-import com.github.ykrank.androidautodispose.AndroidRxDispose
-import com.github.ykrank.androidlifecycle.event.FragmentEvent
 import com.github.ykrank.androidtools.databinding.ProgressBarMenuBinding
+import com.github.ykrank.androidtools.extension.await
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.RxJavaUtil
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.ApiException
@@ -89,17 +89,19 @@ class NewReportFragment : BaseFragment() {
     }
 
     private fun refreshData() {
-        s1Service.getReportPreInfo(threadId, postID, System.currentTimeMillis())
+        lifecycleScope.launch {
+            try {
+                val info = s1Service.getReportPreInfo(threadId, postID, System.currentTimeMillis())
                 .map<ReportPreInfo> { ReportPreInfo.fromHtml(threadId, pageNum, it) }
                 .compose(RxJavaUtil.iOSingleTransformer())
-                .to(AndroidRxDispose.withSingle(this, FragmentEvent.DESTROY))
-                .subscribe({ info ->
-                    reportPreInfo = info
-                    setSpinner(info.reason)
-                }, {
-                    showRetrySnackbar(it, View.OnClickListener { v -> refreshData() })
-                }
-                )
+                    .await()
+                reportPreInfo = info
+                setSpinner(info.reason)
+            } catch (throwable: Throwable) {
+                if (throwable is CancellationException) return@launch
+                showRetrySnackbar(throwable, View.OnClickListener { refreshData() })
+            }
+        }
     }
 
     private fun setSpinner(reason: List<String>) {

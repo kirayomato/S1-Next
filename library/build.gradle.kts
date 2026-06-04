@@ -58,6 +58,7 @@ dependencies {
     api(libs.androidx.preference)
     api(libs.androidx.lifecycle.livedata.ktx)
     api(libs.androidx.constraintlayout)
+    api(libs.androidx.swiperefreshlayout)
 
     api(libs.androidx.multidex)
 
@@ -72,9 +73,6 @@ dependencies {
     api(libs.glide)
     api(libs.glide.okhttp3.integration)
     api(libs.okhttp)
-
-    api(libs.androidautodispose)
-    api(libs.adapterdelegates3)
 
     api(libs.bugly.crashreport)
 

@@ -6,15 +6,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Spinner
+import androidx.lifecycle.lifecycleScope
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.ykrank.androidautodispose.AndroidRxDispose
-import com.github.ykrank.androidlifecycle.event.FragmentEvent
+import com.github.ykrank.androidtools.extension.await
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.RxJavaUtil
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.S1Service
 import me.ykrank.s1next.data.api.model.PostEditor
@@ -162,25 +164,28 @@ class NewThreadFragment : BasePostEditFragment() {
     }
 
     private fun init() {
-        mS1Service.getNewThreadEditorInfo(mForumId)
+        lifecycleScope.launch {
+            try {
+                val postEditor = mS1Service.getNewThreadEditorInfo(mForumId)
                 .map<PostEditor> { PostEditor.fromHtml(it) }
                 .compose(RxJavaUtil.iOSingleTransformer())
-                .to(AndroidRxDispose.withSingle(this, FragmentEvent.DESTROY))
-                .subscribe({ postEditor ->
-                    parsedPostEditor = postEditor
-                    parsedForumAttachmentUploadInfo = postEditor.forumAttachmentUploadInfo
-                    parsedForumAttachments = postEditor.forumAttachments
-                    notifyForumAttachmentsChanged()
-                    val threadTypes = postEditor.threadTypes ?: emptyList()
-                    if (threadTypes.isEmpty()) {
-                        showRetrySnackbar(getString(R.string.message_network_error), View.OnClickListener { v -> init() })
-                    } else {
-                        setSpinner(threadTypes)
-                    }
-                }, {
-                    L.report(it)
-                    showRetrySnackbar(it, View.OnClickListener { v -> init() })
-                })
+                .await()
+                parsedPostEditor = postEditor
+                parsedForumAttachmentUploadInfo = postEditor.forumAttachmentUploadInfo
+                parsedForumAttachments = postEditor.forumAttachments
+                notifyForumAttachmentsChanged()
+                val threadTypes = postEditor.threadTypes ?: emptyList()
+                if (threadTypes.isEmpty()) {
+                    showRetrySnackbar(getString(R.string.message_network_error), View.OnClickListener { init() })
+                } else {
+                    setSpinner(threadTypes)
+                }
+            } catch (throwable: Throwable) {
+                if (throwable is CancellationException) return@launch
+                L.report(throwable)
+                showRetrySnackbar(throwable, View.OnClickListener { init() })
+            }
+        }
     }
 
     private fun setSpinner(types: List<ThreadType>) {

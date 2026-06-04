@@ -11,13 +11,13 @@ import android.view.ViewGroup
 import android.widget.SpinnerAdapter
 import androidx.appcompat.widget.ListPopupWindow
 import androidx.lifecycle.lifecycleScope
-import com.github.ykrank.androidautodispose.AndroidRxDispose
-import com.github.ykrank.androidlifecycle.event.ActivityEvent
+import com.github.ykrank.androidtools.extension.await
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.RxJavaUtil
 import com.github.ykrank.androidtools.widget.net.WifiBroadcastReceiver
 import com.google.android.material.tabs.TabLayout
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.Api
@@ -176,19 +176,22 @@ class ThreadListActivity : BaseActivity(), ThreadListPagerFragment.SubForumsCall
     }
 
     private fun init() {
-        mS1Service.getNewThreadInfo(forum.id!!.toInt())
+        lifecycleScope.launch {
+            try {
+                val types = mS1Service.getNewThreadInfo(forum.id!!.toInt())
                 .map<List<ThreadType>>(ThreadType.Companion::fromXmlString)
                 .compose(RxJavaUtil.iOSingleTransformer())
-                .to(AndroidRxDispose.withSingle(this, ActivityEvent.DESTROY))
-                .subscribe({
-                    threadTypes = ArrayList(it)
-                    refreshTabLayout()
-                }, {
-                    val msg = it.message?.trim()
-                    if ("抱歉，您所在的用户组(游客)无法进行此操作" != msg && "抱歉，您尚未登录，没有权限在该版块发帖" != msg) {
-                        L.report(it)
-                    }
-                })
+                    .await()
+                threadTypes = ArrayList(types)
+                refreshTabLayout()
+            } catch (throwable: Throwable) {
+                if (throwable is CancellationException) return@launch
+                val msg = throwable.message?.trim()
+                if ("抱歉，您所在的用户组(游客)无法进行此操作" != msg && "抱歉，您尚未登录，没有权限在该版块发帖" != msg) {
+                    L.report(throwable)
+                }
+            }
+        }
     }
 
     /**

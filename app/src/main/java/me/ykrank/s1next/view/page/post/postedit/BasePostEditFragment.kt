@@ -13,11 +13,12 @@ import android.view.ViewGroup
 import android.widget.EditText
 import androidx.annotation.CallSuper
 import androidx.annotation.UiThread
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import cn.dreamtobe.kpswitch.util.KPSwitchConflictUtil
 import cn.dreamtobe.kpswitch.util.KeyboardUtil
 import cn.dreamtobe.kpswitch.widget.KPSwitchPanelFrameLayout
-import com.github.ykrank.androidautodispose.AndroidRxDispose
-import com.github.ykrank.androidlifecycle.event.FragmentEvent
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.RxJavaUtil
 import com.github.ykrank.androidtools.widget.EditorDiskCache
@@ -26,6 +27,9 @@ import com.github.ykrank.androidtools.widget.uploadimg.ModelImageUpload
 import com.google.android.material.tabs.TabLayout
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.launch
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.model.PostEditor
 import me.ykrank.s1next.data.pref.GeneralPreferencesManager
@@ -66,7 +70,7 @@ abstract class BasePostEditFragment : BaseFragment(),
     @Inject
     internal lateinit var editorDiskCache: EditorDiskCache
     private var mCacheDisposable: Disposable? = null
-    private var requestDialogDisposable: Disposable? = null
+    private var requestDialogObserverBound = false
     /**
      * whether already post
      */
@@ -145,6 +149,7 @@ abstract class BasePostEditFragment : BaseFragment(),
         })
 
         setupToolsKeyboard()
+        setupEditorEventObservers()
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -156,22 +161,6 @@ abstract class BasePostEditFragment : BaseFragment(),
 
     override fun onResume() {
         super.onResume()
-
-        mEventBus.get()
-                .ofType(EmoticonClickEvent::class.java)
-                .to(AndroidRxDispose.withObservable(this, FragmentEvent.PAUSE))
-                .subscribe { event ->
-                    mReplyView.text.replace(mReplyView.selectionStart,
-                            mReplyView.selectionEnd, event.emoticonEntity)
-                }
-        mEventBus.get()
-                .ofType(PostAddImageEvent::class.java)
-                .to(AndroidRxDispose.withObservable(this, FragmentEvent.PAUSE))
-                .subscribe { event ->
-                    addImages.add(event.url)
-                    mReplyView.text.replace(mReplyView.selectionStart,
-                            mReplyView.selectionEnd, event.insertText)
-                }
 
         RxJavaUtil.disposeIfNotNull(mCacheDisposable)
         mCacheDisposable = null
@@ -261,17 +250,46 @@ abstract class BasePostEditFragment : BaseFragment(),
     }
 
     private fun bindRequestDialog() {
-        if (requestDialogDisposable == null) {
-            requestDialogDisposable = mEventBus.get()
-                    .filter { it is RequestDialogSuccessEvent && isRequestDialogAccept(it) }
-                    .map { it as RequestDialogSuccessEvent }
-                    .to(AndroidRxDispose.withObservable(this, FragmentEvent.DESTROY))
-                    .subscribe({
+        if (!requestDialogObserverBound) {
+            requestDialogObserverBound = true
+            lifecycleScope.launch(L.report) {
+                mEventBus.getClsFlow<RequestDialogSuccessEvent>()
+                    .filter { isRequestDialogAccept(it) }
+                    .collect {
                         post = true
                         editorDiskCache.remove(cacheKey)
                         showShortTextAndFinishCurrentActivity(it.msg)
                         onRequestDialogSuccess()
-                    }, L::report)
+                    }
+            }
+        }
+    }
+
+    private fun setupEditorEventObservers() {
+        viewLifecycleOwner.lifecycleScope.launch(L.report) {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                launch {
+                    mEventBus.getClsFlow<EmoticonClickEvent>()
+                        .collect { event ->
+                            mReplyView.text.replace(
+                                mReplyView.selectionStart,
+                                mReplyView.selectionEnd,
+                                event.emoticonEntity
+                            )
+                        }
+                }
+                launch {
+                    mEventBus.getClsFlow<PostAddImageEvent>()
+                        .collect { event ->
+                            addImages.add(event.url)
+                            mReplyView.text.replace(
+                                mReplyView.selectionStart,
+                                mReplyView.selectionEnd,
+                                event.insertText
+                            )
+                        }
+                }
+            }
         }
     }
 

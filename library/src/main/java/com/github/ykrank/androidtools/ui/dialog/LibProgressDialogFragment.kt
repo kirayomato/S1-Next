@@ -5,12 +5,12 @@ import android.app.ProgressDialog
 import android.os.Bundle
 import androidx.annotation.CallSuper
 import androidx.lifecycle.lifecycleScope
-import com.github.ykrank.androidautodispose.AndroidRxDispose
-import com.github.ykrank.androidlifecycle.event.FragmentEvent
+import com.github.ykrank.androidtools.extension.await
 import com.github.ykrank.androidtools.GlobalData
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
 /**
@@ -60,12 +60,20 @@ abstract class LibProgressDialogFragment<D> : LibBaseDialogFragment() {
      * @see BaseRecyclerViewFragment.load
      */
     private fun request() {
-        getLibSourceObservable()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doAfterTerminate { this.finallyDo() }
-            .to(AndroidRxDispose.withSingle<D>(this, FragmentEvent.DESTROY))
-            .subscribe({ this.onNext(it) }, { this.onError(it) })
+        lifecycleScope.launch {
+            try {
+                val data = getLibSourceObservable()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .await()
+                onNext(data)
+            } catch (throwable: Throwable) {
+                if (throwable is CancellationException) return@launch
+                onError(throwable)
+            } finally {
+                finallyDo()
+            }
+        }
     }
 
     /**

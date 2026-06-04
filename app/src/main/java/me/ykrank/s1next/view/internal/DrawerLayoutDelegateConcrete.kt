@@ -13,8 +13,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.github.ykrank.androidautodispose.AndroidRxDispose
-import com.github.ykrank.androidlifecycle.event.ActivityEvent
+import com.github.ykrank.androidtools.extension.await
 import com.github.ykrank.androidtools.extension.toast
 import com.github.ykrank.androidtools.ui.internal.DrawerLayoutDelegate
 import com.github.ykrank.androidtools.util.L
@@ -47,6 +46,7 @@ import me.ykrank.s1next.view.dialog.ThemeChangeDialogFragment
 import me.ykrank.s1next.view.page.setting.SettingsActivity
 import me.ykrank.s1next.viewmodel.UserViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
 /**
@@ -132,12 +132,18 @@ class DrawerLayoutDelegateConcrete(
 
         binding.drawerAutoSign.setOnClickListener {
             if (!mUser.isSigned) {
-                mAutoSignTask.autoSign().compose(RxJavaUtil.iOSingleTransformer())
-                    .to(AndroidRxDispose.withSingle(activity, ActivityEvent.DESTROY))
-                    .subscribe({ d ->
+                activity.lifecycleScope.launch {
+                    try {
+                        val d = mAutoSignTask.autoSign()
+                            .compose(RxJavaUtil.iOSingleTransformer())
+                            .await()
                         mUser.isSigned = d.signed
                         activity.toast(d.msg, Toast.LENGTH_SHORT)
-                    }, { L.report(it) })
+                    } catch (throwable: Throwable) {
+                        if (throwable is CancellationException) return@launch
+                        L.report(throwable)
+                    }
+                }
             }
         }
     }

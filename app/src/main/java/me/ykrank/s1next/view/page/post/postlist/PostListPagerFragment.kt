@@ -16,8 +16,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bigkoo.quicksidebar.QuickSideBarView
 import com.bigkoo.quicksidebar.listener.OnQuickSideBarTouchListener
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.ykrank.androidautodispose.AndroidRxDispose
-import com.github.ykrank.androidlifecycle.event.FragmentEvent
 import com.github.ykrank.androidtools.data.Resource
 import com.github.ykrank.androidtools.ui.internal.LoadingViewModelBindingDelegate
 import com.github.ykrank.androidtools.util.L
@@ -31,6 +29,7 @@ import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.ykrank.s1next.R
@@ -227,27 +226,7 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
 
         quickSideBarView.setOnQuickSideBarTouchListener(this)
 
-        mEventBus.get()
-            .ofType(QuickSidebarEnableChangeEvent::class.java)
-            .to(AndroidRxDispose.withObservable(this, FragmentEvent.DESTROY_VIEW))
-            .subscribe({ invalidateQuickSidebarVisible() }, { super.onError(it) })
-
-        mEventBus.get()
-            .ofType(BlackListChangeEvent::class.java)
-            .to(AndroidRxDispose.withObservable(this, FragmentEvent.DESTROY_VIEW))
-            .subscribe { startBlackListRefresh() }
-
-        mEventBus.get()
-            .ofType(EnterPostShareSelectionEvent::class.java)
-            .to(AndroidRxDispose.withObservable(this, FragmentEvent.DESTROY_VIEW))
-            .subscribe({ event ->
-                if ((event.threadId == null || event.threadId == mThreadId) &&
-                    event.pageNum == mPageNum &&
-                    currentPosts.any { it.id == event.postId }
-                ) {
-                    startPostShareSelection(event.postId)
-                }
-            }, { super.onError(it) })
+        setupEventBusObservers()
 
         parentFragmentManager.setFragmentResultListener(
             PostSharePreviewDialogFragment.RESULT_REQUEST_KEY,
@@ -255,6 +234,30 @@ class PostListPagerFragment : BaseRecyclerViewFragment<PostsWrapper>(),
         ) { _, result ->
             if (result.getBoolean(PostSharePreviewDialogFragment.RESULT_SHARED, false)) {
                 cancelPostShareSelection()
+            }
+        }
+    }
+
+    private fun setupEventBusObservers() {
+        viewLifecycleOwner.lifecycleScope.launch(L.report) {
+            launch {
+                mEventBus.getClsFlow<QuickSidebarEnableChangeEvent>()
+                    .collect { invalidateQuickSidebarVisible() }
+            }
+            launch {
+                mEventBus.getClsFlow<BlackListChangeEvent>()
+                    .collect { startBlackListRefresh() }
+            }
+            launch {
+                mEventBus.getClsFlow<EnterPostShareSelectionEvent>()
+                    .collect { event ->
+                        if ((event.threadId == null || event.threadId == mThreadId) &&
+                            event.pageNum == mPageNum &&
+                            currentPosts.any { it.id == event.postId }
+                        ) {
+                            startPostShareSelection(event.postId)
+                        }
+                    }
             }
         }
     }

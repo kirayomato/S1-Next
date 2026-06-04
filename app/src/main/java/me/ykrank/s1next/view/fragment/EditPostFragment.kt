@@ -6,11 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import com.github.ykrank.androidautodispose.AndroidRxDispose
-import com.github.ykrank.androidlifecycle.event.FragmentEvent
+import androidx.lifecycle.lifecycleScope
+import com.github.ykrank.androidtools.extension.await
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.RxJavaUtil
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 import me.ykrank.s1next.R
 import me.ykrank.s1next.data.api.S1Service
 import me.ykrank.s1next.data.api.model.Post
@@ -152,30 +154,32 @@ class EditPostFragment : BasePostEditFragment() {
     }
 
     private fun init() {
-        mS1Service.getEditPostEditorInfo(mThread.fid!!.toInt(), mThread.id!!.toInt(), mPost.id)
+        lifecycleScope.launch {
+            try {
+                val postEditor = mS1Service.getEditPostEditorInfo(mThread.fid!!.toInt(), mThread.id!!.toInt(), mPost.id)
                 .map<PostEditor> { PostEditor.fromHtml(it) }
                 .compose(RxJavaUtil.iOSingleTransformer())
-                .to(AndroidRxDispose.withSingle(this, FragmentEvent.DESTROY))
-                .subscribe({ postEditor ->
-                    parsedPostEditor = postEditor
-                    parsedForumAttachmentUploadInfo = postEditor.forumAttachmentUploadInfo
-                    parsedForumAttachments = postEditor.forumAttachments
-                    notifyForumAttachmentsChanged()
-                    if (isHost) {
-                        setSpinnerType(postEditor.threadTypes)
-                        binding.spinnerType.setSelection(postEditor.typeIndex)
+                    .await()
+                parsedPostEditor = postEditor
+                parsedForumAttachmentUploadInfo = postEditor.forumAttachmentUploadInfo
+                parsedForumAttachments = postEditor.forumAttachments
+                notifyForumAttachmentsChanged()
+                if (isHost) {
+                    setSpinnerType(postEditor.threadTypes)
+                    binding.spinnerType.setSelection(postEditor.typeIndex)
 
-                        setSpinnerPerm(postEditor.readPermTypes)
-                        binding.spinnerPerm.setSelection(postEditor.readPermIndex)
+                    setSpinnerPerm(postEditor.readPermTypes)
+                    binding.spinnerPerm.setSelection(postEditor.readPermIndex)
 
-                        binding.title.setText(postEditor.subject)
-                    }
-                    binding.layoutPost.reply.setText(postEditor.message)
-                }, { e ->
-                    L.report(e)
-                    showRetrySnackbar(e, View.OnClickListener { init() })
-                })
-
+                    binding.title.setText(postEditor.subject)
+                }
+                binding.layoutPost.reply.setText(postEditor.message)
+            } catch (throwable: Throwable) {
+                if (throwable is CancellationException) return@launch
+                L.report(throwable)
+                showRetrySnackbar(throwable, View.OnClickListener { init() })
+            }
+        }
     }
 
     private fun setSpinnerType(types: List<ThreadType>?) {

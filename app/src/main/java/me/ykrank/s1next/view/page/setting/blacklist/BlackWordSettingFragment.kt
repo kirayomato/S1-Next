@@ -11,12 +11,12 @@ import android.view.ViewGroup
 import android.widget.AbsListView
 import android.widget.ListView
 import androidx.lifecycle.lifecycleScope
-import com.github.ykrank.androidautodispose.AndroidRxDispose
-import com.github.ykrank.androidlifecycle.event.FragmentEvent
+import com.github.ykrank.androidtools.extension.await
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.RxJavaUtil
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.Single
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -181,11 +181,17 @@ class BlackWordSettingFragment : BaseFragment() {
      * Starts to load new data.
      */
     private fun load() {
-        sourceObservable
-            .compose(RxJavaUtil.iOSingleTransformer())
-            .to(AndroidRxDispose.withSingle(this, FragmentEvent.DESTROY))
-            .subscribe({ mListViewAdapter.changeCursor(it) },
-                { throwable -> L.e("S1next", throwable) })
+        lifecycleScope.launch {
+            try {
+                val cursor = sourceObservable
+                    .compose(RxJavaUtil.iOSingleTransformer())
+                    .await()
+                mListViewAdapter.changeCursor(cursor)
+            } catch (throwable: Throwable) {
+                if (throwable is CancellationException) return@launch
+                L.e("S1next", throwable)
+            }
+        }
     }
 
     override fun onPause() {

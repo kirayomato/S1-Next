@@ -16,10 +16,10 @@ import androidx.annotation.MainThread
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView
-import com.github.ykrank.androidautodispose.AndroidRxDispose
-import com.github.ykrank.androidlifecycle.event.FragmentEvent
 import com.github.ykrank.androidtools.extension.throttleFirst
 import com.github.ykrank.androidtools.ui.dialog.PageJumpDialogFragment
 import com.github.ykrank.androidtools.ui.internal.CoordinatorLayoutAnchorDelegate
@@ -28,10 +28,11 @@ import com.github.ykrank.androidtools.widget.EventBus
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.Single
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -62,7 +63,6 @@ import me.ykrank.s1next.view.internal.RequestCode
 import me.ykrank.s1next.view.page.edit.EditPostActivity
 import me.ykrank.s1next.view.page.post.prefetch.ThreadPrefetchDialogFragment
 import me.ykrank.s1next.widget.track.event.ViewThreadTrackEvent
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 
@@ -198,6 +198,7 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
         (activity as CoordinatorLayoutAnchorDelegate).setupFloatingActionButton(
             R.drawable.ic_insert_comment_black_24dp, this
         )
+        setupPostActionObservers()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -220,69 +221,18 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        mEventBus.get()
-            .ofType(QuoteEvent::class.java)
-            .to(AndroidRxDispose.withObservable(this, FragmentEvent.PAUSE))
-            .subscribe { quoteEvent ->
-                startReplyActivity(
-                    quoteEvent.quotePostId,
-                    quoteEvent.quotePostCount
-                )
-            }
-        mEventBus.get()
-            .ofType(RateEvent::class.java)
-            .to(AndroidRxDispose.withObservable(this, FragmentEvent.PAUSE))
-            .subscribe { event -> startRateActivity(event.threadId, event.postId) }
-        mEventBus.get()
-            .ofType(ReportEvent::class.java)
-            .to(AndroidRxDispose.withObservable(this, FragmentEvent.PAUSE))
-            .subscribe { event -> startReportActivity(event.threadId, event.postId, event.pageNum) }
-
-        mEventBus.get()
-            .ofType(EditPostEvent::class.java)
-            .to(AndroidRxDispose.withObservable(this, FragmentEvent.PAUSE))
-            .subscribe {
-                val thread = it.thread
-                val post = it.post
-                EditPostActivity.startActivityForResult(
-                    this,
-                    RequestCode.REQUEST_CODE_EDIT_POST,
-                    thread,
-                    post
-                )
-            }
-        mEventBus.get()
-            .ofType(VotePostEvent::class.java)
-            .to(AndroidRxDispose.withObservable(this, FragmentEvent.PAUSE))
-            .subscribe {
-                if (!LoginPromptDialogFragment.showAppLoginPromptDialogIfNeeded(
-                        childFragmentManager,
-                        mUser
-                    )
-                ) {
-                    VoteDialogFragment.newInstance(it.threadId, it.vote)
-                        .show(childFragmentManager, VoteDialogFragment.TAG)
-                }
-            }
-    }
-
     override fun onPause() {
         //save last read progress
         val fragment = curPostPageFragment
         if (fragment != null) {
             tempReadProgress = fragment.curReadProgress
-            if (tempReadProgress != null) {
-                Single.just(tempReadProgress)
-                    .delay(5, TimeUnit.SECONDS)
-                    .doOnError(L::report)
-                    .to(AndroidRxDispose.withSingle(this, FragmentEvent.DESTROY))
-                    .subscribe { b ->
-                        mReadPrefManager.saveLastReadProgress(b)
-                        L.i("Save last read progress:$b")
-                    }
+            val readProgressToSave = tempReadProgress
+            if (readProgressToSave != null) {
+                lifecycleScope.launch(L.report) {
+                    delay(5_000)
+                    mReadPrefManager.saveLastReadProgress(readProgressToSave)
+                    L.i("Save last read progress:$readProgressToSave")
+                }
             }
         } else {
             tempReadProgress = null
@@ -313,6 +263,56 @@ class PostListFragment : BaseViewPagerFragment(), PostListPagerFragment.PagerCal
         if (mReadPrefManager.isSaveAuto) {
             val saveMenu = menu.findItem(R.id.menu_save_progress)
             saveMenu?.isVisible = false
+        }
+    }
+
+    private fun setupPostActionObservers() {
+        viewLifecycleOwner.lifecycleScope.launch(L.report) {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                launch {
+                    mEventBus.getClsFlow<QuoteEvent>()
+                        .collect { quoteEvent ->
+                            startReplyActivity(
+                                quoteEvent.quotePostId,
+                                quoteEvent.quotePostCount
+                            )
+                        }
+                }
+                launch {
+                    mEventBus.getClsFlow<RateEvent>()
+                        .collect { event -> startRateActivity(event.threadId, event.postId) }
+                }
+                launch {
+                    mEventBus.getClsFlow<ReportEvent>()
+                        .collect { event ->
+                            startReportActivity(event.threadId, event.postId, event.pageNum)
+                        }
+                }
+                launch {
+                    mEventBus.getClsFlow<EditPostEvent>()
+                        .collect {
+                            EditPostActivity.startActivityForResult(
+                                this@PostListFragment,
+                                RequestCode.REQUEST_CODE_EDIT_POST,
+                                it.thread,
+                                it.post
+                            )
+                        }
+                }
+                launch {
+                    mEventBus.getClsFlow<VotePostEvent>()
+                        .collect {
+                            if (!LoginPromptDialogFragment.showAppLoginPromptDialogIfNeeded(
+                                    childFragmentManager,
+                                    mUser
+                                )
+                            ) {
+                                VoteDialogFragment.newInstance(it.threadId, it.vote)
+                                    .show(childFragmentManager, VoteDialogFragment.TAG)
+                            }
+                        }
+                }
+            }
         }
     }
 

@@ -1,7 +1,5 @@
 [versions]
-adapterdelegates3 = "3.1.0"
 alicloudAndroidHttpdns = "2.4.0"
-androidautodispose = "0.4.0"
 activity = "1.9.0"
 cardview = "1.0.0"
 constraintlayout = "2.1.4"
@@ -33,6 +31,7 @@ rxandroid = "2.1.1"
 rxjava = "2.2.21"
 rxkotlin = "2.4.0"
 soloader = "0.11.0"
+swiperefreshlayout = "1.1.0"
 gradleVersionsPlugin = "0.51.0"
 kotlin = "2.3.20"
 kotlinKsp = "2.3.8"
@@ -50,9 +49,7 @@ targetSdk = "34"
 agp = "9.2.0"
 
 [libraries]
-adapterdelegates3 = { module = "com.hannesdorfmann:adapterdelegates3", version.ref = "adapterdelegates3" }
 alicloud-android-httpdns = { module = "com.aliyun.ams:alicloud-android-httpdns", version.ref = "alicloudAndroidHttpdns" }
-androidautodispose = { module = "com.github.ykrank:androidautodispose", version.ref = "androidautodispose" }
 androidx-activity = { module = "androidx.activity:activity", version.ref = "activity" }
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
 androidx-cardview = { module = "androidx.cardview:cardview", version.ref = "cardview" }
@@ -105,6 +102,7 @@ rxandroid = { module = "io.reactivex.rxjava2:rxandroid", version.ref = "rxandroi
 rxjava = { module = "io.reactivex.rxjava2:rxjava", version.ref = "rxjava" }
 rxkotlin = { module = "io.reactivex.rxjava2:rxkotlin", version.ref = "rxkotlin" }
 soloader = { module = "com.facebook.soloader:soloader", version.ref = "soloader" }
+androidx-swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefreshlayout" }
 largeimageview = { module = "com.shizhefei:LargeImageView", version.ref = "largeimageview" }
 
 [plugins]

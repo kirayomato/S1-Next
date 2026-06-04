@@ -6,8 +6,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.fragment.app.Fragment
-import com.github.ykrank.androidautodispose.AndroidRxDispose
-import com.github.ykrank.androidlifecycle.event.ActivityEvent
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import me.ykrank.s1next.R
 import me.ykrank.s1next.view.event.PmGroupClickEvent
 import me.ykrank.s1next.view.fragment.PmFragment
@@ -28,15 +29,14 @@ class PmActivity : BaseActivity() {
                 .commit()
         }
 
-        mEventBus.get()
-            .ofType(PmGroupClickEvent::class.java)
-            .to(AndroidRxDispose.withObservable(this, ActivityEvent.DESTROY))
-            .subscribe { event ->
+        lifecycleScope.launch {
+            mEventBus.getClsFlow<PmGroupClickEvent>().collect { event ->
                 val pmGroup = event.pmGroup
                 val newFragment = PmFragment.newInstance(pmGroup.toUid.orEmpty(), pmGroup.toUsername.orEmpty())
                 fragment = newFragment
                 replaceFragmentWithBackStack(newFragment, PmFragment.TAG)
             }
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
