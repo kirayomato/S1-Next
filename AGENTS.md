@@ -59,7 +59,7 @@ S1-Next 是 STAGE1 论坛的 Android 客户端。项目采用 Gradle 多模块�
 
 ## 架构说明
 
-- UI 使用传统 Android XML/Data Binding，加 Material/AppCompat；不是 Jetpack Compose。除非任务明确要求，否则沿用现有 Activity/Fragment/XML 模式。
+- UI 使用传统 Android XML/View Binding，加 Material/AppCompat；不是 Jetpack Compose。除非任务明确要求，否则沿用现有 Activity/Fragment/XML 模式。
 - `BaseActivity`、`BaseFragment`、`BaseRecyclerViewFragment`、`BaseViewPagerFragment` 提供生命周期、toolbar/drawer、注入、加载、重试和缓存提示等通用能力。新增页面优先复用这些基类。
 - `:library` 放通用 base UI、adapter、event、Glide、network、tracking、upload 和工具代码。S1 业务逻辑应放在 `:app`；只有真正可复用的平台代码才放入 `:library`。
 - Dagger 为手动 wiring。新增需要字段注入的类时，需要在 `AppComponent` 添加 `inject(...)` 方法，并按邻近类的生命周期风格调用 `App.appComponent.inject(this)`。
@@ -76,7 +76,7 @@ S1-Next 是 STAGE1 论坛的 Android 客户端。项目采用 Gradle 多模块�
 - 新增依赖应通过 `gradle/libs.versions.toml` 和对应模块的 `build.gradle.kts`，不要在模块 build 文件里新增仓库。
 - 用户可见文案使用 string resource；必要时同步更新相关本地化资源（`values`、`values-zh`、`values-zh-rTW`）。
 - 修改 Room entity/DAO 时，需要提升数据库版本，按需添加 auto/manual migration，并提交 `app/schemas` 下生成的 schema JSON。
-- 修改 Data Binding layout 后，应构建相关变体，因为 binding 错误会在编译期暴露。
+- 修改 View Binding layout 后，应构建相关变体，因为 binding 错误会在编译期暴露。
 - 除非任务明确涉及键盘/面板行为，否则避免改动 `JKeyboardPanelSwitch`。
 - 谨慎扩大 `:library` API：该模块很多依赖通过 `api` 暴露，改动可能广泛影响 `:app`。
 

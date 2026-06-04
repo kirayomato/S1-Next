@@ -80,7 +80,6 @@ class OpenSourceLicensesFragment : PreferenceFragment() {
             arrayOf("android-apt", "UNLICENSE"),
             arrayOf("Bugsnag Android", "BUGSNAG_ANDROID"),
             arrayOf("Dagger 2", "DAGGER_2"),
-            arrayOf("Data Binding", "ANDROID_SUPPORT"),
             arrayOf("FindBugs-jsr305", "APACHE_LICENSE_2.0"),
             arrayOf("Glide", "GLIDE"),
             arrayOf("Gradle Retrolambda Plugin", "GRADLE_RETROLAMBDA_PLUGIN"),
