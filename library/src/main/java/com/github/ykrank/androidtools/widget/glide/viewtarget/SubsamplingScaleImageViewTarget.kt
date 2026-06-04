@@ -1,0 +1,27 @@
+package com.github.ykrank.androidtools.widget.glide.viewtarget
+
+import android.graphics.drawable.Drawable
+import com.bumptech.glide.request.transition.Transition
+import com.davemorrissey.labs.subscaleview.ImageSource
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+import java.io.File
+
+/**
+ * A Glide target for displaying downloaded image files in [SubsamplingScaleImageView].
+ */
+open class SubsamplingScaleImageViewTarget(
+    view: SubsamplingScaleImageView
+) : CustomViewTarget<SubsamplingScaleImageView, File>(view) {
+
+    override fun onResourceReady(resource: File, transition: Transition<in File>?) {
+        view.setImage(ImageSource.uri(resource.absolutePath))
+    }
+
+    override fun onLoadFailed(errorDrawable: Drawable?) {
+        view.recycle()
+    }
+
+    override fun onResourceCleared(placeholder: Drawable?) {
+        view.recycle()
+    }
+}

@@ -85,6 +85,6 @@ dependencies {
     api(libs.retrofit2.converter.jackson)
     api(libs.retrofit2.converter.scalars)
 
-    api(libs.largeimageview)
+    api(libs.subsamplingimageview)
 
 }

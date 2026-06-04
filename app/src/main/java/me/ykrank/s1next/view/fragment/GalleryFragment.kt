@@ -32,8 +32,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.ykrank.s1next.App
 import me.ykrank.s1next.R
-import me.ykrank.s1next.binding.LargeImageViewBindingAdapter
 import me.ykrank.s1next.binding.PhotoViewBindingAdapter
+import me.ykrank.s1next.binding.SubsamplingScaleImageViewBindingAdapter
 import me.ykrank.s1next.data.pref.DownloadPreferencesManager
 import me.ykrank.s1next.databinding.FragmentGalleryBinding
 import me.ykrank.s1next.databinding.MenuGalleryLargeImageSwitchBinding
@@ -179,7 +179,7 @@ class GalleryFragment : Fragment() {
     private fun bindLargeMode() {
         binding.photoView.visibility = if (large) View.GONE else View.VISIBLE
         binding.largeImageView.visibility = if (large) View.VISIBLE else View.GONE
-        LargeImageViewBindingAdapter.loadImage(
+        SubsamplingScaleImageViewBindingAdapter.loadImage(
             binding.largeImageView,
             mImageUrl,
             mImageThumbUrl,

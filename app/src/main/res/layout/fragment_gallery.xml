@@ -14,7 +14,7 @@
         android:contentDescription="@string/picture_content_desc"
         android:transitionName="@string/gallery_transition" />
 
-    <com.shizhefei.view.largeimage.LargeImageView
+    <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
         android:id="@+id/largeImageView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -38,7 +38,7 @@ kotlinKsp = "2.3.9"
 paging = "3.5.0"
 room = "2.8.4"
 transition = "1.7.0"
-largeimageview = "1.1.0"
+subsamplingimageview = "3.10.0"
 compileSdk = "37"
 targetSdk = "34"
 agp = "9.2.0"
@@ -92,7 +92,7 @@ rxjava = { module = "io.reactivex.rxjava2:rxjava", version.ref = "rxjava" }
 rxkotlin = { module = "io.reactivex.rxjava2:rxkotlin", version.ref = "rxkotlin" }
 soloader = { module = "com.facebook.soloader:soloader", version.ref = "soloader" }
 androidx-swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefreshlayout" }
-largeimageview = { module = "com.shizhefei:LargeImageView", version.ref = "largeimageview" }
+subsamplingimageview = { module = "com.davemorrissey.labs:subsampling-scale-image-view-androidx", version.ref = "subsamplingimageview" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
