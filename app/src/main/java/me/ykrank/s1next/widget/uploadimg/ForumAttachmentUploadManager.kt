@@ -9,7 +9,6 @@ import me.ykrank.s1next.data.User
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.data.api.S1Service
 import me.ykrank.s1next.data.api.model.PostEditor
-import okhttp3.ExperimentalOkHttpApi
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -36,12 +35,10 @@ class ForumAttachmentUploadManager(
         return upload(requestFile, metadata)
     }
 
-    @OptIn(ExperimentalOkHttpApi::class)
     override suspend fun uploadImage(imageFile: FileDescriptor): ImageUpload {
         return uploadImage(imageFile, ImageUploadMetadata())
     }
 
-    @OptIn(ExperimentalOkHttpApi::class)
     override suspend fun uploadImage(imageFile: FileDescriptor, metadata: ImageUploadMetadata): ImageUpload {
         val requestFile = imageFile.toRequestBody((metadata.mimeType ?: "image/*").toMediaTypeOrNull())
         return upload(requestFile, metadata)

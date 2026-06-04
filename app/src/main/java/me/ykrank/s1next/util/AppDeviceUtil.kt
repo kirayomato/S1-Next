@@ -17,7 +17,7 @@ object AppDeviceUtil {
 
     @JvmStatic
     fun getVersionName(): String {
-        return packageInfo.versionName
+        return packageInfo.versionName.orEmpty()
     }
 
     fun getAppFullVersionName(): String {

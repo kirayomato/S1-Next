@@ -2,7 +2,6 @@ package com.github.ykrank.androidtools.widget.uploadimg
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.github.ykrank.androidtools.util.L
-import okhttp3.ExperimentalOkHttpApi
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
@@ -51,7 +50,6 @@ class SmmsImageUploadManager(_okHttpClient: OkHttpClient? = null) : ImageUploadM
         return uploadApiService.postSmmsImage(body).toCommon()
     }
 
-    @OptIn(ExperimentalOkHttpApi::class)
     override suspend fun uploadImage(imageFile: FileDescriptor): ImageUpload {
         val requestFile = imageFile.toRequestBody("image/*".toMediaTypeOrNull())
         val body = MultipartBody.Part.createFormData("smfile", "image.jpg", requestFile)

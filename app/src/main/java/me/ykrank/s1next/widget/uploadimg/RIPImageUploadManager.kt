@@ -4,7 +4,6 @@ import com.github.ykrank.androidtools.widget.uploadimg.ImageDelete
 import com.github.ykrank.androidtools.widget.uploadimg.ImageUpload
 import com.github.ykrank.androidtools.widget.uploadimg.ImageUploadManager
 import me.ykrank.s1next.widget.uploadimg.model.RIPImageUpload
-import okhttp3.ExperimentalOkHttpApi
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
@@ -49,7 +48,6 @@ class RIPImageUploadManager(_okHttpClient: OkHttpClient? = null) : ImageUploadMa
         return uploadApiService.postRIPImage(imageFile.name, requestFile).toCommon()
     }
 
-    @OptIn(ExperimentalOkHttpApi::class)
     override suspend fun uploadImage(imageFile: FileDescriptor): ImageUpload {
         val requestFile = imageFile.toRequestBody("image/*".toMediaTypeOrNull())
         return uploadApiService.postRIPImage("image.jpg", requestFile).toCommon()
