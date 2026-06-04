@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.github.ykrank.androidtools.R
 import com.github.ykrank.androidtools.ui.internal.CoordinatorLayoutAnchorDelegate
+import com.github.ykrank.androidtools.util.ContextUtils
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.widget.track.event.page.FragmentEndEvent
 import com.github.ykrank.androidtools.widget.track.event.page.FragmentStartEvent
@@ -28,7 +29,9 @@ abstract class LibBaseFragment : Fragment() {
     @CallSuper
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        mCoordinatorLayoutAnchorDelegate = context as CoordinatorLayoutAnchorDelegate
+        mCoordinatorLayoutAnchorDelegate =
+            (context as? CoordinatorLayoutAnchorDelegate)
+                ?: (ContextUtils.getBaseContext(context) as CoordinatorLayoutAnchorDelegate)
     }
 
     @CallSuper

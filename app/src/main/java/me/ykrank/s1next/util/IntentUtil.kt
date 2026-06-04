@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.widget.Toast
 import com.github.ykrank.androidtools.ui.internal.CoordinatorLayoutAnchorDelegate
+import com.github.ykrank.androidtools.util.ContextUtils
 import me.ykrank.s1next.R
 
 object IntentUtil {
@@ -85,8 +86,10 @@ object IntentUtil {
             }
         }
         if (targetIntentList.isEmpty()) {
-            if (context is CoordinatorLayoutAnchorDelegate) {
-                (context as CoordinatorLayoutAnchorDelegate).showSnackbar(
+            val coordinatorLayoutAnchorDelegate = (context as? CoordinatorLayoutAnchorDelegate)
+                ?: (ContextUtils.getBaseContext(context) as? CoordinatorLayoutAnchorDelegate)
+            if (coordinatorLayoutAnchorDelegate != null) {
+                coordinatorLayoutAnchorDelegate.showSnackbar(
                     R.string.message_chooser_no_applications
                 )
             } else {

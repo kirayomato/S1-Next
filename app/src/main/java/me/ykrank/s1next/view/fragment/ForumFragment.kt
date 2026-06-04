@@ -10,6 +10,7 @@ import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.github.ykrank.androidtools.data.CacheParam
 import com.github.ykrank.androidtools.data.Resource
+import com.github.ykrank.androidtools.util.ContextUtils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -44,7 +45,8 @@ class ForumFragment : BaseRecyclerViewFragment<ForumGroupsWrapper>(),
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        mToolbarCallback = context as ToolbarDropDownInterface.Callback?
+        mToolbarCallback = (context as? ToolbarDropDownInterface.Callback)
+            ?: (ContextUtils.getBaseContext(context) as? ToolbarDropDownInterface.Callback)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

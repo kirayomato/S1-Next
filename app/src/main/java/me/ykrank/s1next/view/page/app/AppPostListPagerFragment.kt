@@ -11,6 +11,7 @@ import com.bigkoo.quicksidebar.listener.OnQuickSideBarTouchListener
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.ykrank.androidtools.ui.internal.LoadingViewModelBindingDelegate
 import com.github.ykrank.androidtools.ui.vm.LoadingViewModel
+import com.github.ykrank.androidtools.util.ContextUtils
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.LooperUtil
 import com.github.ykrank.androidtools.util.MathUtil
@@ -132,7 +133,8 @@ class AppPostListPagerFragment : BaseRecyclerViewFragment<AppPostsWrapper>(),
         mPagerCallback = if (parentFragment != null) {
             parentFragment as PagerCallback
         } else {
-            context as PagerCallback
+            (context as? PagerCallback)
+                ?: (ContextUtils.getBaseContext(context) as PagerCallback)
         }
     }
 

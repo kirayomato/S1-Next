@@ -7,6 +7,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.ykrank.androidtools.data.CacheParam
 import com.github.ykrank.androidtools.data.Resource
+import com.github.ykrank.androidtools.util.ContextUtils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -62,7 +63,8 @@ class ThreadListPagerFragment : BaseRecyclerViewFragment<ThreadsWrapper>() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        mSubForumsCallback = context as SubForumsCallback?
+        mSubForumsCallback = (context as? SubForumsCallback)
+            ?: (ContextUtils.getBaseContext(context) as? SubForumsCallback)
     }
 
 
