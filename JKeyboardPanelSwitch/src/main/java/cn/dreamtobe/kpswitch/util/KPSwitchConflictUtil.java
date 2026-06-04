@@ -16,6 +16,8 @@
 package cn.dreamtobe.kpswitch.util;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -72,7 +74,7 @@ public class KPSwitchConflictUtil {
                               /* Nullable **/final View switchPanelKeyboardBtn,
                               /* Nullable **/final View focusView,
                               /* Nullable **/final SwitchClickListener switchClickListener) {
-        final Activity activity = (Activity) panelLayout.getContext();
+        final Activity activity = findActivity(panelLayout);
 
         if (switchPanelKeyboardBtn != null) {
             switchPanelKeyboardBtn.setOnClickListener(new View.OnClickListener() {
@@ -129,7 +131,7 @@ public class KPSwitchConflictUtil {
                               final View focusView,
                               /** Nullable **/final SwitchClickListener switchClickListener,
                               SubPanelAndTrigger... subPanelAndTriggers) {
-        final Activity activity = (Activity) panelLayout.getContext();
+        final Activity activity = findActivity(panelLayout);
 
         for (SubPanelAndTrigger subPanelAndTrigger : subPanelAndTriggers) {
 
@@ -182,7 +184,7 @@ public class KPSwitchConflictUtil {
      * @see KPSwitchPanelLayoutHandler
      */
     public static void showPanel(final View panelLayout) {
-        final Activity activity = (Activity) panelLayout.getContext();
+        final Activity activity = findActivity(panelLayout);
         panelLayout.setVisibility(View.VISIBLE);
         if (activity.getCurrentFocus() != null) {
             KeyboardUtil.hideKeyboard(activity.getCurrentFocus());
@@ -197,7 +199,7 @@ public class KPSwitchConflictUtil {
      * @param focusView   the view will be focused.
      */
     public static void showKeyboard(final View panelLayout, final View focusView) {
-        final Activity activity = (Activity) panelLayout.getContext();
+        final Activity activity = findActivity(panelLayout);
 
         KeyboardUtil.showKeyboard(focusView);
         if (isHandleByPlaceholder(activity)) {
@@ -236,7 +238,7 @@ public class KPSwitchConflictUtil {
      * @param panelLayout the layout of panel.
      */
     public static void hidePanelAndKeyboard(final View panelLayout) {
-        final Activity activity = (Activity) panelLayout.getContext();
+        final Activity activity = findActivity(panelLayout);
 
         final View focusView = activity.getCurrentFocus();
         if (focusView != null) {
@@ -278,6 +280,17 @@ public class KPSwitchConflictUtil {
     static boolean isHandleByPlaceholder(final Activity activity) {
         return isHandleByPlaceholder(ViewUtil.isFullScreen(activity),
                 ViewUtil.isTranslucentStatus(activity), ViewUtil.isFitsSystemWindows(activity));
+    }
+
+    public static Activity findActivity(final View view) {
+        Context context = view.getContext();
+        while (context instanceof ContextWrapper) {
+            if (context instanceof Activity) {
+                return (Activity) context;
+            }
+            context = ((ContextWrapper) context).getBaseContext();
+        }
+        throw new IllegalStateException("Can't find Activity from view context: " + view.getContext());
     }
 
     private static void bindSubPanel(final SubPanelAndTrigger subPanelAndTrigger,

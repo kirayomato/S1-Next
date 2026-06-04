@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 
 import cn.dreamtobe.kpswitch.IPanelConflictLayout;
 import cn.dreamtobe.kpswitch.util.KeyboardUtil;
+import cn.dreamtobe.kpswitch.util.KPSwitchConflictUtil;
 import cn.dreamtobe.kpswitch.util.StatusBarHeightUtil;
 import cn.dreamtobe.kpswitch.util.ViewUtil;
 
@@ -47,7 +48,7 @@ public class KPSwitchRootLayoutHandler {
     public KPSwitchRootLayoutHandler(final View rootView) {
         this.mTargetRootView = rootView;
         this.mStatusBarHeight = StatusBarHeightUtil.getStatusBarHeight(rootView.getContext());
-        final Activity activity = (Activity) rootView.getContext();
+        final Activity activity = KPSwitchConflictUtil.findActivity(rootView);
         this.mIsTranslucentStatus = ViewUtil.isTranslucentStatus(activity);
     }
 
