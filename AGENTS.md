@@ -6,7 +6,7 @@
 
 ## 项目概览
 
-S1-Next 是 STAGE1 论坛的 Android 客户端。项目采用 Gradle 多模块结构，使用 Kotlin DSL、Android Gradle Plugin 9.2.0、Gradle 9.5.1、Kotlin 2.3.20、Java 8 字节码，`compileSdk` 为 35，`targetSdk` 为 34。
+S1-Next 是 STAGE1 论坛的 Android 客户端。项目采用 Gradle 多模块结构，使用 Kotlin DSL、Android Gradle Plugin 9.2.0、Gradle 9.5.1、Kotlin 2.3.20、Java 8 字节码，`compileSdk` 为 37，`targetSdk` 为 34。
 
 模块划分：
 

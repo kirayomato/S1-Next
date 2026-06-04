@@ -51,8 +51,16 @@ public final class LibViewBindingAdapter {
             return;
         }
         if (tintColor == null || tintColor == Integer.MIN_VALUE) {
-            TypedArray ta = view.getContext().obtainStyledAttributes(ResourceUtil.getResourceId(view.getContext(), com.google.android.material.R.attr.materialCardViewStyle), new int[]{com.google.android.material.R.attr.cardBackgroundColor});
-            tintColor = ta.getColor(0, Color.TRANSPARENT);
+            int styleRes = ResourceUtil.getResourceId(view.getContext(), com.google.android.material.R.attr.materialCardViewStyle);
+            TypedArray ta = view.getContext().obtainStyledAttributes(
+                    styleRes,
+                    new int[]{androidx.cardview.R.attr.cardBackgroundColor}
+            );
+            try {
+                tintColor = ta.getColor(0, Color.TRANSPARENT);
+            } finally {
+                ta.recycle();
+            }
         }
         view.setCardBackgroundColor(tintColor);
     }

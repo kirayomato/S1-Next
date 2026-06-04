@@ -138,6 +138,7 @@ dependencies {
     implementation(project(":JKeyboardPanelSwitch"))
 
     implementation(libs.paging)
+    implementation(libs.androidx.documentfile)
 
     implementation(libs.bugly.nativecrashreport)
 

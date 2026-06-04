@@ -9,11 +9,11 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.AttrRes
+import androidx.appcompat.R as AppCompatR
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.graphics.ColorUtils
 import me.ykrank.s1next.R
 import com.github.ykrank.androidtools.R as ToolsR
-import com.google.android.material.R as MaterialR
 
 class CollapsibleInfoBar @JvmOverloads constructor(
     context: Context,
@@ -85,7 +85,7 @@ class CollapsibleInfoBar @JvmOverloads constructor(
         val base = resolveThemeColor(ToolsR.attr.cardViewBackground)
             ?: resolveThemeColor(android.R.attr.colorBackground)
             ?: Color.TRANSPARENT
-        val primaryTint = resolveThemeColor(MaterialR.attr.colorPrimary)?.withOpaqueAlpha()
+        val primaryTint = resolveThemeColor(AppCompatR.attr.colorPrimary)?.withOpaqueAlpha()
         val primaryBackground = primaryTint?.let { ColorUtils.blendARGB(base, it, PRIMARY_BLEND_ALPHA) }
         if (primaryBackground != null && !primaryBackground.isTooCloseTo(base)) {
             return primaryBackground
