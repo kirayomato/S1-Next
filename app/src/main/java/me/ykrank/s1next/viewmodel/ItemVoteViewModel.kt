@@ -1,13 +1,12 @@
 package me.ykrank.s1next.viewmodel
 
-import androidx.databinding.ObservableBoolean
 import me.ykrank.s1next.data.api.model.Vote
 
 class ItemVoteViewModel(
     private val voteVM: VoteViewModel,
     val option: Vote.VoteOption
 ) {
-    val selected = ObservableBoolean()
+    var selected: Boolean = false
 
     val isSingleVotable: Boolean
         get() = voteVM.isVoteable && !voteVM.isMultiple

@@ -4,7 +4,6 @@ alicloudAndroidHttpdns = "2.4.0"
 androidautodispose = "0.4.0"
 activity = "1.9.0"
 cardview = "1.0.0"
-databinding_compiler = "3.1.4"
 constraintlayout = "2.1.4"
 bugly_crashreport = "4.1.9.3"
 bugly_crashreport_upgrade = "1.6.1"
@@ -67,7 +66,6 @@ androidx-transition = { module = "androidx.transition:transition", version.ref =
 bugly-nativecrashreport = { module = "com.tencent.bugly:nativecrashreport", version.ref = "bugly_nativecrashreport" }
 bugly-crashreport = { module = "com.tencent.bugly:crashreport", version.ref = "bugly_crashreport" }
 bugly-crashreport_upgrade = { module = "com.tencent.bugly:crashreport_upgrade", version.ref = "bugly_crashreport_upgrade" }
-databinding-compiler = { module = "com.android.databinding:compiler", version.ref = "databinding_compiler" }
 flipper = { module = "com.facebook.flipper:flipper", version.ref = "flipper" }
 flipper-network-plugin = { module = "com.facebook.flipper:flipper-network-plugin", version.ref = "flipper" }
 flipper-leakcanary-plugin = { module = "com.facebook.flipper:flipper-leakcanary2-plugin", version.ref = "flipper" }

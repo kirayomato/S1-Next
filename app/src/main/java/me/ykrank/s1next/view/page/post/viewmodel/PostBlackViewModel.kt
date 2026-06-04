@@ -3,9 +3,6 @@ package me.ykrank.s1next.view.page.post.viewmodel
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.PopupMenu
-import androidx.databinding.Observable
-import androidx.databinding.ObservableField
-import androidx.databinding.ObservableInt
 import androidx.lifecycle.LifecycleOwner
 import com.github.ykrank.androidtools.util.ContextUtils
 import com.github.ykrank.androidtools.util.L
@@ -19,28 +16,19 @@ import me.ykrank.s1next.view.internal.BlacklistMenuAction
 
 class PostBlackViewModel(val lifecycleOwner: LifecycleOwner, private val eventBus: EventBus) {
 
-    val post = ObservableField<Post>()
-    val thread = ObservableField<Thread>()
-    val vote = ObservableField<Vote>()
-    val floor = ObservableField<CharSequence>()
-    val pageNum = ObservableInt()
+    var post: Post? = null
+    var thread: Thread? = null
+    var vote: Vote? = null
+    var pageNum: Int = 0
 
-    private val postFloor: CharSequence?
+    val floor: CharSequence?
         get() {
-            val p = post.get() ?: return null
+            val p = post ?: return null
             return "#${p.number}"
         }
 
-    init {
-        post.addOnPropertyChangedCallback(object : Observable.OnPropertyChangedCallback() {
-            override fun onPropertyChanged(observable: Observable, i: Int) {
-                floor.set(postFloor)
-            }
-        })
-    }
-
     fun onAvatarClick(v: View) {
-        post.get()?.let {
+        post?.let {
             val authorId = it.authorId
             val authorName = it.authorName
             if (authorId != null && authorName != null) {
@@ -66,7 +54,7 @@ class PostBlackViewModel(val lifecycleOwner: LifecycleOwner, private val eventBu
     fun showBlackListMenu(v: View): Boolean {
         //长按显示抹布菜单
         val popup = PopupMenu(v.context, v)
-        val postData = post.get()
+        val postData = post
         popup.setOnMenuItemClickListener { menuitem: MenuItem ->
             when (menuitem.itemId) {
                 R.id.menu_popup_blacklist -> {

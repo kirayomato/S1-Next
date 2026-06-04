@@ -90,17 +90,17 @@ class PostBlackAdapterDelegate(
             setTextSelectable(binding, selectable)
         }
 
-        holder.viewModel.thread.set(threadInfo)
-        holder.viewModel.pageNum.set(pageNum)
-        holder.viewModel.post.set(post)
-        holder.viewModel.vote.set(if ("1" == post.number) voteInfo else null)
+        holder.viewModel.thread = threadInfo
+        holder.viewModel.pageNum = pageNum
+        holder.viewModel.post = post
+        holder.viewModel.vote = if ("1" == post.number) voteInfo else null
         binding.threadTitle.text = threadInfo?.title
         binding.threadTitle.visibility =
             if (pageNum == 1 && post.isFirst && threadInfo?.title != null) View.VISIBLE else View.GONE
         ImageViewBindingAdapter.loadAvatar(binding.avatar, null, post.authorId)
         binding.authorName.text = post.authorName
         binding.originalPosterTag.visibility = if (post.isOpPost) View.VISIBLE else View.GONE
-        binding.tvFloor.text = holder.viewModel.floor.get()
+        binding.tvFloor.text = holder.viewModel.floor
         TextViewBindingAdapter.setReply(binding.tvReply, null, null, fragment.viewLifecycleOwner, post)
     }
 

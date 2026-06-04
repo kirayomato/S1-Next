@@ -23,7 +23,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
     buildFeatures {
-        dataBinding = true
         viewBinding = true
         buildConfig = true
     }
@@ -51,8 +50,6 @@ dependencies {
     normalApi(fileTree("libs/normal") { include("*.jar", "*.aar") })
     playApi(fileTree("libs/play") { include("*.jar", "*.aar") })
     api(fileTree("libs/common") { include("*.jar", "*.aar") })
-
-    kapt(libs.databinding.compiler)
 
     implementation(libs.jackson.kotlin)
     api(libs.material)

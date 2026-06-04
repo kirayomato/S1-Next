@@ -3,7 +3,6 @@ package me.ykrank.s1next.binding
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import androidx.core.net.toFile
-import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.github.ykrank.androidtools.util.L
 import com.github.ykrank.androidtools.util.isFile
@@ -16,7 +15,6 @@ import me.ykrank.s1next.widget.image.image
 
 object LargeImageViewBindingAdapter {
     @JvmStatic
-    @BindingAdapter("url", "thumbUrl", "manager", "show")
     fun loadImage(
         largeImageView: LargeImageView,
         url: Uri?,

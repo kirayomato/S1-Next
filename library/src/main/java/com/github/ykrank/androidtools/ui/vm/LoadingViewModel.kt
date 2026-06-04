@@ -2,14 +2,15 @@ package com.github.ykrank.androidtools.ui.vm
 
 import android.os.Parcel
 import androidx.annotation.IntDef
-import androidx.databinding.BaseObservable
 
-class LoadingViewModel : BaseObservable {
+class LoadingViewModel {
+    private val loadingChangedListeners = mutableSetOf<() -> Unit>()
+
     @LoadingDef
     var loading: Int = LOADING_FIRST_TIME
         set(value) {
             field = value
-            notifyChange()
+            loadingChangedListeners.forEach { it() }
         }
 
 
@@ -24,6 +25,14 @@ class LoadingViewModel : BaseObservable {
         get() = loading != LOADING_FIRST_TIME && loading != LOADING_PULL_UP_TO_REFRESH
     val isLoadingFirstTime: Boolean
         get() = loading == LOADING_FIRST_TIME
+
+    fun addOnLoadingChangedListener(listener: () -> Unit) {
+        loadingChangedListeners += listener
+    }
+
+    fun removeOnLoadingChangedListener(listener: () -> Unit) {
+        loadingChangedListeners -= listener
+    }
 
     @Retention(AnnotationRetention.SOURCE)
     @IntDef(value = [LOADING_FINISH, LOADING_FIRST_TIME, LOADING_SWIPE_REFRESH, LOADING_PULL_UP_TO_REFRESH])

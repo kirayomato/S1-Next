@@ -109,7 +109,7 @@ class VoteDialogFragment : BaseDialogFragment(), VoteViewModel.VoteVmAction {
                     appVoteResult.toastError(activity) {
                         val appVote = this.data
                         voteOptionsResult.toastError(activity) {
-                            model.appVote.set(appVote)
+                            model.appVote = appVote
                             binding.bindVote(model)
                             data?.let {
                                 this@VoteDialogFragment.data.forEachIndexed { index, vm ->
@@ -127,7 +127,7 @@ class VoteDialogFragment : BaseDialogFragment(), VoteViewModel.VoteVmAction {
     }
 
     private fun LayoutVoteBinding.bindVote(model: VoteViewModel) {
-        val appVote = model.appVote.get()
+        val appVote = model.appVote
         tvVoteIntro.text = model.getVoteSummary(appVote)
         btnViewAllVoter.isEnabled = appVote?.isOvert == true
         btnViewAllVoter.setOnClickListener(model.clickViewAllVoter(appVote))
@@ -139,22 +139,22 @@ class VoteDialogFragment : BaseDialogFragment(), VoteViewModel.VoteVmAction {
     private fun refreshSelectedItem(position: Int) {
         if (mVote.isMultiple) {
             val vm = data[position]
-            if (vm.selected.get()) {
-                vm.selected.set(false)
+            if (vm.selected) {
+                vm.selected = false
             } else {
-                val selected = data.filter { it.selected.get() }
+                val selected = data.filter { it.selected }
                 if (selected.size < mVote.maxChoices) {
-                    vm.selected.set(true)
+                    vm.selected = true
                 }
             }
         } else {
-            data.forEachIndexed { index, vm -> vm.selected.set(index == position) }
+            data.forEachIndexed { index, vm -> vm.selected = index == position }
         }
         adapter.notifyDataSetChanged()
     }
 
     override fun onClickVote(view: View?) {
-        val selected = data.filter { it.selected.get() }.map { it.option.optionId }
+        val selected = data.filter { it.selected }.map { it.option.optionId }
         lifecycleScope.launch {
             val voteRaw = runApiCatching {
                 s1Service.vote(tid, mUser.authenticityToken, selected)

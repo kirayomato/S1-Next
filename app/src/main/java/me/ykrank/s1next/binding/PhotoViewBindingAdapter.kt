@@ -3,7 +3,6 @@ package me.ykrank.s1next.binding
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import androidx.core.content.ContextCompat
-import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.RequestBuilder
@@ -22,7 +21,6 @@ import me.ykrank.s1next.widget.image.image
 
 object PhotoViewBindingAdapter {
     @JvmStatic
-    @BindingAdapter("url", "thumbUrl", "manager")
     fun loadImage(
         photoView: PhotoView,
         url: Uri?,

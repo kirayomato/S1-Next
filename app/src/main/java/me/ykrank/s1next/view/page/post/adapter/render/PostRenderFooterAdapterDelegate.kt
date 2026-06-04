@@ -74,12 +74,12 @@ class PostRenderFooterAdapterDelegate(
                 0f
             }
         )
-        holder.viewModel.thread.set(threadInfo)
-        holder.viewModel.pageNum.set(pageNum)
-        holder.viewModel.post.set(post)
-        holder.viewModel.vote.set(if ("1" == post.number) voteInfo else null)
+        holder.viewModel.thread = threadInfo
+        holder.viewModel.pageNum = pageNum
+        holder.viewModel.post = post
+        holder.viewModel.vote = if ("1" == post.number) voteInfo else null
         binding.tvShowTrade.visibility = if (post.isTrade) View.VISIBLE else View.GONE
-        binding.tvShowVote.visibility = if (holder.viewModel.vote.get() != null) View.VISIBLE else View.GONE
+        binding.tvShowVote.visibility = if (holder.viewModel.vote != null) View.VISIBLE else View.GONE
         binding.tvCastMagic.visibility = if (post.banned) View.VISIBLE else View.GONE
 
         val rates = post.rates

@@ -49,7 +49,7 @@ class FavouriteAdapterDelegate(
         }
 
         fun bind(favourite: Favourite) {
-            model.favourite.set(favourite)
+            model.favourite = favourite
             binding.root.text = favourite.title
         }
     }

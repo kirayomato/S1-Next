@@ -10,13 +10,13 @@ import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.databinding.Observable
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.lifecycleScope
 import com.github.ykrank.androidtools.util.ResourceUtil
 import com.github.ykrank.androidtools.util.ViewUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.ykrank.s1next.R
@@ -59,20 +59,20 @@ class BlackWordDialogFragment : BaseDialogFragment() {
         val binding = DialogBlackWordBinding.inflate(activity.layoutInflater, null, false)
         val model = BlackWordViewModel()
         if (mBlackWord != null) {
-            model.blackword.set(mBlackWord)
+            model.setBlackWord(mBlackWord)
         }
         binding.bind(model)
 
         //Check could add
         if (mBlackWord == null) {
-            model.loading.set(true)
+            model.setLoading(true)
             lifecycleScope.launch {
                 val count = withContext(Dispatchers.IO) {
                     blackWordBiz.count()
                 }
-                model.loading.set(false)
+                model.setLoading(false)
                 if (count >= 10) {
-                    model.message.set(getString(R.string.error_word_out_of_bound))
+                    model.setMessage(getString(R.string.error_word_out_of_bound))
                 }
             }
         }
@@ -82,7 +82,7 @@ class BlackWordDialogFragment : BaseDialogFragment() {
         val btnVerify = binding.btnVerify
 
         //@array/black_list_stat_entry_values
-        val stat = model.blackword.get()?.stat
+        val stat = model.uiState.value.blackWord?.stat
         when (stat) {
             BlackWord.HIDE -> binding.spinner.setSelection(1)
             BlackWord.DEL -> binding.spinner.setSelection(2)
@@ -165,21 +165,19 @@ class BlackWordDialogFragment : BaseDialogFragment() {
     }
 
     private fun DialogBlackWordBinding.bind(model: BlackWordViewModel) {
-        etWord.setText(model.blackword.get()?.word.orEmpty())
-        val callback = object : Observable.OnPropertyChangedCallback() {
-            override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-                refreshFloatStatus(model)
+        etWord.setText(model.uiState.value.blackWord?.word.orEmpty())
+        lifecycleScope.launch {
+            model.uiState.collect {
+                refreshFloatStatus(it)
             }
         }
-        model.loading.addOnPropertyChangedCallback(callback)
-        model.message.addOnPropertyChangedCallback(callback)
-        refreshFloatStatus(model)
+        refreshFloatStatus(model.uiState.value)
     }
 
-    private fun DialogBlackWordBinding.refreshFloatStatus(model: BlackWordViewModel) {
-        floatContainer.isVisible = model.floatVisible.get()
-        loadingProgress.isVisible = model.loading.get()
-        message.text = model.message.get()
+    private fun DialogBlackWordBinding.refreshFloatStatus(uiState: BlackWordViewModel.BlackWordUiState) {
+        floatContainer.isVisible = uiState.floatVisible
+        loadingProgress.isVisible = uiState.loading
+        message.text = uiState.message
     }
 
     companion object {

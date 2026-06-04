@@ -11,7 +11,6 @@ import android.widget.ImageView
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
-import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.RequestBuilder
@@ -29,7 +28,6 @@ import com.github.ykrank.androidtools.widget.glide.downsamplestrategy.GlMaxTextu
 
 object LibImageViewBindingAdapter {
     @JvmStatic
-    @BindingAdapter("imageDrawable")
     fun setImageDrawable(imageView: ImageView, drawable: Drawable?) {
         @SuppressLint("PrivateResource") @ColorInt val rippleColor = ContextCompat.getColor(
             imageView.context, R.color.ripple_material_dark
@@ -43,7 +41,6 @@ object LibImageViewBindingAdapter {
     }
 
     @JvmStatic
-    @BindingAdapter("url", "localUri")
     fun loadImageNetLocal(imageView: ImageView, url: String?, localUri: Uri?) {
         if (localUri == null) {
             loadImage(imageView, url)
@@ -99,17 +96,14 @@ object LibImageViewBindingAdapter {
     }
 
     @JvmStatic
-    @BindingAdapter("url")
     fun loadImage(imageView: ImageView, url: String?) {
         loadImage(imageView, url, null)
     }
 
-    @BindingAdapter("url", "thumbUrl")
     fun loadImage(imageView: ImageView, url: String?, thumbUrl: String?) {
         loadImage(imageView, url, thumbUrl, recycleViewLoadingId, recycleViewErrorId)
     }
 
-    @BindingAdapter("url", "thumbUrl", "loading", "error")
     fun loadImage(
         imageView: ImageView,
         url: String?,

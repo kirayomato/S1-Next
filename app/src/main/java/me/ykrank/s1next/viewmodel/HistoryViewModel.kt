@@ -1,7 +1,6 @@
 package me.ykrank.s1next.viewmodel
 
 import android.view.View
-import androidx.databinding.ObservableField
 import androidx.lifecycle.LifecycleOwner
 import me.ykrank.s1next.data.api.model.Thread
 import me.ykrank.s1next.data.db.biz.ReadProgressBiz
@@ -14,14 +13,14 @@ class HistoryViewModel(
     private val readPreferencesManager: ReadPreferencesManager,
     private val readProgressBiz: ReadProgressBiz
 ) {
-    val history = ObservableField<History>()
+    var history: History? = null
 
     fun onBind(): Function1<View, Any> {
         return { v: View ->
             bindClickStartForView(
                 v, lifecycleOwner, readPreferencesManager, readProgressBiz
             ) {
-                history.get()?.let {
+                history?.let {
                     Thread(it)
                 }
             }

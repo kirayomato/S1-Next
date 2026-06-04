@@ -9,8 +9,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
 import android.widget.Toast
-import androidx.databinding.Observable
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.github.ykrank.androidautodispose.AndroidRxDispose
 import com.github.ykrank.androidlifecycle.event.ActivityEvent
 import com.github.ykrank.androidtools.extension.toast
@@ -44,6 +46,8 @@ import me.ykrank.s1next.view.dialog.LogoutDialogFragment
 import me.ykrank.s1next.view.dialog.ThemeChangeDialogFragment
 import me.ykrank.s1next.view.page.setting.SettingsActivity
 import me.ykrank.s1next.viewmodel.UserViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 /**
  * Implements the concrete UI logic for [DrawerLayoutDelegate].
@@ -64,7 +68,7 @@ class DrawerLayoutDelegateConcrete(
     private lateinit var pmNoticeBinding: ActionViewNoticeCountBinding
     private lateinit var noteNoticeBinding: ActionViewNoticeCountBinding
     private lateinit var binding: NavigationViewHeaderBinding
-    private var userHeaderCallback: Observable.OnPropertyChangedCallback? = null
+    private var userHeaderJob: Job? = null
 
     override fun setupNavDrawerItem(drawerLayout: DrawerLayout, navigationView: NavigationView) {
         setupNavDrawerHeader(drawerLayout, navigationView)
@@ -78,14 +82,14 @@ class DrawerLayoutDelegateConcrete(
     @SuppressLint("RestrictedApi")
     private fun setupNavDrawerHeader(drawerLayout: DrawerLayout, navigationView: NavigationView) {
         binding = NavigationViewHeaderBinding.bind(navigationView.getHeaderView(0))
-        binding.bindUserHeader()
-        val callback = object : Observable.OnPropertyChangedCallback() {
-            override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-                binding.bindUserHeader()
+        binding.bindUserHeader(mUserViewModel.headerUiState.value)
+        userHeaderJob = activity.lifecycleScope.launch {
+            activity.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mUserViewModel.headerUiState.collect {
+                    binding.bindUserHeader(it)
+                }
             }
         }
-        userHeaderCallback = callback
-        mUserViewModel.addOnPropertyChangedCallback(callback)
 
         // let status bar display over drawer if API >= 21
         // let DrawerLayout draw the insets area for the status bar
@@ -150,16 +154,16 @@ class DrawerLayoutDelegateConcrete(
 
     override fun onDestroy() {
         super.onDestroy()
-        userHeaderCallback?.let(mUserViewModel::removeOnPropertyChangedCallback)
-        userHeaderCallback = null
+        userHeaderJob?.cancel()
+        userHeaderJob = null
     }
 
-    private fun NavigationViewHeaderBinding.bindUserHeader() {
+    private fun NavigationViewHeaderBinding.bindUserHeader(uiState: UserViewModel.UserHeaderUiState) {
         ImageViewBindingAdapter.loadUserAvatar(drawerUserAvatar, mUser)
-        drawerUserName.text = if (mUser.isLogged) mUser.name else drawerUserName.context.getString(R.string.action_login)
-        drawerAutoSign.visibility = if (mUser.isLogged) View.VISIBLE else View.GONE
+        drawerUserName.text = if (uiState.isLogged) uiState.name else drawerUserName.context.getString(R.string.action_login)
+        drawerAutoSign.visibility = if (uiState.isLogged) View.VISIBLE else View.GONE
         drawerAutoSign.text = drawerAutoSign.context.getString(
-            if (mUserViewModel.isSigned) R.string.already_checked_in else R.string.action_check_in
+            if (uiState.isSigned) R.string.already_checked_in else R.string.action_check_in
         )
     }
 

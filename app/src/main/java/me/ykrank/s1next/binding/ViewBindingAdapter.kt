@@ -5,7 +5,6 @@ import android.graphics.drawable.BitmapDrawable
 import android.text.TextUtils
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
-import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -28,7 +27,6 @@ import me.ykrank.s1next.widget.image.image
  */
 object ViewBindingAdapter {
     @JvmStatic
-    @BindingAdapter("marginEnd")
     fun setMarginEnd(view: View, margin: Float) {
         val layoutParams = view.layoutParams as MarginLayoutParams
         layoutParams.setMarginEnd(margin.toInt())
@@ -42,7 +40,6 @@ object ViewBindingAdapter {
      * @param onViewBind action when view init
      */
     @JvmStatic
-    @BindingAdapter("bindEvent")
     fun setOnViewBind(view: View, onViewBind: Function1<View, Any>) {
         try {
             onViewBind(view)
@@ -52,7 +49,6 @@ object ViewBindingAdapter {
     }
 
     @JvmStatic
-    @BindingAdapter("downloadPreferencesManager", "blurUid")
     fun setUserBlurBackground(
         view: View, oldManager: DownloadPreferencesManager?, oldBlurUid: String?,
         newManager: DownloadPreferencesManager, newBlurUid: String?
@@ -69,7 +65,6 @@ object ViewBindingAdapter {
         }
     }
 
-    @BindingAdapter("downloadPreferencesManager", "blurUrl")
     fun setBlurBackground(
         view: View, oldManager: DownloadPreferencesManager?, oldBlurUrl: String?,
         newManager: DownloadPreferencesManager, newBlurUrl: String?

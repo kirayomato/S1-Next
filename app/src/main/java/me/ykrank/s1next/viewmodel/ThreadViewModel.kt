@@ -2,7 +2,6 @@ package me.ykrank.s1next.viewmodel
 
 import android.view.View
 import android.view.View.OnLongClickListener
-import androidx.databinding.ObservableField
 import androidx.lifecycle.LifecycleOwner
 import me.ykrank.s1next.data.api.model.Thread
 import me.ykrank.s1next.data.db.biz.ReadProgressBiz
@@ -15,20 +14,21 @@ class ThreadViewModel(
     private val readPreferencesManager: ReadPreferencesManager,
     private val readProgressBiz: ReadProgressBiz
 ) {
-    val thread = ObservableField<Thread>()
+    var thread: Thread? = null
+
     fun onBind(): Function1<View, Any> {
         return { v: View ->
             bindClickStartForView(
                 v, lifecycleOwner, readPreferencesManager, readProgressBiz
             ) {
-                thread.get()
+                thread
             }
         }
     }
 
     fun goToThisThreadLastPage(): OnLongClickListener {
         return OnLongClickListener { v: View ->
-            thread.get()?.apply {
+            thread?.apply {
                 start(v.context, this, true)
             }
             true

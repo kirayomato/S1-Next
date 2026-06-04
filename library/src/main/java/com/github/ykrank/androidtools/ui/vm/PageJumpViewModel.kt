@@ -1,29 +1,19 @@
 package com.github.ykrank.androidtools.ui.vm
 
-import androidx.databinding.BaseObservable
-import androidx.databinding.Bindable
-import androidx.databinding.ObservableInt
 import android.text.Editable
 import android.text.InputFilter
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.widget.SeekBar
-import com.github.ykrank.androidtools.BR
 import com.github.ykrank.androidtools.widget.RangeInputFilter
 
 
-class PageJumpViewModel(seekBarMax: Int, seekBarProgress: Int) : BaseObservable() {
+class PageJumpViewModel(private val seekBarMax: Int, seekBarProgress: Int) {
 
-    private val seekBarMax = ObservableInt()
-    @Bindable
     var seekBarProgress: Int = 0
-        private set(value) {
-            field = value
-            notifyPropertyChanged(BR.seekBarProgressText)
-        }
+        private set
 
     // current page is zero-based
-    @get:Bindable
     val seekBarProgressText: CharSequence
         get() = (seekBarProgress + 1).toString()
 
@@ -43,7 +33,7 @@ class PageJumpViewModel(seekBarMax: Int, seekBarProgress: Int) : BaseObservable(
 
     // SeekBar max is zero-based
     val filters: Array<InputFilter>
-        get() = arrayOf(RangeInputFilter(1, seekBarMax.get() + 1))
+        get() = arrayOf(RangeInputFilter(1, seekBarMax + 1))
 
     val textWatcher: TextWatcher
         get() = object : TextWatcher {
@@ -64,11 +54,10 @@ class PageJumpViewModel(seekBarMax: Int, seekBarProgress: Int) : BaseObservable(
         }
 
     init {
-        this.seekBarMax.set(seekBarMax)
         this.seekBarProgress = seekBarProgress
     }
 
     fun getSeekBarMax(): Int {
-        return seekBarMax.get()
+        return seekBarMax
     }
 }

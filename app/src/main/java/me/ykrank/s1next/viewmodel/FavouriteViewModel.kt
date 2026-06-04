@@ -4,7 +4,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.View.OnLongClickListener
 import androidx.appcompat.widget.PopupMenu
-import androidx.databinding.ObservableField
 import androidx.lifecycle.LifecycleOwner
 import com.github.ykrank.androidtools.widget.EventBus
 import me.ykrank.s1next.R
@@ -20,14 +19,14 @@ class FavouriteViewModel(
     private val readPreferencesManager: ReadPreferencesManager,
     private val readProgressBiz: ReadProgressBiz
 ) {
-    val favourite = ObservableField<Favourite>()
+    var favourite: Favourite? = null
 
     fun onBind(): Function1<View, Any> {
         return { v: View ->
             bindClickStartForView(
                 v, lifecycleOwner, readPreferencesManager, readProgressBiz
             ) {
-                favourite.get()?.let {
+                favourite?.let {
                     val thread = Thread()
                     thread.id = it.id
                     thread.title = it.title
@@ -42,7 +41,9 @@ class FavouriteViewModel(
             val popup = PopupMenu(v.context, v)
             popup.setOnMenuItemClickListener { menuitem: MenuItem ->
                 if (menuitem.itemId == R.id.menu_popup_remove_favourite) {
-                    eventBus.postDefault(FavoriteRemoveEvent(favourite.get()!!.favId))
+                    favourite?.let {
+                        eventBus.postDefault(FavoriteRemoveEvent(it.favId))
+                    }
                     return@setOnMenuItemClickListener true
                 }
                 false

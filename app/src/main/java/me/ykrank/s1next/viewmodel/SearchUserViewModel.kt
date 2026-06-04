@@ -1,19 +1,19 @@
 package me.ykrank.s1next.viewmodel
 
 import android.view.View
-import androidx.databinding.ObservableField
 import me.ykrank.s1next.data.api.model.search.UserSearchResult
 import me.ykrank.s1next.view.activity.UserHomeActivity.Companion.start
 
 class SearchUserViewModel {
-    val search = ObservableField<UserSearchResult>()
+    var search: UserSearchResult? = null
+
     fun onClick(v: View, avatarView: View) {
         //个人主页
-        search.get()?.uid?.apply {
+        search?.uid?.apply {
             start(
                 v.context,
                 this,
-                search.get()?.name,
+                search?.name,
                 avatarView
             )
         }

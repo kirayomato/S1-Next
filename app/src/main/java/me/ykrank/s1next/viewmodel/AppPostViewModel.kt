@@ -3,8 +3,6 @@ package me.ykrank.s1next.viewmodel
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.PopupMenu
-import androidx.databinding.Observable
-import androidx.databinding.ObservableField
 import androidx.lifecycle.LifecycleOwner
 import com.github.ykrank.androidtools.util.ContextUtils
 import com.github.ykrank.androidtools.util.L
@@ -27,27 +25,17 @@ class AppPostViewModel(
     private val user: User
 ) {
 
-    val post = ObservableField<AppPost>()
-    val thread = ObservableField<AppThread>()
-    val floor = ObservableField<CharSequence>()
+    var post: AppPost? = null
+    var thread: AppThread? = null
 
-    private val postFloor: CharSequence?
+    val floor: CharSequence?
         get() {
-            val p = post.get() ?: return null
+            val p = post ?: return null
             return "#${p.position}"
         }
 
-
-    init {
-        post.addOnPropertyChangedCallback(object : Observable.OnPropertyChangedCallback() {
-            override fun onPropertyChanged(observable: Observable, i: Int) {
-                floor.set(postFloor)
-            }
-        })
-    }
-
     fun onAvatarClick(v: View) {
-        post.get()?.let {
+        post?.let {
             //个人主页
             UserHomeActivity.start(
                 v.context,
@@ -61,7 +49,7 @@ class AppPostViewModel(
     fun onLongClick(v: View): Boolean {
         //长按显示抹布菜单
         val popup = PopupMenu(v.context, v)
-        val postData = post.get()
+        val postData = post
         popup.setOnMenuItemClickListener { menuitem: MenuItem ->
             when (menuitem.itemId) {
                 R.id.menu_popup_blacklist -> {
@@ -120,32 +108,32 @@ class AppPostViewModel(
         popup.inflate(R.menu.popup_post_floor)
 
         val editPostMenuItem = popup.menu.findItem(R.id.menu_popup_edit)
-        editPostMenuItem.isVisible = user.isLogged && user.uid == post.get()?.authorId?.toString()
+        editPostMenuItem.isVisible = user.isLogged && user.uid == post?.authorId?.toString()
         popup.show()
     }
 
     fun onReplyClick(v: View) {
-        post.get()?.let {
+        post?.let {
             eventBus.postDefault(QuoteEvent(it.pid.toString(), it.position.toString()))
         }
     }
 
     fun onRateClick(v: View) {
-        post.get()?.let {
+        post?.let {
             eventBus.postDefault(RateEvent(it.tid.toString(), it.pid.toString()))
         }
     }
 
     fun onEditClick(v: View) {
-        val p = post.get()
-        val t = thread.get()
+        val p = post
+        val t = thread
         if (p != null && t != null) {
             eventBus.postDefault(EditAppPostEvent(p, t))
         }
     }
 
     fun onTradeHtmlClick(v: View) {
-        post.get()?.let {
+        post?.let {
             val url = String.format(
                 "%sforum.php?mod=viewthread&do=tradeinfo&tid=%s&pid=%s",
                 Api.BASE_URL,

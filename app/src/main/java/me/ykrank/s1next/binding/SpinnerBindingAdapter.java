@@ -1,7 +1,6 @@
 package me.ykrank.s1next.binding;
 
 import android.content.Context;
-import androidx.databinding.BindingAdapter;
 import android.os.Build;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
@@ -18,7 +17,6 @@ public final class SpinnerBindingAdapter {
     private SpinnerBindingAdapter() {
     }
 
-    @BindingAdapter({"dropDownItemList", "selectedItemPosition"})
     public static void setForumGroupNameList(Spinner spinner, List<CharSequence> dropDownItemList, int selectedItemPosition) {
         spinner.setAdapter(getSpinnerAdapter(spinner, dropDownItemList));
         // invalid position may occurs when user's login status has changed

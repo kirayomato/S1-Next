@@ -1,31 +1,33 @@
 package me.ykrank.s1next.viewmodel
 
-import androidx.databinding.Observable
-import androidx.databinding.ObservableBoolean
-import androidx.databinding.ObservableField
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import me.ykrank.s1next.data.db.dbmodel.BlackWord
 
 class BlackWordViewModel {
-    val blackword: ObservableField<BlackWord> = ObservableField()
+    private val _uiState = MutableStateFlow(BlackWordUiState())
+    val uiState: StateFlow<BlackWordUiState> = _uiState.asStateFlow()
 
-    val loading = ObservableBoolean()
-
-    val message = ObservableField<String>()
-
-    val floatVisible = ObservableBoolean()
-
-    init {
-        val floatVisibleCallback = object : Observable.OnPropertyChangedCallback() {
-            override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-                refreshFloatVisible()
-            }
-        }
-        loading.addOnPropertyChangedCallback(floatVisibleCallback)
-
-        message.addOnPropertyChangedCallback(floatVisibleCallback)
+    fun setBlackWord(blackWord: BlackWord?) {
+        _uiState.update { it.copy(blackWord = blackWord) }
     }
 
-    private fun refreshFloatVisible() {
-        floatVisible.set(loading.get() || !message.get().isNullOrEmpty())
+    fun setLoading(loading: Boolean) {
+        _uiState.update { it.copy(loading = loading) }
+    }
+
+    fun setMessage(message: String?) {
+        _uiState.update { it.copy(message = message) }
+    }
+
+    data class BlackWordUiState(
+        val blackWord: BlackWord? = null,
+        val loading: Boolean = false,
+        val message: String? = null,
+    ) {
+        val floatVisible: Boolean
+            get() = loading || !message.isNullOrEmpty()
     }
 }

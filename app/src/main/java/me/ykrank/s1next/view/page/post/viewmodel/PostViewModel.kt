@@ -3,9 +3,6 @@ package me.ykrank.s1next.view.page.post.viewmodel
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.PopupMenu
-import androidx.databinding.Observable
-import androidx.databinding.ObservableField
-import androidx.databinding.ObservableInt
 import androidx.lifecycle.LifecycleOwner
 import com.github.ykrank.androidtools.util.ContextUtils
 import com.github.ykrank.androidtools.util.L
@@ -35,29 +32,20 @@ class PostViewModel(
     private val user: User
 ) {
 
-    val post = ObservableField<Post>()
-    val authorProfile = ObservableField<Profile>()
-    val thread = ObservableField<Thread>()
-    val vote = ObservableField<Vote>()
-    val floor = ObservableField<CharSequence>()
-    val pageNum = ObservableInt()
+    var post: Post? = null
+    var authorProfile: Profile? = null
+    var thread: Thread? = null
+    var vote: Vote? = null
+    var pageNum: Int = 0
 
-    private val postFloor: CharSequence?
+    val floor: CharSequence?
         get() {
-            val p = post.get() ?: return null
+            val p = post ?: return null
             return "#${p.number}"
         }
 
-    init {
-        post.addOnPropertyChangedCallback(object : Observable.OnPropertyChangedCallback() {
-            override fun onPropertyChanged(observable: Observable, i: Int) {
-                floor.set(postFloor)
-            }
-        })
-    }
-
     fun onAvatarClick(v: View) {
-        post.get()?.let {
+        post?.let {
             val authorId = it.authorId
             val authorName = it.authorName
             if (authorId != null && authorName != null) {
@@ -70,7 +58,7 @@ class PostViewModel(
     fun onAvatarLongClick(v: View): Boolean {
         //长按显示抹布菜单
         val popup = PopupMenu(v.context, v)
-        val postData = post.get()
+        val postData = post
         popup.setOnMenuItemClickListener { menuitem: MenuItem ->
             when (menuitem.itemId) {
                 R.id.menu_popup_blacklist -> {
@@ -107,62 +95,62 @@ class PostViewModel(
 
     //click floor textView, show popup menu
     fun showFloorActionMenu(v: View) {
-        val postData = post.get() ?: return
+        val postData = post ?: return
         PostRenderActions.showPostActionMenu(
             anchor = v,
             fragment = null,
             user = user,
-            thread = thread.get(),
-            pageNum = pageNum.get(),
+            thread = thread,
+            pageNum = pageNum,
             post = postData,
             onReply = { onReplyClick(v) },
             onRate = { onRateClick(v) },
             onEdit = { onEditClick(v) },
             onReport = { onReportClick(v) },
             onShare = {
-                val threadData = thread.get()
+                val threadData = thread
                 eventBus.postDefault(
-                    EnterPostShareSelectionEvent(threadData?.id, pageNum.get(), postData.id)
+                    EnterPostShareSelectionEvent(threadData?.id, pageNum, postData.id)
                 )
             },
         )
     }
 
     fun onReplyClick(v: View) {
-        val postId = post.get()?.id?.toString()
-        val count = post.get()?.number
+        val postId = post?.id?.toString()
+        val count = post?.number
         if (postId != null && count != null) {
             eventBus.postDefault(QuoteEvent(postId, count))
         }
     }
 
     fun onRateClick(v: View) {
-        val tid = thread.get()?.id
-        val pid = post.get()?.id?.toString()
+        val tid = thread?.id
+        val pid = post?.id?.toString()
         if (tid != null && pid != null) {
             eventBus.postDefault(RateEvent(tid, pid))
         }
     }
 
     fun onReportClick(v: View) {
-        val tid = thread.get()?.id
-        val pid = post.get()?.id?.toString()
+        val tid = thread?.id
+        val pid = post?.id?.toString()
         if (tid != null && pid != null) {
-            eventBus.postDefault(ReportEvent(tid, pid, pageNum.get()))
+            eventBus.postDefault(ReportEvent(tid, pid, pageNum))
         }
     }
 
     fun onEditClick(v: View) {
-        val p = post.get()
-        val t = thread.get()
+        val p = post
+        val t = thread
         if (p != null && t != null) {
             eventBus.postDefault(EditPostEvent(p, t))
         }
     }
 
     fun onExtraHtmlClick(v: View) {
-        val p = post.get()
-        val t = thread.get()
+        val p = post
+        val t = thread
         if (p != null && t != null) {
             val url = "${Api.BASE_URL}forum.php?mod=viewthread&do=tradeinfo&tid=${t.id}&pid=${p.id + 1}"
             WebViewActivity.start(v.context, url, true, true)
@@ -170,16 +158,16 @@ class PostViewModel(
     }
 
     fun onVoteClick(v: View) {
-        val tid = thread.get()?.id
-        val vo = vote.get()
+        val tid = thread?.id
+        val vo = vote
         if (tid != null && vo != null) {
             eventBus.postDefault(VotePostEvent(tid, vo))
         }
     }
 
     fun onAppPostClick(v: View) {
-        val p = post.get()
-        val t = thread.get()
+        val p = post
+        val t = thread
         if (p != null && t?.id != null) {
             AppPostListActivity.start(v.context, t.id!!, p.getPage(), p.id.toString())
         }

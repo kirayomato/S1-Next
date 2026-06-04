@@ -56,7 +56,7 @@ class ThreadAdapterDelegate(
         }
 
         fun bind(thread: Thread) {
-            model.thread.set(thread)
+            model.thread = thread
             TextViewBindingAdapter.setThread(
                 binding.tvThread,
                 themeManager,

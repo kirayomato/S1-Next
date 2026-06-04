@@ -2,7 +2,6 @@ package me.ykrank.s1next.viewmodel
 
 import android.view.View
 import android.widget.TextView
-import androidx.databinding.ObservableArrayList
 import com.github.ykrank.androidtools.ui.internal.CoordinatorLayoutAnchorDelegateBaseImpl
 import com.google.android.material.R
 import com.google.android.material.snackbar.Snackbar
@@ -13,7 +12,7 @@ import me.ykrank.s1next.data.db.dbmodel.BlackList
  * Email：Cintory@gmail.com
  */
 class BlackDialogViewModel {
-    val blacklist: ObservableArrayList<BlackList> = ObservableArrayList()
+    val blacklist: MutableList<BlackList> = mutableListOf()
 
     val blackIdList: String
         get() {

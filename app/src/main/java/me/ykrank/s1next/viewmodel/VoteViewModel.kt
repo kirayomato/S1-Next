@@ -1,7 +1,6 @@
 package me.ykrank.s1next.viewmodel
 
 import android.view.View
-import androidx.databinding.ObservableField
 import me.ykrank.s1next.data.api.Api
 import me.ykrank.s1next.data.api.app.model.AppVote
 import me.ykrank.s1next.data.api.model.Vote
@@ -9,7 +8,8 @@ import me.ykrank.s1next.view.activity.WebViewActivity.Companion.start
 
 class VoteViewModel(private val vote: Vote, private val action: VoteVmAction?) {
     @JvmField
-    val appVote = ObservableField<AppVote>()
+    var appVote: AppVote? = null
+
     fun getVoteSummary(appVote: AppVote?): String {
         if (appVote == null) {
             return "加载数据中..."
@@ -38,7 +38,7 @@ class VoteViewModel(private val vote: Vote, private val action: VoteVmAction?) {
     }
 
     val isVoteable: Boolean
-        get() = isVoteable(appVote.get())
+        get() = isVoteable(appVote)
     val isMultiple: Boolean
         get() = vote.isMultiple
 

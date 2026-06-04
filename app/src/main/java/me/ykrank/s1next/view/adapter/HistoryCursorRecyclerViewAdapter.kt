@@ -57,7 +57,7 @@ class HistoryCursorRecyclerViewAdapter(
         }
 
         fun bind(history: History) {
-            model.history.set(history)
+            model.history = history
             TextViewBindingAdapter.setHomeThread(binding.root, history)
         }
     }

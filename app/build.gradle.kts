@@ -52,7 +52,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
     buildFeatures {
-        dataBinding = true
         viewBinding = true
         buildConfig = true
     }
@@ -143,7 +142,6 @@ dependencies {
     implementation(project(":library"))
     implementation(project(":JKeyboardPanelSwitch"))
 
-    kapt(libs.databinding.compiler)
     implementation(libs.paging)
 
     implementation(libs.bugly.nativecrashreport)

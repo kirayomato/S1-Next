@@ -110,7 +110,7 @@ class PostAdapterDelegate(
         if (payloads.any { it is Profile }) {
             val post = items[position] as? Post ?: return
             val profile = post.authorId?.let { authorProfiles[it] }
-            viewHolder.viewModel.authorProfile.set(profile)
+            viewHolder.viewModel.authorProfile = profile
             bindAuthorProfile(viewHolder.binding, profile)
             return
         }
@@ -139,11 +139,11 @@ class PostAdapterDelegate(
             setTextSelectable(binding, selectable)
         }
 
-        holder.viewModel.thread.set(threadInfo)
-        holder.viewModel.pageNum.set(pageNum)
-        holder.viewModel.post.set(post)
-        holder.viewModel.authorProfile.set(post.authorId?.let { authorProfiles[it] })
-        holder.viewModel.vote.set(if ("1" == post.number) voteInfo else null)
+        holder.viewModel.thread = threadInfo
+        holder.viewModel.pageNum = pageNum
+        holder.viewModel.post = post
+        holder.viewModel.authorProfile = post.authorId?.let { authorProfiles[it] }
+        holder.viewModel.vote = if ("1" == post.number) voteInfo else null
         binding.threadTitle.text = threadInfo?.title
         binding.threadTitle.visibility =
             if (pageNum == 1 && post.isFirst && threadInfo?.title != null) View.VISIBLE else View.GONE
@@ -151,10 +151,10 @@ class PostAdapterDelegate(
         binding.authorName.text = post.authorName
         binding.originalPosterTag.visibility = if (post.isOpPost) View.VISIBLE else View.GONE
         LibTextViewBindingAdapter.setRelativeDateTime(binding.tvDatetime, post.dateTime * 1000)
-        binding.tvFloor.text = holder.viewModel.floor.get()
+        binding.tvFloor.text = holder.viewModel.floor
         TextViewBindingAdapter.setReply(binding.tvReply, null, null, fragment.viewLifecycleOwner, post)
         binding.tvShowTrade.visibility = if (post.isTrade) View.VISIBLE else View.GONE
-        binding.tvShowVote.visibility = if (holder.viewModel.vote.get() != null) View.VISIBLE else View.GONE
+        binding.tvShowVote.visibility = if (holder.viewModel.vote != null) View.VISIBLE else View.GONE
         binding.tvCastMagic.visibility = if (post.banned) View.VISIBLE else View.GONE
 
         val rates = post.rates

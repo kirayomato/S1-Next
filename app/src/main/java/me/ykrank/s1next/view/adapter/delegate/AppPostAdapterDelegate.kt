@@ -69,11 +69,11 @@ class AppPostAdapterDelegate(
             setTextSelectable(binding, selectable)
         }
 
-        holder.viewModel.thread.set(threadInfo)
-        holder.viewModel.post.set(post)
+        holder.viewModel.thread = threadInfo
+        holder.viewModel.post = post
         binding.authorName.text = post.author
         LibTextViewBindingAdapter.setRelativeDateTime(binding.tvDatetime, post.dateline * 1000)
-        binding.tvFloor.text = holder.viewModel.floor.get()
+        binding.tvFloor.text = holder.viewModel.floor
         TextViewBindingAdapter.setReply(binding.tvReply, null, null, lifecycleOwner, post)
         ImageViewBindingAdapter.loadAvatar(binding.avatar, null, post.authorId.toString())
         binding.tvShowTrade.visibility = if (post.trade) View.VISIBLE else View.GONE

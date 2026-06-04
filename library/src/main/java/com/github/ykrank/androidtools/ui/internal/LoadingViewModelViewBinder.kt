@@ -1,6 +1,5 @@
 package com.github.ykrank.androidtools.ui.internal
 
-import androidx.databinding.Observable
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.github.ykrank.androidtools.R
@@ -12,11 +11,7 @@ class LoadingViewModelViewBinder(
     private val recyclerView: RecyclerView,
 ) {
     private var loadingViewModel: LoadingViewModel? = null
-    private val loadingCallback = object : Observable.OnPropertyChangedCallback() {
-        override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-            bindCurrentState()
-        }
-    }
+    private val loadingCallback = { bindCurrentState() }
 
     init {
         swipeRefreshLayout.setColorSchemeColors(
@@ -31,12 +26,12 @@ class LoadingViewModelViewBinder(
         }
         clear()
         this.loadingViewModel = loadingViewModel
-        loadingViewModel.addOnPropertyChangedCallback(loadingCallback)
+        loadingViewModel.addOnLoadingChangedListener(loadingCallback)
         bindCurrentState()
     }
 
     fun clear() {
-        loadingViewModel?.removeOnPropertyChangedCallback(loadingCallback)
+        loadingViewModel?.removeOnLoadingChangedListener(loadingCallback)
         loadingViewModel = null
     }
 

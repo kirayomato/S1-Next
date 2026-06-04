@@ -4,7 +4,6 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.text.TextUtils
 import android.widget.ImageView
-import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.RequestManager
@@ -32,7 +31,6 @@ import me.ykrank.s1next.widget.image.avatarUid
 
 object ImageViewBindingAdapter {
     @JvmStatic
-    @BindingAdapter("emoticonRequestManager", "emoticon")
     fun loadEmoticon(
         imageView: ImageView,
         requestManager: RequestManager,
@@ -81,7 +79,6 @@ object ImageViewBindingAdapter {
      * otherwise show user's avatar.
      */
     @JvmStatic
-    @BindingAdapter("user")
     fun loadUserAvatar(bezelImageView: ImageView, user: User) {
         //in device before 4.4, destroyed activity will cause glide error
         if (ContextUtils.isActivityDestroyedForGlide(bezelImageView.context)) {
@@ -136,13 +133,11 @@ object ImageViewBindingAdapter {
     }
 
     @JvmStatic
-    @BindingAdapter("uid")
     fun loadAvatar(bezelImageView: ImageView, oldUid: Int, newUid: Int) {
         loadAvatar(bezelImageView, oldUid.toString(), newUid.toString())
     }
 
     @JvmStatic
-    @BindingAdapter("uid")
     fun loadAvatar(bezelImageView: ImageView, oldUid: String?, newUid: String?) {
         if (TextUtils.equals(oldUid, newUid)) {
             return
@@ -167,7 +162,6 @@ object ImageViewBindingAdapter {
     }
 
     @JvmStatic
-    @BindingAdapter("downloadPreferencesManager", "uid", "thumb")
     fun loadAvatar(
         bezelImageView: ImageView,
         oldManager: DownloadPreferencesManager?,

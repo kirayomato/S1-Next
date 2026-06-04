@@ -67,7 +67,7 @@ class PostRenderHeaderAdapterDelegate(
         }
         if (payloads.any { it is Profile }) {
             val profile = t.post.authorId?.let { authorProfiles[it] }
-            holder.viewModel.authorProfile.set(profile)
+            holder.viewModel.authorProfile = profile
             bindAuthorProfile(holder.binding, profile)
             return
         }
@@ -85,10 +85,10 @@ class PostRenderHeaderAdapterDelegate(
                 0f
             }
         )
-        viewModel.thread.set(threadInfo)
-        viewModel.pageNum.set(pageNum)
-        viewModel.post.set(post)
-        viewModel.authorProfile.set(post.authorId?.let { authorProfiles[it] })
+        viewModel.thread = threadInfo
+        viewModel.pageNum = pageNum
+        viewModel.post = post
+        viewModel.authorProfile = post.authorId?.let { authorProfiles[it] }
         binding.threadTitle.text = threadInfo?.title
         binding.threadTitle.visibility =
             if (pageNum == 1 && post.isFirst && threadInfo?.title != null) View.VISIBLE else View.GONE
@@ -96,7 +96,7 @@ class PostRenderHeaderAdapterDelegate(
         binding.authorName.text = post.authorName
         binding.originalPosterTag.visibility = if (post.isOpPost) View.VISIBLE else View.GONE
         LibTextViewBindingAdapter.setRelativeDateTime(binding.tvDatetime, post.dateTime * 1000)
-        binding.tvFloor.text = viewModel.floor.get()
+        binding.tvFloor.text = viewModel.floor
     }
 
     private fun bindAuthorProfile(binding: ItemPostRenderHeaderBinding, profile: Profile?) {

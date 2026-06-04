@@ -47,7 +47,7 @@ class VoteOptionsAdapter(
         }
 
         fun bind(model: ItemVoteViewModel) {
-            val isSelected = model.selected.get()
+            val isSelected = model.selected
             val option = model.option
             binding.radio.isChecked = isSelected
             binding.radio.visibility = if (model.isSingleVotable) View.VISIBLE else View.GONE

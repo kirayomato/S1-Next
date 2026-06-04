@@ -17,7 +17,6 @@ import android.text.style.TextAppearanceSpan
 import android.view.TouchDelegate
 import android.view.View
 import android.widget.TextView
-import androidx.databinding.BindingAdapter
 import androidx.core.graphics.ColorUtils
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -49,7 +48,6 @@ object TextViewBindingAdapter {
     private const val defaultTextColor = 0
 
     @JvmStatic
-    @BindingAdapter("increaseClickingArea")
     fun increaseClickingArea(textView: TextView, size: Float) {
         // fork from http://stackoverflow.com/a/1343796
         val parent = textView.parent as View
@@ -69,7 +67,6 @@ object TextViewBindingAdapter {
     }
 
     @JvmStatic
-    @BindingAdapter("textPath")
     fun loadTextAsset(textView: TextView, textPath: String?) {
         try {
             if (textPath.isNullOrEmpty()) {
@@ -85,7 +82,6 @@ object TextViewBindingAdapter {
     }
 
     @JvmStatic
-    @BindingAdapter("forum", "gentleAccentColor")
     fun setForum(textView: TextView, forum: Forum, gentleAccentColor: Int) {
         textView.text = forum.name
         // add today's posts count to each forum
@@ -97,7 +93,6 @@ object TextViewBindingAdapter {
     }
 
     @JvmStatic
-    @BindingAdapter("themeManager", "forumId", "thread", "user")
     fun setThread(
         textView: TextView, themeManager: ThemeManager, forumId: String, thread: Thread, user: User
     ) {
@@ -169,7 +164,6 @@ object TextViewBindingAdapter {
     }
 
     @JvmStatic
-    @BindingAdapter("lifecycleOwner", "reply")
     fun setReply(
         textView: TextView,
         oLifecycleOwner: LifecycleOwner?,
@@ -227,7 +221,6 @@ object TextViewBindingAdapter {
     }
 
     @JvmStatic
-    @BindingAdapter("lifecycleOwner", "reply")
     fun setReply(
         textView: TextView,
         oLifecycleOwner: LifecycleOwner?,
@@ -262,7 +255,6 @@ object TextViewBindingAdapter {
 
     @JvmStatic
     @SuppressLint("WrongConstant")
-    @BindingAdapter("lifecycleOwner", "imgHtml")
     fun setHtmlWithImage(
         textView: TextView,
         oLifecycleOwner: LifecycleOwner?,
@@ -293,7 +285,6 @@ object TextViewBindingAdapter {
     }
 
     @JvmStatic
-    @BindingAdapter("lifecycleOwner", "html")
     fun setHtml(textView: TextView, lifecycleOwner: LifecycleOwner, html: String?) {
         if (TextUtils.isEmpty(html)) {
             textView.text = null
@@ -309,7 +300,6 @@ object TextViewBindingAdapter {
 
     @JvmStatic
     @Suppress("deprecation")
-    @BindingAdapter("pmAuthorNameDesc", "user")
     fun setPmAuthorNameDesc(textView: TextView, pmGroup: PmGroup, user: User) {
         val context = textView.context
         if (TextUtils.equals(pmGroup.lastAuthorid, user.uid)) {
@@ -322,7 +312,6 @@ object TextViewBindingAdapter {
     }
 
     @JvmStatic
-    @BindingAdapter("homeThread")
     fun setHomeThread(textView: TextView, thread: HomeThread?) {
         if (thread == null) {
             textView.text = null
@@ -333,7 +322,6 @@ object TextViewBindingAdapter {
     }
 
     @JvmStatic
-    @BindingAdapter("history")
     fun setHomeThread(textView: TextView, history: History?) {
         if (history == null) {
             textView.text = null
@@ -343,7 +331,6 @@ object TextViewBindingAdapter {
     }
 
     @JvmStatic
-    @BindingAdapter("goose")
     fun setGoose(textView: TextView, goose: String?) {
         val normalizedGoose = normalizeGoose(goose)
         val gooseValue = normalizedGoose?.let { GOOSE_VALUE_REGEX.find(it)?.value?.toIntOrNull() }
@@ -384,7 +371,6 @@ object TextViewBindingAdapter {
     }
 
     @JvmStatic
-    @BindingAdapter("registrationAge")
     fun setRegistrationAge(textView: TextView, regDate: Long?) {
         val bucket = registrationAgeBucket(regDate)
         if (bucket == null) {
