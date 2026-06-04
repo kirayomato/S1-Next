@@ -15,7 +15,6 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.Nullable;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.view.TintableBackgroundView;
-import androidx.core.view.ViewCompat;
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 import androidx.cardview.widget.CardView;
 
@@ -27,7 +26,8 @@ import com.github.ykrank.androidtools.R;
 import com.github.ykrank.androidtools.extension.ContextExtensionKt;
 import com.github.ykrank.androidtools.util.ColorDrawableUtils;
 import com.github.ykrank.androidtools.util.ResourceUtil;
-import com.google.common.base.Objects;
+
+import java.util.Objects;
 
 
 public final class LibViewBindingAdapter {
@@ -47,7 +47,7 @@ public final class LibViewBindingAdapter {
     private static final ColorDrawable UNABLE_DRAWABLE = new ColorDrawable(UNABLE);
 
     public static void setCardBackgroundTint(CardView view, @ColorInt Integer oldTintColor, @ColorInt Integer tintColor) {
-        if (Objects.equal(oldTintColor, tintColor)) {
+        if (Objects.equals(oldTintColor, tintColor)) {
             return;
         }
         if (tintColor == null || tintColor == Integer.MIN_VALUE) {
@@ -103,7 +103,7 @@ public final class LibViewBindingAdapter {
                     tintDrawable = ColorDrawableUtils.getRippleDrawable(originalDrawable, ripple);
                 }
 
-                ViewCompat.setBackground(view, tintDrawable);
+                view.setBackground(tintDrawable);
             }
             return;
         }
@@ -120,14 +120,14 @@ public final class LibViewBindingAdapter {
             } else {
                 tintDrawable = ColorDrawableUtils.getRippleDrawable(tintDrawable, ripple);
             }
-            ViewCompat.setBackground(view, tintDrawable);
+            view.setBackground(tintDrawable);
         } else {
             tintDrawable = DrawableCompat.wrap(originalDrawable.mutate());
             if (tintMode != null) {
                 DrawableCompat.setTintMode(tintDrawable, tintMode);
             }
             DrawableCompat.setTintList(tintDrawable, colorStateList);
-            ViewCompat.setBackground(view, tintDrawable);
+            view.setBackground(tintDrawable);
             if (tintDrawable == originalDrawable) {
                 view.invalidate();
             }
@@ -152,7 +152,7 @@ public final class LibViewBindingAdapter {
         } else {
             tintDrawable = ColorDrawableUtils.getRippleDrawable(tintDrawable, ripple);
         }
-        ViewCompat.setBackground(view, tintDrawable);
+        view.setBackground(tintDrawable);
     }
 
     public static void increaseClickingArea(View view, float size) {
@@ -180,9 +180,9 @@ public final class LibViewBindingAdapter {
         }
         if (backProgress) {
             CircularProgressDrawable drawable = new CircularProgressDrawable(view.getContext());
-            ViewCompat.setBackground(view, drawable);
+            view.setBackground(drawable);
         } else {
-            ViewCompat.setBackground(view, normalDrawable);
+            view.setBackground(normalDrawable);
         }
     }
 }

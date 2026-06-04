@@ -29,6 +29,7 @@ public class ColorDrawableUtils {
      * @return
      */
     @NonNull
+    @SuppressWarnings("unchecked")
     public static <T extends Drawable> T getNewDrawable(@NonNull T drawable) {
         //noinspection ConstantConditions
         return (T) drawable.getConstantState().newDrawable();
@@ -36,6 +37,7 @@ public class ColorDrawableUtils {
 
     @SuppressLint("RestrictedApi")
     @NonNull
+    @SuppressWarnings("unchecked")
     public static <T extends Drawable> T safeMutableDrawable(@NonNull T drawable) {
         T tDrawable;
         if (DrawableUtils.canSafelyMutateDrawable(drawable)) {
