@@ -73,7 +73,7 @@ object LibImageViewBindingAdapter {
                 .listener(object : RequestListener<Drawable?> {
                     override fun onLoadFailed(
                         e: GlideException?,
-                        model: Any?,
+                        model: Any,
                         target: Target<Drawable?>,
                         isFirstResource: Boolean
                     ): Boolean {
@@ -81,9 +81,9 @@ object LibImageViewBindingAdapter {
                     }
 
                     override fun onResourceReady(
-                        resource: Drawable,
+                        resource: Drawable?,
                         model: Any,
-                        target: Target<Drawable?>?,
+                        target: Target<Drawable?>,
                         dataSource: DataSource,
                         isFirstResource: Boolean
                     ): Boolean {
@@ -149,7 +149,7 @@ object LibImageViewBindingAdapter {
             .listener(object : RequestListener<Drawable?> {
                 override fun onLoadFailed(
                     e: GlideException?,
-                    model: Any?,
+                    model: Any,
                     target: Target<Drawable?>,
                     isFirstResource: Boolean
                 ): Boolean {
@@ -161,7 +161,7 @@ object LibImageViewBindingAdapter {
                 }
 
                 override fun onResourceReady(
-                    resource: Drawable,
+                    resource: Drawable?,
                     model: Any,
                     target: Target<Drawable?>,
                     dataSource: DataSource,

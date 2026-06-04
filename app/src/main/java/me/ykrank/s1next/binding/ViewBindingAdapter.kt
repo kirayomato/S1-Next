@@ -93,7 +93,7 @@ object ViewBindingAdapter {
                 .listener(object : RequestListener<Bitmap> {
                     override fun onLoadFailed(
                         e: GlideException?,
-                        model: Any?,
+                        model: Any,
                         target: Target<Bitmap>,
                         isFirstResource: Boolean
                     ): Boolean {
