@@ -56,7 +56,7 @@ class Note(
         isNew = aNew > 0
     }
 
-    override fun isSameItem(other: Any): Boolean {
+    override fun isSameItem(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 

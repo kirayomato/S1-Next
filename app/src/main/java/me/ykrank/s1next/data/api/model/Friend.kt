@@ -18,9 +18,9 @@ class Friend : DiffSameItem, StableIdModel {
     override val stableId: Long
         get() = uid?.toLongOrNull() ?: 0
 
-    override fun isSameItem(other: Any): Boolean {
+    override fun isSameItem(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other.javaClass) return false
+        if (javaClass != other?.javaClass) return false
 
         other as Friend
 

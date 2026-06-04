@@ -34,9 +34,9 @@ class HomeThread : DiffSameItem, HomeReplyWebWrapper.HomeReplyItem, StableIdMode
                 '}'.toString()
     }
 
-    override fun isSameItem(other: Any): Boolean {
+    override fun isSameItem(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other.javaClass) return false
+        if (javaClass != other?.javaClass) return false
 
         other as HomeThread
 
