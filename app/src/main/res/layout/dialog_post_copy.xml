@@ -15,8 +15,12 @@
     <me.ykrank.s1next.widget.MaxHeightScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/item_padding_small"
+        android:background="@drawable/bg_post_copy_content"
         android:fillViewport="true"
-        android:maxHeight="360dp">
+        android:maxHeight="360dp"
+        android:padding="@dimen/item_padding_small"
+        android:scrollbarStyle="insideInset">
 
         <TextView
             android:id="@+id/post_copy_content"
