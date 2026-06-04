@@ -1,6 +1,7 @@
 package me.ykrank.s1next.data.api.model
 
 import android.os.Parcelable
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -17,11 +18,12 @@ import me.ykrank.s1next.util.HtmlUtils
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Parcelize
-class Thread(
+class Thread @JsonCreator constructor(
     @JsonProperty("tid")
     var id: String? = null,
 
-    @JsonIgnore
+    @param:JsonProperty("subject")
+    @field:JsonIgnore
     private var parcelTitle: String? = null,
 
     /**
@@ -59,6 +61,10 @@ class Thread(
     @JsonProperty("_lastReplyCount")
     var lastReplyCount: Int = 0,
 ) : Parcelable, Cloneable, DiffSameItem, StableIdModel {
+
+    init {
+        parcelTitle = HtmlUtils.unescapeHtml(parcelTitle)
+    }
 
     @get:JsonProperty("subject")
     @set:JsonProperty("subject")
