@@ -40,7 +40,7 @@ S1-Next 是 STAGE1 论坛的 Android 客户端。项目采用 Gradle 多模块�
 
 - `settings.gradle.kts`：模块引入和仓库策略。当前通过 `RepositoriesMode.FAIL_ON_PROJECT_REPOS` 禁止模块级仓库配置。
 - `gradle/libs.versions.toml`：集中管理依赖和插件版本。
-- `app/build.gradle.kts`：应用变体、签名配置、Room schema 的 KSP 参数、Dagger/PaperParcel kapt、Room/Glide KSP。
+- `app/build.gradle.kts`：应用变体、签名配置、Room schema 的 KSP 参数、Hilt/Room/Glide KSP。
 - `library/build.gradle.kts`：可复用 Android 工具库依赖，其中多数通过 `api` 暴露。
 - `app/src/main/AndroidManifest.xml`：应用入口、权限、Activity、深链、Bugly/TalkingData 元数据。
 - `app/src/main/java/me/ykrank/s1next/App.kt`：应用启动入口，初始化 pre-app component、主 app component、全局数据、Bugly 和生命周期回调。

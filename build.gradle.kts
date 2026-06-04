@@ -3,7 +3,6 @@ import org.gradle.api.tasks.compile.JavaCompile
 plugins {
     alias(libs.plugins.androidApplication) apply false
     alias(libs.plugins.androidLibrary) apply false
-    alias(libs.plugins.androidLegacyKapt) apply false
     alias(libs.plugins.kotlinParcelize) apply false
     alias(libs.plugins.androidKsp) apply false
     alias(libs.plugins.gradleVersionsPlugin) apply false

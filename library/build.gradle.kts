@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.androidLibrary)
-    alias(libs.plugins.androidLegacyKapt)
     alias(libs.plugins.kotlinParcelize)
 }
 

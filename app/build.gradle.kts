@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.gradleVersionsPlugin)
     alias(libs.plugins.androidKsp)
     alias(libs.plugins.hiltAndroid)
-    alias(libs.plugins.androidLegacyKapt)
     alias(libs.plugins.kotlinParcelize)
 }
 
@@ -131,10 +130,6 @@ kotlin {
     }
 }
 
-kapt {
-    correctErrorTypes = true
-}
-
 val alphaImplementation by configurations
 dependencies {
     implementation(fileTree("libs") { include("*.jar", "*.aar") })
@@ -147,7 +142,7 @@ dependencies {
     implementation(libs.bugly.nativecrashreport)
 
     implementation(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
+    ksp(libs.hilt.android.compiler)
 
     implementation(libs.androidx.transition)
 
