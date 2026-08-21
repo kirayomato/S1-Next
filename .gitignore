@@ -54,3 +54,4 @@ freeline_project_description.json
 /library/libs/play/._*.jar
 /.kotlin
 /app/normal
+/.workbuddy

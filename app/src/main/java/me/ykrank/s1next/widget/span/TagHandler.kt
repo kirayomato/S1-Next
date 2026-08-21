@@ -51,9 +51,8 @@ class TagHandler(textView: TextView) : Html.TagHandler {
             if (url == null) {
                 url = ""
             }
-            // replace \uFFFC with ImageSpan's source
-            // in order to support url copyFrom when selected
-            output.replace(end - len, end, url)
+            // 用换行占位符替换 \uFFFC，保证复制帖子内容时不会把图片 URL 一并复制出来
+            output.replace(end - len, end, " ")
             output.removeSpan(imageSpan)
             // make this ImageSpan clickable
             output.setSpan(
