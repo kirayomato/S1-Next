@@ -70,7 +70,7 @@ S1-Next 是 Stage1st（S1 论坛，https://bbs.saraba1st.com）的第三方 Andr
 
 ## 易踩坑提醒
 
-- **帖子可复制**：`menu_post_selectable` 开关开启后 `tvReply.setTextIsSelectable(true)` 支持选中复制。复制输出来自 TextView 文本流，**不要把图片 URL 塞进文本流**（`TagHandler` 中图片占位符应为 `\n`，否则复制会带出图片链接）
+- **帖子可复制**：`menu_post_selectable` 开关开启后 `tvReply.setTextIsSelectable(true)` 支持选中复制。复制输出来自 TextView 文本流，**不要把图片 URL 塞进文本流**（`TagHandler` 中图片占位符应保留 `\uFFFC`，不要替换成空格或换行——空格会因行尾空白悬挂导致满宽图片的 ReplacementSpan 不被绘制，换行是行终止符同样不绘制，二者都会让帖子图片显示为透明）
 - 设置 `setTextIsSelectable` 后需重置 `movementMethod`（见 `PostAdapterDelegate.setTextSelectable`），否则链接点击失效
 - `FixedSpannableFactory` 已解决 TextView span 工厂问题，勿随意改动
 - Material 版本锁定 1.12.0，升级到 1.13.0 会出问题（toml 中有 noinspection 注释）

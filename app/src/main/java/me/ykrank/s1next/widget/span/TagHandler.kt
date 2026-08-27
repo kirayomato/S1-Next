@@ -51,8 +51,12 @@ class TagHandler(textView: TextView) : Html.TagHandler {
             if (url == null) {
                 url = ""
             }
-            // 用换行占位符替换 \uFFFC，保证复制帖子内容时不会把图片 URL 一并复制出来
-            output.replace(end - len, end, " ")
+            // 保留 \uFFFC（OBJECT REPLACEMENT CHARACTER）作为图片占位符，不要替换成普通空格：
+            // \uFFFC 是 Html.fromHtml 插入图片的标准占位符，TextLine 会正常测量并绘制其上的
+            // ReplacementSpan。若替换成空格（" "），当图片满宽独占一行时，该空格会成为行尾可悬挂
+            // 的空白字符，TextLine 不会对其上的 ReplacementSpan 调用 draw()，导致帖子内图片
+            // "位置被占但显示为透明"。\uFFFC 既非空白也非换行、且不是图片 URL，复制帖子内容时
+            // 不会带出图片链接。
             output.removeSpan(imageSpan)
             // make this ImageSpan clickable
             output.setSpan(

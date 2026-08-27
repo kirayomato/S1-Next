@@ -67,7 +67,8 @@ internal class ImageGetterViewTarget constructor(
 
     override fun onLoadFailed(errorDrawable: Drawable?) {
         L.l("onLoadFailed:" + mDrawable.url)
-        if (checkTextViewValidate()) {
+        // checkTextViewValidate() 返回 true 表示当前 target 仍然有效，应显示错误兜底图，不能 return
+        if (!checkTextViewValidate()) {
             return
         }
         if (errorDrawable != null) {
@@ -81,7 +82,12 @@ internal class ImageGetterViewTarget constructor(
                 it.stop()
             }
         }
-        mDrawable.drawable = null
+        // 恢复占位图，避免 UrlDrawable 内容为空导致帖子内图片显示为透明
+        if (placeholder != null) {
+            setDrawable(placeholder, 0)
+        } else {
+            mDrawable.drawable = null
+        }
     }
 
     override fun onStart() {
@@ -129,6 +135,9 @@ internal class ImageGetterViewTarget constructor(
         }
 
         val rect = Rect(0, 0, width, height)
+        if (width <= 0 || height <= 0) {
+            return
+        }
         mDrawable.drawable = resource
         mDrawable.bounds = rect
 

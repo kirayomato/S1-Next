@@ -304,7 +304,11 @@ object TextViewBindingAdapter {
                     HtmlCompat.fromHtml(html, glideImageGetter, TagHandler(textView))
                         .replaceQuoteSpans(textView.context)
                 }
-                textView.text = span
+                // 必须用 SPANNABLE buffer：默认 NORMAL 会把 Spannable 转成不可变的 SpannedString，
+                // span 仍可绘制但不再是 Spannable，导致 ImageGetterViewTarget.refreshLayout 的
+                // `text is Spannable` 判断失败，图片加载完成后的重排永远空转（帖子内图片显示为透明）。
+                // FixedSpannableFactory 对 Spannable 原样返回、避免拷贝，正是为配合 SPANNABLE buffer 设计。
+                textView.setText(span, TextView.BufferType.SPANNABLE)
             }
         }
     }
